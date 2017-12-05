@@ -10,28 +10,20 @@ namespace Lykke.Service.LiteCoin.API.Controllers
 {
     public class AddressController:Controller
     {
-        private readonly Network _network;
 
-        public AddressController(Network network)
-        {
-            _network = network;
-        }
-
-        [HttpGet("api/address/validator")]
-        public AddressValidatorResponce Validate(AddressValidatorRequest request)
+        [HttpPost("api/address/validator")]
+        public AddressValidatorResponce Validate([FromBody]AddressValidatorRequest request)
         {
             try
             {
-
-                BitcoinAddress.Create(request.Address, _network);
+                BitcoinAddress.Create(request.Address);
                 return new AddressValidatorResponce
                 {
                     IsValid = true
                 };
             }
-            catch 
+            catch(Exception)
             {
-
                 return new AddressValidatorResponce
                 {
                     IsValid = false
