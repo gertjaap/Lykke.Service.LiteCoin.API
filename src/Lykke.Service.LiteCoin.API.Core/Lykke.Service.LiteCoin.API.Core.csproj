@@ -9,12 +9,14 @@
 
   <ItemGroup>
     <PackageReference Include="Lykke.Common" Version="3.0.2" />
+    <PackageReference Include="Lykke.SettingsReader" Version="1.0.43" />
     <PackageReference Include="NBitcoin" Version="4.0.0.48" />
     <PackageReference Include="NBitcoin.Litecoin" Version="1.0.0.7" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Domain\" />
+    <Folder Include="SignFacadeService\" />
     <Folder Include="Services\" />
   </ItemGroup>
 

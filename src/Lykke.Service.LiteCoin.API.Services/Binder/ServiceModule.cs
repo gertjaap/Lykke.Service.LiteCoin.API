@@ -1,6 +1,8 @@
 ﻿using Autofac;
 using Common.Log;
+using Lykke.Service.LiteCoin.API.Core.Fee;
 using Lykke.Service.LiteCoin.API.Core.Settings.ServiceSettings;
+using Lykke.Service.LiteCoin.API.Services.Fee;
 using Lykke.SettingsReader;
 using NBitcoin;
 
@@ -19,18 +21,19 @@ namespace Lykke.Service.LiteCoin.API.Services.Binder
         protected override void Load(ContainerBuilder builder)
         {
             RegisterNetwork(builder);
-            //builder.RegisterInstance(new InsightsApiSettings
-            //{
-            //    Url = _settings.CurrentValue.InsightAPIUrl
-            //});
+            RegisterFeeServices(builder);
         }
 
         private void RegisterNetwork(ContainerBuilder builder)
         {
             NBitcoin.Litecoin.Networks.Register();
             builder.RegisterInstance(Network.GetNetwork(_settings.CurrentValue.Network)).As<Network>();
+        }
 
-
+        private void RegisterFeeServices(ContainerBuilder builder)
+        {
+            builder.RegisterInstance(new FeeRateFacade(_settings.CurrentValue.FeePerByte)).As<IFeeRateFacade>();
+            builder.RegisterType<FeeFacade>().As<IFeeFacade>();
         }
     }
 }
