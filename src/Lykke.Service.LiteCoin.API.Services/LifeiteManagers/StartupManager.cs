@@ -2,7 +2,7 @@
 using Common.Log;
 using Lykke.Service.LiteCoin.API.Core.Services;
 
-namespace Lykke.Service.LiteCoin.API.Services
+namespace Lykke.Service.LiteCoin.API.Services.LifeiteManagers
 {
     // NOTE: Sometimes, startup process which is expressed explicitly is not just better, 
     // but the only way. If this is your case, use this class to manage startup.

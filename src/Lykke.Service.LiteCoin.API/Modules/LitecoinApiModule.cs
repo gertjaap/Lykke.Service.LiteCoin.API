@@ -4,6 +4,7 @@ using Common.Log;
 using Lykke.Service.LiteCoin.API.Core.Services;
 using Lykke.Service.LiteCoin.API.Core.Settings.ServiceSettings;
 using Lykke.Service.LiteCoin.API.Services;
+using Lykke.Service.LiteCoin.API.Services.LifeiteManagers;
 using Lykke.SettingsReader;
 using Microsoft.Extensions.DependencyInjection;
 

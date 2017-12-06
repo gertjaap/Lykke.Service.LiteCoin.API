@@ -1,7 +1,9 @@
 ﻿using Autofac;
 using Common.Log;
+using Lykke.Service.LiteCoin.API.Core.Address;
 using Lykke.Service.LiteCoin.API.Core.Fee;
 using Lykke.Service.LiteCoin.API.Core.Settings.ServiceSettings;
+using Lykke.Service.LiteCoin.API.Services.Address;
 using Lykke.Service.LiteCoin.API.Services.Fee;
 using Lykke.SettingsReader;
 using NBitcoin;
@@ -22,6 +24,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Binder
         {
             RegisterNetwork(builder);
             RegisterFeeServices(builder);
+            RegisterAddressValidatorServices(builder);
         }
 
         private void RegisterNetwork(ContainerBuilder builder)
@@ -34,6 +37,11 @@ namespace Lykke.Service.LiteCoin.API.Services.Binder
         {
             builder.RegisterInstance(new FeeRateFacade(_settings.CurrentValue.FeePerByte)).As<IFeeRateFacade>();
             builder.RegisterType<FeeFacade>().As<IFeeFacade>();
+        }
+
+        private void RegisterAddressValidatorServices(ContainerBuilder builder)
+        {
+            builder.RegisterType<AddressValidator>().As<IAddressValidator>();
         }
     }
 }

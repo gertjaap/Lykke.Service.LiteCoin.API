@@ -2,7 +2,7 @@
 using Common.Log;
 using Lykke.Service.LiteCoin.API.Core.Services;
 
-namespace Lykke.Service.LiteCoin.API.Services
+namespace Lykke.Service.LiteCoin.API.Services.LifeiteManagers
 {
     // NOTE: Sometimes, shutdown process should be expressed explicitly. 
     // If this is your case, use this class to manage shutdown.
