@@ -1,9 +1,9 @@
 ﻿using System.Threading.Tasks;
 
-namespace Lykke.Service.LiteCoin.API.Core.TxTracker
+namespace Lykke.Service.LiteCoin.API.Core.BlockChainTracker
 {
 
-    public interface ILastProcessedBlockRepository
+    public interface ILastTrackedBlockRepository
     {
         Task<int> GetLastProcessedBlockHeight();
         Task SetLastProcessedBlockHeight(int height);

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using AzureStorage;
-using Lykke.Service.LiteCoin.API.Core.TxTracker;
+using Lykke.Service.LiteCoin.API.Core.BlockChainTracker;
 using Microsoft.WindowsAzure.Storage.Table;
 
 namespace Lykke.Service.LiteCoin.API.AzureRepositories.TxTracker
@@ -32,11 +32,11 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.TxTracker
         }
     }
 
-    public class LastProcessedBlockRepository: ILastProcessedBlockRepository
+    public class LastTrackedBlockRepository: ILastTrackedBlockRepository
     {
         private readonly INoSQLTableStorage<LastProcessedBlockEntity> _storage;
 
-        public LastProcessedBlockRepository(INoSQLTableStorage<LastProcessedBlockEntity> storage)
+        public LastTrackedBlockRepository(INoSQLTableStorage<LastProcessedBlockEntity> storage)
         {
             _storage = storage;
         }

@@ -2,6 +2,7 @@
 using AzureStorage.Tables;
 using Common.Log;
 using Lykke.Service.LiteCoin.API.AzureRepositories.TxTracker;
+using Lykke.Service.LiteCoin.API.AzureRepositories.WebHook;
 using Lykke.Service.LiteCoin.API.Core.Settings.ServiceSettings;
 using Lykke.SettingsReader;
 
@@ -24,9 +25,13 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Binder
 
         private void RegisterRepo(ContainerBuilder builder)
         {
-            builder.RegisterInstance(new LastProcessedBlockRepository(
+            builder.RegisterInstance(new LastTrackedBlockRepository(
                 AzureTableStorage<LastProcessedBlockEntity>.Create(_settings.Nested(p => p.Db.DataConnString),
                     "LastProcessedBlocks", _log)));
+
+            builder.RegisterInstance(new FailedWebHookEventRepository(
+                AzureTableStorage<FailedWebHookEventEntity>.Create(_settings.Nested(p => p.Db.DataConnString),
+                    "FailedWebHookEvents", _log)));
         }
     }
 }
