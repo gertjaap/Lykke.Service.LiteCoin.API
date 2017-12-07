@@ -40,7 +40,7 @@ namespace Lykke.Service.LiteCoin.API.Services.WebHook
         }
     }
 
-    internal class WebHookSender: IWebHookSender
+    public class WebHookSender: IWebHookSender
     {
         private readonly WebHookSettings _settings;
         private readonly ILog _log;
