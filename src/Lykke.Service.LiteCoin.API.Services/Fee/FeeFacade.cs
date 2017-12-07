@@ -7,7 +7,7 @@ using NBitcoin;
 
 namespace Lykke.Service.LiteCoin.API.Services.Fee
 {
-    public class FeeFacade:IFeeFacade
+    internal class FeeFacade:IFeeFacade
     {
         private readonly IFeeRateFacade _feeRateFacade;
 

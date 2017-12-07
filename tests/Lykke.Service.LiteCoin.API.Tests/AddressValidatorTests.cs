@@ -31,7 +31,7 @@ namespace Lykke.Service.LiteCoin.API.Tests
         }
 
         [Fact]
-        public void DetectInvalidAddress()
+        public void CanDetectInvalidAddress()
         {
             PrepareNetworks.EnsureLiteCoinPrepared();
 

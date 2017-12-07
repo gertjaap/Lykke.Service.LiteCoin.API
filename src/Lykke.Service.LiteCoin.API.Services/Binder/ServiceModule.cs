@@ -1,9 +1,12 @@
 ﻿using Autofac;
 using Common.Log;
 using Lykke.Service.LiteCoin.API.Core.Address;
+using Lykke.Service.LiteCoin.API.Core.BlockChainReaders;
 using Lykke.Service.LiteCoin.API.Core.Fee;
 using Lykke.Service.LiteCoin.API.Core.Settings.ServiceSettings;
 using Lykke.Service.LiteCoin.API.Services.Address;
+using Lykke.Service.LiteCoin.API.Services.BlockChainReaders;
+using Lykke.Service.LiteCoin.API.Services.BlockChainReaders.InsightApi;
 using Lykke.Service.LiteCoin.API.Services.Fee;
 using Lykke.SettingsReader;
 using NBitcoin;
@@ -25,6 +28,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Binder
             RegisterNetwork(builder);
             RegisterFeeServices(builder);
             RegisterAddressValidatorServices(builder);
+            RegisterInsightApiBlockChainReaders(builder);
         }
 
         private void RegisterNetwork(ContainerBuilder builder)
@@ -42,6 +46,16 @@ namespace Lykke.Service.LiteCoin.API.Services.Binder
         private void RegisterAddressValidatorServices(ContainerBuilder builder)
         {
             builder.RegisterType<AddressValidator>().As<IAddressValidator>();
+        }
+
+        private void RegisterInsightApiBlockChainReaders(ContainerBuilder builder)
+        {
+            builder.RegisterInstance(new InsightApiSettings
+            {
+                Url = _settings.CurrentValue.InsightAPIUrl
+            }).SingleInstance();
+
+            builder.RegisterType<InsightApiBlockChainReader>().As<IBlockChainReader>();
         }
     }
 }

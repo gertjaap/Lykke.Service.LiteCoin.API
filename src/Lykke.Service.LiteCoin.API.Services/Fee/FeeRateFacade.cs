@@ -3,7 +3,7 @@ using Lykke.Service.LiteCoin.API.Core.Fee;
 
 namespace Lykke.Service.LiteCoin.API.Services.Fee
 {
-    public class FeeRateFacade:IFeeRateFacade
+    internal class FeeRateFacade:IFeeRateFacade
     {
         private readonly int _feePerByte;
 

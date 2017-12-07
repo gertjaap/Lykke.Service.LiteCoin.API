@@ -1,5 +1,7 @@
 ﻿using Autofac;
+using AzureStorage.Tables;
 using Common.Log;
+using Lykke.Service.LiteCoin.API.AzureRepositories.TxTracker;
 using Lykke.Service.LiteCoin.API.Core.Settings.ServiceSettings;
 using Lykke.SettingsReader;
 
@@ -17,6 +19,14 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Binder
 
         protected override void Load(ContainerBuilder builder)
         {
+            RegisterRepo(builder);
+        }
+
+        private void RegisterRepo(ContainerBuilder builder)
+        {
+            builder.RegisterInstance(new LastProcessedBlockRepository(
+                AzureTableStorage<LastProcessedBlockEntity>.Create(_settings.Nested(p => p.Db.DataConnString),
+                    "LastProcessedBlocks", _log)));
         }
     }
 }
