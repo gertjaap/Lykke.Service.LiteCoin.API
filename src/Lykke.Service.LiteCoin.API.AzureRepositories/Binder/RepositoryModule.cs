@@ -1,6 +1,8 @@
 ﻿using Autofac;
 using AzureStorage.Tables;
 using Common.Log;
+using Lykke.Service.LiteCoin.API.AzureRepositories.Operations;
+using Lykke.Service.LiteCoin.API.AzureRepositories.TrackedCashoutTransaction;
 using Lykke.Service.LiteCoin.API.AzureRepositories.TxTracker;
 using Lykke.Service.LiteCoin.API.AzureRepositories.WebHook;
 using Lykke.Service.LiteCoin.API.Core.Settings.ServiceSettings;
@@ -21,6 +23,7 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Binder
         protected override void Load(ContainerBuilder builder)
         {
             RegisterRepo(builder);
+            RegisterQueue(builder);
         }
 
         private void RegisterRepo(ContainerBuilder builder)
@@ -32,6 +35,19 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Binder
             builder.RegisterInstance(new FailedWebHookEventRepository(
                 AzureTableStorage<FailedWebHookEventEntity>.Create(_settings.Nested(p => p.Db.DataConnString),
                     "FailedWebHookEvents", _log)));
+            
+            builder.RegisterInstance(new TrackedCashoutTransactionRepository(
+                AzureTableStorage<TrackedCashoutTransactionEntity>.Create(_settings.Nested(p => p.Db.DataConnString),
+                    "TrackedCashoutTransactions", _log)));
+
+            builder.RegisterInstance(new CashOutOperationRepository(
+                AzureTableStorage<CashOutOperationTableEntity>.Create(_settings.Nested(p => p.Db.DataConnString),
+                    "CashOutOperations", _log)));
+        }
+
+        private void RegisterQueue(ContainerBuilder builder)
+        {
+
         }
     }
 }

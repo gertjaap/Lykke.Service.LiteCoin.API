@@ -4,16 +4,16 @@ using System.Threading.Tasks;
 using Flurl;
 using Flurl.Http;
 using Lykke.Service.LiteCoin.API.Core.BlockChainReaders;
-using Lykke.Service.LiteCoin.API.Services.BlockChainReaders.InsightApi.Contracts;
+using Lykke.Service.LiteCoin.API.Services.BlockChainProviders.InsightApi.Contracts;
 using NBitcoin;
 
-namespace Lykke.Service.LiteCoin.API.Services.BlockChainReaders.InsightApi
+namespace Lykke.Service.LiteCoin.API.Services.BlockChainProviders.InsightApi
 {
-    internal class InsightApiBlockChainReader: IBlockChainReader
+    internal class InsightApiBlockChainProvider: IBlockChainProvider
     {
         private readonly InsightApiSettings _insightApiSettings;
 
-        public InsightApiBlockChainReader(InsightApiSettings insightApiSettings)
+        public InsightApiBlockChainProvider(InsightApiSettings insightApiSettings)
         {
             _insightApiSettings = insightApiSettings;
         }
@@ -44,6 +44,16 @@ namespace Lykke.Service.LiteCoin.API.Services.BlockChainReaders.InsightApi
                 .GetJsonAsync<RawTxResponce>();
 
             return Transaction.Parse(resp.RawTx);
+        }
+
+        public async Task BroadCastTransaction(Transaction tx)
+        {
+            await _insightApiSettings.Url.AppendPathSegment("insight-lite-api/tx/send")
+                .PostJsonAsync(new BroadcastTransactionRequestContract
+                {
+                    RawTx = tx.ToHex()
+                })
+                .ReceiveJson<BroadcastTransactionResponceContract>();
         }
     }
 }

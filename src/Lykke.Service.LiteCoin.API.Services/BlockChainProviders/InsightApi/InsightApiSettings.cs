@@ -1,4 +1,4 @@
-﻿namespace Lykke.Service.LiteCoin.API.Services.BlockChainReaders.InsightApi
+﻿namespace Lykke.Service.LiteCoin.API.Services.BlockChainProviders.InsightApi
 {
     internal class InsightApiSettings
     {

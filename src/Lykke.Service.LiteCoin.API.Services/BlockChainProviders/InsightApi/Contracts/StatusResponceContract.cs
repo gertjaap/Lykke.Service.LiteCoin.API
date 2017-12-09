@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
-namespace Lykke.Service.LiteCoin.API.Services.BlockChainReaders.InsightApi.Contracts
+namespace Lykke.Service.LiteCoin.API.Services.BlockChainProviders.InsightApi.Contracts
 {
     internal class StatusResponceContract
     {

@@ -5,11 +5,14 @@ using Lykke.Service.LiteCoin.API.Core.Address;
 using Lykke.Service.LiteCoin.API.Core.BlockChainReaders;
 using Lykke.Service.LiteCoin.API.Core.Fee;
 using Lykke.Service.LiteCoin.API.Core.Settings.ServiceSettings;
+using Lykke.Service.LiteCoin.API.Core.SourceWallets;
+using Lykke.Service.LiteCoin.API.Core.TrackedEntites;
 using Lykke.Service.LiteCoin.API.Core.WebHook;
 using Lykke.Service.LiteCoin.API.Services.Address;
-using Lykke.Service.LiteCoin.API.Services.BlockChainReaders;
-using Lykke.Service.LiteCoin.API.Services.BlockChainReaders.InsightApi;
+using Lykke.Service.LiteCoin.API.Services.BlockChainProviders.InsightApi;
 using Lykke.Service.LiteCoin.API.Services.Fee;
+using Lykke.Service.LiteCoin.API.Services.SignFacade;
+using Lykke.Service.LiteCoin.API.Services.SourceWallet;
 using Lykke.Service.LiteCoin.API.Services.WebHook;
 using Lykke.SettingsReader;
 using NBitcoin;
@@ -33,6 +36,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Binder
             RegisterAddressValidatorServices(builder);
             RegisterInsightApiBlockChainReaders(builder);
             RegisterWebHookServices(builder);
+            RegisterSignFacadeServices(builder);
         }
 
         private void RegisterNetwork(ContainerBuilder builder)
@@ -59,7 +63,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Binder
                 Url = _settings.CurrentValue.InsightAPIUrl
             }).SingleInstance();
 
-            builder.RegisterType<InsightApiBlockChainReader>().As<IBlockChainReader>();
+            builder.RegisterType<InsightApiBlockChainProvider>().As<IBlockChainProvider>();
         }
 
         private void RegisterWebHookServices(ContainerBuilder builder)
@@ -70,6 +74,21 @@ namespace Lykke.Service.LiteCoin.API.Services.Binder
             }).SingleInstance();
 
             builder.RegisterType<WebHookSender>().As<IWebHookSender>();
+        }
+
+        private void RegisterSignFacadeServices(ContainerBuilder builder)
+        {
+            builder.RegisterInstance(new SourceWalletsSettings
+            {
+                SourceWalletIds = _settings.CurrentValue.SourceWallets
+            }).SingleInstance();
+
+            builder.RegisterInstance(new SignFacadeSettings
+            {
+                Url = _settings.CurrentValue.SignFacadeUrl
+            }).SingleInstance();
+            
+            builder.RegisterType<SignFacadeService>().As<ISignFacadeService>().SingleInstance();
         }
     }
 }
