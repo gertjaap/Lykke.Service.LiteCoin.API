@@ -78,7 +78,7 @@ namespace Lykke.Service.LiteCoin.API.Tests
             var repo = new Mock<IFailedWebHookEventRepository>();
 
 
-            repo.Setup(x => x.InsertAsync(It.Is<object>(p=>p!=null), It.Is<string>(p=>p==operationId)))
+            repo.Setup(x => x.Insert(It.Is<object>(p=>p!=null), It.Is<string>(p=>p==operationId)))
                 .Returns(Task.CompletedTask)
                 .Verifiable();
             return repo;

@@ -12,10 +12,10 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.WebHook
     internal class FailedWebHookEventEntity : TableEntity
     {
         public string Data { get; set; }
-        public static string GeneratePartitionKey(DateTime dateTime)
+        public static string GeneratePartitionKey()
         {
 
-            return dateTime.ToString("yyyy-MM-dd");
+            return "FWH";
         }
 
         public static string GenerateRowKey(string operationId)
@@ -27,7 +27,7 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.WebHook
         {
             return new FailedWebHookEventEntity
             {
-                PartitionKey = GeneratePartitionKey(DateTime.UtcNow),
+                PartitionKey = GeneratePartitionKey(),
                 Data = eventData.ToJson(),
                 RowKey = GenerateRowKey(operationId)
             };
@@ -43,9 +43,15 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.WebHook
             _storage = storage;
         }
 
-        public Task InsertAsync(object eventData, string operationId)
+        public Task Insert(object eventData, string operationId)
         {
             return _storage.InsertOrReplaceAsync(FailedWebHookEventEntity.Create(eventData, operationId));
+        }
+
+        public Task DeleteIfExist(string operationId)
+        {
+            return _storage.DeleteIfExistAsync(FailedWebHookEventEntity.GeneratePartitionKey(),
+                FailedWebHookEventEntity.GenerateRowKey(operationId));
         }
     }
 }

@@ -4,6 +4,7 @@ namespace Lykke.Service.LiteCoin.API.Core.WebHook
 {
     public interface IFailedWebHookEventRepository
     {
-        Task InsertAsync(object  eventData, string operationId);
+        Task Insert(object  eventData, string operationId);
+        Task DeleteIfExist(string operationId);
     }
 }

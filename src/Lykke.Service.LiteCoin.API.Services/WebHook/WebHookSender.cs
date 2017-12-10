@@ -120,6 +120,9 @@ namespace Lykke.Service.LiteCoin.API.Services.WebHook
             {
                 await _settings.Url.PostJsonAsync(requestData);
 
+                //remove previous attempt data 
+                await _failedWebHookEventRepository.DeleteIfExist(operationId);
+
                 return WebHookEvent.Ok(requestData);
             }
             catch (Exception e)
@@ -127,7 +130,7 @@ namespace Lykke.Service.LiteCoin.API.Services.WebHook
                 await _log.WriteErrorAsync(nameof(WebHookSender), nameof(ProcessWebHook), operationId, e);
                 
                 var failedEvent =  WebHookEvent.Fail(requestData, e.ToString());
-                await _failedWebHookEventRepository.InsertAsync(failedEvent, operationId);
+                await _failedWebHookEventRepository.Insert(failedEvent, operationId);
                 
                 return failedEvent;
             }

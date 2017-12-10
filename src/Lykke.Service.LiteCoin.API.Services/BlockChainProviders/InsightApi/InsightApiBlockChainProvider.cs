@@ -55,5 +55,13 @@ namespace Lykke.Service.LiteCoin.API.Services.BlockChainProviders.InsightApi
                 })
                 .ReceiveJson<BroadcastTransactionResponceContract>();
         }
+
+        public async Task<int> GetTxConfirmationCount(string txHash)
+        {
+            return (await _insightApiSettings.Url
+                .AppendPathSegment($"insight-lite-api/tx/{txHash}")
+                .GetJsonAsync<TxResponceContract>())
+                .Confirmation;
+        }
     }
 }

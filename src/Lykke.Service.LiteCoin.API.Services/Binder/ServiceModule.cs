@@ -47,8 +47,12 @@ namespace Lykke.Service.LiteCoin.API.Services.Binder
 
         private void RegisterFeeServices(ContainerBuilder builder)
         {
-            builder.RegisterInstance(new FeeRateFacade(_settings.CurrentValue.FeePerByte)).As<IFeeRateFacade>();
-            builder.RegisterType<FeeFacade>().As<IFeeFacade>();
+            builder.RegisterInstance(new FeeRateFacade(_settings.CurrentValue.FeePerByte, _settings.CurrentValue.FeeRateMultiplayer)).As<IFeeRateFacade>();
+            builder.Register(x =>
+            {
+                var resolver = x.Resolve<IComponentContext>();
+                return new FeeFacade(resolver.Resolve<IFeeRateFacade>(), _settings.CurrentValue.MinFeeValue, _settings.CurrentValue.MaxFeeValue);
+            });
         }
 
         private void RegisterAddressValidatorServices(ContainerBuilder builder)

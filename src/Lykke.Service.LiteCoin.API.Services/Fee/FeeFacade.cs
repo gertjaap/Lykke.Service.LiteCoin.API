@@ -7,13 +7,17 @@ using NBitcoin;
 
 namespace Lykke.Service.LiteCoin.API.Services.Fee
 {
-    internal class FeeFacade:IFeeFacade
+    public class FeeFacade:IFeeFacade
     {
         private readonly IFeeRateFacade _feeRateFacade;
+        private readonly decimal _minFeeValue;
+        private readonly decimal _maxFeeValue;
 
-        public FeeFacade(IFeeRateFacade feeRateFacade)
+        public FeeFacade(IFeeRateFacade feeRateFacade, decimal minFeeValue, decimal maxFeeValue)
         {
             _feeRateFacade = feeRateFacade;
+            _minFeeValue = minFeeValue;
+            _maxFeeValue = maxFeeValue;
         }
 
         public async Task<Money> CalcFeeForTransaction(Transaction tx)
@@ -32,12 +36,24 @@ namespace Lykke.Service.LiteCoin.API.Services.Fee
         {
             var feePerByte = await _feeRateFacade.GetFeePerByte();
 
-            return new FeeRate(new Money(feePerByte * 1000, MoneyUnit.Satoshi));
+            return new FeeRate(new Money(feePerByte * 1024, MoneyUnit.Satoshi));
         }
 
-        public async Task<Money> CalcFee(int size)
+        private async Task<Money> CalcFee(int size)
         {
-            return (await GetFeeRate()).GetFee(size);
+            var  fromFeeRate = (await GetFeeRate()).GetFee(size);
+
+            if (fromFeeRate.Satoshi > _maxFeeValue)
+            {
+                return new Money(_maxFeeValue, MoneyUnit.Satoshi);
+            }
+
+            if (fromFeeRate.Satoshi < _minFeeValue)
+            {
+                return new Money(_minFeeValue, MoneyUnit.Satoshi);
+            }
+
+            return fromFeeRate;
         }
     }
 }
