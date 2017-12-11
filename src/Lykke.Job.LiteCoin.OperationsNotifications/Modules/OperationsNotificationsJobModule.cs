@@ -11,19 +11,17 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Lykke.Job.LiteCoin.OperationsNotifications.Modules
 {
-    public class JobModule : Module
+    public class OperationsNotificationsJobModule : Module
     {
-        private readonly LiteCoinAPISettings _settings;
-        private readonly IReloadingManager<DbSettings> _dbSettingsManager;
+        private readonly IReloadingManager<LiteCoinAPISettings> _settings;
         private readonly ILog _log;
         // NOTE: you can remove it if you don't need to use IServiceCollection extensions to register service specific dependencies
         private readonly IServiceCollection _services;
 
-        public JobModule(LiteCoinAPISettings settings, IReloadingManager<DbSettings> dbSettingsManager, ILog log)
+        public OperationsNotificationsJobModule(IReloadingManager<LiteCoinAPISettings> settings, ILog log)
         {
             _settings = settings;
             _log = log;
-            _dbSettingsManager = dbSettingsManager;
 
             _services = new ServiceCollection();
         }
@@ -62,7 +60,7 @@ namespace Lykke.Job.LiteCoin.OperationsNotifications.Modules
             builder.AddTriggers(
                 pool =>
                 {
-                    pool.AddDefaultConnection(_settings.Db.DataConnString);
+                    pool.AddDefaultConnection(_settings.CurrentValue.Db.DataConnString);
                 });
         }
 

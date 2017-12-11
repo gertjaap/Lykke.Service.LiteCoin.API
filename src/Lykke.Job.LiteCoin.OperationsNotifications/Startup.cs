@@ -12,8 +12,10 @@ using Lykke.Logs;
 using Lykke.SettingsReader;
 using Lykke.SlackNotification.AzureQueue;
 using Lykke.JobTriggers.Triggers;
+using Lykke.Service.LiteCoin.API.AzureRepositories.Binder;
 using Lykke.Service.LiteCoin.API.Core.Services;
 using Lykke.Service.LiteCoin.API.Core.Settings;
+using Lykke.Service.LiteCoin.API.Services.Binder;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -62,8 +64,18 @@ namespace Lykke.Job.LiteCoin.OperationsNotifications
 
                 Log = CreateLogWithSlack(services, appSettings);
 
-                builder.RegisterModule(new JobModule(appSettings.CurrentValue.LiteCoinAPI, appSettings.Nested(x => x.LiteCoinAPI.Db), Log));
+                var modules = new Module[]
+                {
+                    new OperationsNotificationsJobModule (appSettings.Nested(x => x.LiteCoinAPI), Log),
+                    new RepositoryModule(appSettings.Nested(x=>x.LiteCoinAPI), Log),
+                    new ServiceModule(appSettings.Nested(x=>x.LiteCoinAPI), Log)
+                };
 
+                foreach (var module in modules)
+                {
+                    builder.RegisterModule(module);
+                }
+                
                 builder.Populate(services);
 
                 ApplicationContainer = builder.Build();

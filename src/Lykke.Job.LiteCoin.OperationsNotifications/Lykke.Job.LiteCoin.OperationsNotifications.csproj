@@ -48,4 +48,8 @@
     <ProjectReference Include="..\Lykke.Service.LiteCoin.API.Core\Lykke.Service.LiteCoin.API.Core.csproj" />
     <ProjectReference Include="..\Lykke.Service.LiteCoin.API.Services\Lykke.Service.LiteCoin.API.Services.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="IncomingMessages\" />
+  </ItemGroup>
 </Project>

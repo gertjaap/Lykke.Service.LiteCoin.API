@@ -6,7 +6,7 @@ using Lykke.Service.LiteCoin.API.AzureRepositories.Queue;
 using Lykke.Service.LiteCoin.API.AzureRepositories.TrackedCashoutTransaction;
 using Lykke.Service.LiteCoin.API.AzureRepositories.TxTracker;
 using Lykke.Service.LiteCoin.API.AzureRepositories.WebHook;
-using Lykke.Service.LiteCoin.API.Core.QueueFactory;
+using Lykke.Service.LiteCoin.API.Core.Queue;
 using Lykke.Service.LiteCoin.API.Core.Settings.ServiceSettings;
 using Lykke.SettingsReader;
 
@@ -51,6 +51,8 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Binder
         {
             builder.RegisterInstance(new AzureQueueFactory(_settings.Nested(p => p.Db.DataConnString)))
                 .As<IQueueFactory>();
+
+            builder.RegisterGeneric(typeof(QueueRouter<>)).As(typeof(IQueueRouter<>)).InstancePerDependency();
         }
     }
 }

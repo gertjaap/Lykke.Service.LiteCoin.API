@@ -26,7 +26,10 @@ namespace Lykke.Service.LiteCoin.API.Tests
 
             var whSender = new WebHookSender(webHookSettings, new EmptyLog(), failedEventRepo.Object);
 
-            await whSender.ProcessCashIn(opId, DateTime.UtcNow, "walletId", "assetId", 123, "asda");
+            
+            await Assert.ThrowsAnyAsync<Exception>(async () =>
+                await whSender.ProcessCashIn(opId, DateTime.UtcNow, "walletId", "assetId", 123, "asda"));
+           
 
             failedEventRepo.Verify();
 
@@ -45,8 +48,10 @@ namespace Lykke.Service.LiteCoin.API.Tests
 
             var whSender = new WebHookSender(webHookSettings, new EmptyLog(), failedEventRepo.Object);
 
-            await whSender.ProcessCashOutCompleted(opId, DateTime.UtcNow, "walletId", "assetId", 123, "asda", "txhash");
+            await Assert.ThrowsAnyAsync<Exception>(async () =>
+                await whSender.ProcessCashOutCompleted(opId, DateTime.UtcNow, "walletId", "assetId", 123, "asda", "txhash"));
 
+            
             failedEventRepo.Verify();
 
         }
@@ -63,8 +68,9 @@ namespace Lykke.Service.LiteCoin.API.Tests
 
             var whSender = new WebHookSender(webHookSettings, new EmptyLog(), failedEventRepo.Object);
 
-            await whSender.ProcessCashOutStarted(opId, DateTime.UtcNow, "walletId", "assetId", 123, "asda", "txhash");
-
+            await Assert.ThrowsAnyAsync<Exception>(async () =>
+                await whSender.ProcessCashOutStarted(opId, DateTime.UtcNow, "walletId", "assetId", 123, "asda", "txhash"));
+            
             failedEventRepo.Verify();
 
         }

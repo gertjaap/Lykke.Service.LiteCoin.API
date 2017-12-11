@@ -1,5 +1,5 @@
 ﻿using AzureStorage.Queue;
-using Lykke.Service.LiteCoin.API.Core.QueueFactory;
+using Lykke.Service.LiteCoin.API.Core.Queue;
 using Lykke.SettingsReader;
 
 namespace Lykke.Service.LiteCoin.API.AzureRepositories.Queue

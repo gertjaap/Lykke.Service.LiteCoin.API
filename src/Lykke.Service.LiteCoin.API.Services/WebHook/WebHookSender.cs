@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Common;
 using Common.Log;
 using Flurl.Http;
 using Lykke.Service.LiteCoin.API.Core.WebHook;
@@ -14,7 +15,7 @@ namespace Lykke.Service.LiteCoin.API.Services.WebHook
         CashOutCompleted
     }
 
-    internal class WebHookEvent: IWebHookEvent
+    internal class WebHookEvent
     {
         public bool IsSuccess { get; set; }
         public string Error { get; set; }
@@ -53,7 +54,7 @@ namespace Lykke.Service.LiteCoin.API.Services.WebHook
             _failedWebHookEventRepository = failedWebHookEventRepository;
         }
 
-        public async Task<IWebHookEvent> ProcessCashIn(string operationId, DateTime dateTime, string walletId, string assetId, decimal amount,
+        public async Task ProcessCashIn(string operationId, DateTime dateTime, string walletId, string assetId, decimal amount,
             string sourceAddress)
         {
             var requestData = new WebHookCashInRequestContract
@@ -71,10 +72,10 @@ namespace Lykke.Service.LiteCoin.API.Services.WebHook
 
             };
 
-            return await ProcessWebHook(requestData, operationId);
+            await ProcessWebHook(requestData, operationId);
         }
 
-        public async Task<IWebHookEvent> ProcessCashOutStarted(string operationId, DateTime dateTime, string walletId, string assetId, decimal amount,
+        public async Task ProcessCashOutStarted(string operationId, DateTime dateTime, string walletId, string assetId, decimal amount,
             string destAddress, string txHash)
         {
             var requestData = new WebHookCashOutStartedRequestContract
@@ -91,10 +92,10 @@ namespace Lykke.Service.LiteCoin.API.Services.WebHook
                 WalletId = walletId
             };
 
-            return await ProcessWebHook(requestData, operationId);
+            await ProcessWebHook(requestData, operationId);
         }
 
-        public async Task<IWebHookEvent> ProcessCashOutCompleted(string operationId, DateTime dateTime, string walletId, string assetId, decimal amount,
+        public async Task ProcessCashOutCompleted(string operationId, DateTime dateTime, string walletId, string assetId, decimal amount,
             string destAddress, string txHash)
         {
             var requestData = new WebHookCashOutStartedRequestContract
@@ -111,19 +112,23 @@ namespace Lykke.Service.LiteCoin.API.Services.WebHook
                 WalletId = walletId
             };
 
-            return await ProcessWebHook(requestData, operationId);
+            await ProcessWebHook(requestData, operationId);
         }
 
-        private async Task<IWebHookEvent> ProcessWebHook(object requestData, string operationId)
+        private async Task ProcessWebHook(object requestData, string operationId)
         {
             try
             {
+                await _log.WriteInfoAsync(nameof(WebHookSender), nameof(ProcessWebHook), requestData.ToJson(),
+                    $"Processing web hook for {operationId} started");
+
                 await _settings.Url.PostJsonAsync(requestData);
+
+                await _log.WriteInfoAsync(nameof(WebHookSender), nameof(ProcessWebHook), requestData.ToJson(),
+                    $"Processing web hook for {operationId} done");
 
                 //remove previous attempt data 
                 await _failedWebHookEventRepository.DeleteIfExist(operationId);
-
-                return WebHookEvent.Ok(requestData);
             }
             catch (Exception e)
             {
@@ -131,8 +136,8 @@ namespace Lykke.Service.LiteCoin.API.Services.WebHook
                 
                 var failedEvent =  WebHookEvent.Fail(requestData, e.ToString());
                 await _failedWebHookEventRepository.Insert(failedEvent, operationId);
-                
-                return failedEvent;
+
+                throw;
             }
         }
     }
