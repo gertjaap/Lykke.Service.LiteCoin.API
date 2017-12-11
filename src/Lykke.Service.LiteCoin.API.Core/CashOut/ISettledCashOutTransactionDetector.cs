@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 namespace Lykke.Service.LiteCoin.API.Core.CashOut
 {
 
-    public interface ICashOutSettlementDetector
+    public interface ISettledCashOutTransactionDetector
     {
         Task<IEnumerable<ICashoutTransaction>> CheckSettlement(IEnumerable<ICashoutTransaction> trackedTransactions, int minConfirmationsCount);
     }

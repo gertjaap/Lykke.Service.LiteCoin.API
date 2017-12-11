@@ -7,6 +7,7 @@ using Lykke.Service.LiteCoin.API.Core.CashOut;
 using Lykke.Service.LiteCoin.API.Core.Queue;
 using Lykke.Service.LiteCoin.API.Core.Queue.Contexts;
 using Lykke.Service.LiteCoin.API.Services.CashOut;
+using Lykke.Service.LiteCoin.API.Services.Operations.CashOut;
 using Moq;
 using Xunit;
 
@@ -71,9 +72,9 @@ namespace Lykke.Service.LiteCoin.API.Tests
             return result;
         }
 
-        private Mock<ITrackedCashoutTransactionRepository> GetTrackedCashoutTxRepo(ICashOutOperation op)
+        private Mock<IPendingCashoutTransactionRepository> GetTrackedCashoutTxRepo(ICashOutOperation op)
         {
-            var result = new Mock<ITrackedCashoutTransactionRepository>();
+            var result = new Mock<IPendingCashoutTransactionRepository>();
             
             result.Setup(p=>p.Remove(It.Is<string>(x=>x==op.TxHash)))
                 .Returns(Task.CompletedTask)

@@ -1,32 +1,30 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Common;
 using Common.Log;
 using Lykke.Service.LiteCoin.API.Core.CashOut;
 using Lykke.Service.LiteCoin.API.Core.Queue;
 using Lykke.Service.LiteCoin.API.Core.Queue.Contexts;
-using Lykke.Service.LiteCoin.API.Services.WebHook.Contracts;
 
-namespace Lykke.Service.LiteCoin.API.Services.CashOut
+namespace Lykke.Service.LiteCoin.API.Services.Operations.CashOut
 {
     public class SettledCashoutTransactionHandler: ISettledCashoutTransactionHandler
     {
         private readonly ICashOutOperationRepository _cashOutOperationRepository;
         private readonly ILog _log;
         private readonly IQueueRouter<CashOutCompletedNotificationContext> _notificationsQueue;
-        private readonly ITrackedCashoutTransactionRepository _trackedCashoutTransactionRepository;
+        private readonly IPendingCashoutTransactionRepository _pendingCashoutTransactionRepository;
         
         public SettledCashoutTransactionHandler(ICashOutOperationRepository cashOutOperationRepository, 
             ILog log, 
             IQueueRouter<CashOutCompletedNotificationContext> notificationsQueue,
-            ITrackedCashoutTransactionRepository trackedCashoutTransactionRepository)
+            IPendingCashoutTransactionRepository pendingCashoutTransactionRepository)
         {
             _cashOutOperationRepository = cashOutOperationRepository;
             _log = log;
             _notificationsQueue = notificationsQueue;
-            _trackedCashoutTransactionRepository = trackedCashoutTransactionRepository;
+            _pendingCashoutTransactionRepository = pendingCashoutTransactionRepository;
         }
 
         public async Task HandleSettledTransactions(IEnumerable<ICashoutTransaction> settledTransactions)
@@ -63,7 +61,7 @@ namespace Lykke.Service.LiteCoin.API.Services.CashOut
 
             await _cashOutOperationRepository.SetCompleted(tx.OperationId, DateTime.UtcNow);
 
-            await _trackedCashoutTransactionRepository.Remove(tx.TxHash);
+            await _pendingCashoutTransactionRepository.Remove(tx.TxHash);
         }
     }
 }

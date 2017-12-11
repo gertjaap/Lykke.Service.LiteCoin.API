@@ -35,11 +35,11 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.CashOut
             };
         }
     }
-    public class TrackedCashoutTransactionRepository: ITrackedCashoutTransactionRepository
+    public class PendingCashoutTransactionRepository: IPendingCashoutTransactionRepository
     {
         private readonly INoSQLTableStorage<TrackedCashoutTransactionEntity> _storage;
 
-        public TrackedCashoutTransactionRepository(INoSQLTableStorage<TrackedCashoutTransactionEntity> storage)
+        public PendingCashoutTransactionRepository(INoSQLTableStorage<TrackedCashoutTransactionEntity> storage)
         {
             _storage = storage;
         }

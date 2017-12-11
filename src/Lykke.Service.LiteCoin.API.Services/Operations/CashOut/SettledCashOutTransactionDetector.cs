@@ -9,11 +9,11 @@ using Lykke.Service.LiteCoin.API.Core.CashOut;
 namespace Lykke.Service.LiteCoin.API.Services.CashOut
 {
 
-    public class CashOutSettlementDetector: ICashOutSettlementDetector
+    public class SettledCashOutTransactionDetector: ISettledCashOutTransactionDetector
     {
         private readonly IBlockChainProvider _blockChainProvider;
 
-        public CashOutSettlementDetector(IBlockChainProvider blockChainProvider)
+        public SettledCashOutTransactionDetector(IBlockChainProvider blockChainProvider)
         {
             _blockChainProvider = blockChainProvider;
         }

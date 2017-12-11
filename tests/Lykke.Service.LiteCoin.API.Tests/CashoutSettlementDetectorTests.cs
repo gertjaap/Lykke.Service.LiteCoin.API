@@ -25,7 +25,7 @@ namespace Lykke.Service.LiteCoin.API.Tests
 
             var provider = GetBlockChainProvider(tx, txConfirmationCount);
 
-            var txDetector = new CashOutSettlementDetector(provider.Object);
+            var txDetector = new SettledCashOutTransactionDetector(provider.Object);
 
             var detectedTx = await txDetector.CheckSettlement(new[] {tx}, minConfirmationsCount: 1);
 
@@ -50,7 +50,7 @@ namespace Lykke.Service.LiteCoin.API.Tests
 
             var provider = GetBlockChainProvider(tx, txConfirmationCount);
 
-            var txDetector = new CashOutSettlementDetector(provider.Object);
+            var txDetector = new SettledCashOutTransactionDetector(provider.Object);
 
             var detectedTx = await txDetector.CheckSettlement(new[] { tx }, minConfirmationsCount: 10);
 

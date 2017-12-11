@@ -6,8 +6,11 @@ using Lykke.Service.LiteCoin.API.AzureRepositories.Operations;
 using Lykke.Service.LiteCoin.API.AzureRepositories.Queue;
 using Lykke.Service.LiteCoin.API.AzureRepositories.TxTracker;
 using Lykke.Service.LiteCoin.API.AzureRepositories.WebHook;
+using Lykke.Service.LiteCoin.API.Core.BlockChainTracker;
+using Lykke.Service.LiteCoin.API.Core.CashOut;
 using Lykke.Service.LiteCoin.API.Core.Queue;
 using Lykke.Service.LiteCoin.API.Core.Settings.ServiceSettings;
+using Lykke.Service.LiteCoin.API.Core.WebHook;
 using Lykke.SettingsReader;
 
 namespace Lykke.Service.LiteCoin.API.AzureRepositories.Binder
@@ -32,19 +35,23 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Binder
         {
             builder.RegisterInstance(new LastTrackedBlockRepository(
                 AzureTableStorage<LastProcessedBlockEntity>.Create(_settings.Nested(p => p.Db.DataConnString),
-                    "LastProcessedBlocks", _log)));
+                    "LastProcessedBlocks", _log)))
+                    .As<ILastTrackedBlockRepository>();
 
             builder.RegisterInstance(new FailedWebHookEventRepository(
                 AzureTableStorage<FailedWebHookEventEntity>.Create(_settings.Nested(p => p.Db.DataConnString),
-                    "FailedWebHookEvents", _log)));
+                    "FailedWebHookEvents", _log)))
+                    .As<IFailedWebHookEventRepository>();
             
-            builder.RegisterInstance(new TrackedCashoutTransactionRepository(
+            builder.RegisterInstance(new PendingCashoutTransactionRepository(
                 AzureTableStorage<TrackedCashoutTransactionEntity>.Create(_settings.Nested(p => p.Db.DataConnString),
-                    "TrackedCashoutTransactions", _log)));
+                    "PengingCashoutTransactions", _log)))
+                    .As<IPendingCashoutTransactionRepository>();
 
             builder.RegisterInstance(new CashOutOperationRepository(
                 AzureTableStorage<CashOutOperationTableEntity>.Create(_settings.Nested(p => p.Db.DataConnString),
-                    "CashOutOperations", _log)));
+                    "CashOutOperations", _log)))
+                    .As<ICashOutOperationRepository>();
         }
 
         private void RegisterQueue(ContainerBuilder builder)

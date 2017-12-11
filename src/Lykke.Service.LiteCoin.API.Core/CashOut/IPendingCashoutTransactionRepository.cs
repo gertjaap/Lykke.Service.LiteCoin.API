@@ -28,7 +28,7 @@ namespace Lykke.Service.LiteCoin.API.Core.CashOut
             };
         }
     }
-    public interface ITrackedCashoutTransactionRepository
+    public interface IPendingCashoutTransactionRepository
     {
         Task<IEnumerable<ICashoutTransaction>> GetAll();
         Task Insert(ICashoutTransaction tx);

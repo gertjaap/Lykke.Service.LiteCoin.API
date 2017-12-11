@@ -25,6 +25,9 @@ namespace Lykke.Service.LiteCoin.API.Core.Settings.ServiceSettings
         public int FeeRateMultiplayer { get; set; } = 1;
 
         [Optional]
-        public int CashInConfirmationsCount { get; set; } = 3;
+        public int MinCashInConfirmationsCount { get; set; } = 3;
+
+        [Optional]
+        public int MinCashOutConfirmationsCount { get; set; } = 3;
     }
 }
