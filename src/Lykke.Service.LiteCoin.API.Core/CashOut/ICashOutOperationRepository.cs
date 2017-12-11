@@ -61,5 +61,8 @@ namespace Lykke.Service.LiteCoin.API.Core.Operations
 
         Task Insert(ICashOutOperation operation);
         Task SetCompleted(string operationId, DateTime completedAt);
+
+
+        Task Get(string operationId);
     }
 }

@@ -1,9 +1,9 @@
 ﻿using Autofac;
 using AzureStorage.Tables;
 using Common.Log;
+using Lykke.Service.LiteCoin.API.AzureRepositories.CashOut;
 using Lykke.Service.LiteCoin.API.AzureRepositories.Operations;
 using Lykke.Service.LiteCoin.API.AzureRepositories.Queue;
-using Lykke.Service.LiteCoin.API.AzureRepositories.TrackedCashoutTransaction;
 using Lykke.Service.LiteCoin.API.AzureRepositories.TxTracker;
 using Lykke.Service.LiteCoin.API.AzureRepositories.WebHook;
 using Lykke.Service.LiteCoin.API.Core.Queue;

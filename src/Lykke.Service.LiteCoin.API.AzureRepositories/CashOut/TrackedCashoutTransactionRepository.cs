@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using AzureStorage;
-using Lykke.Service.LiteCoin.API.Core.TrackedEntites;
+using Lykke.Service.LiteCoin.API.Core.CashOut;
 using Microsoft.WindowsAzure.Storage.Table;
 
-namespace Lykke.Service.LiteCoin.API.AzureRepositories.TrackedCashoutTransaction
+namespace Lykke.Service.LiteCoin.API.AzureRepositories.CashOut
 {
-    public class TrackedCashoutTransactionEntity : TableEntity, ITrackedCashoutTransaction
+    public class TrackedCashoutTransactionEntity : TableEntity, ICashoutTransaction
     {
         public string TxHash { get; set; }
         public string OperationId { get; set; }
@@ -24,7 +23,7 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.TrackedCashoutTransaction
             return "TCTH";
         }
 
-        public static TrackedCashoutTransactionEntity Create(ITrackedCashoutTransaction source)
+        public static TrackedCashoutTransactionEntity Create(ICashoutTransaction source)
         {
             return new TrackedCashoutTransactionEntity
             {
@@ -45,12 +44,12 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.TrackedCashoutTransaction
             _storage = storage;
         }
 
-        public async Task<IEnumerable<ITrackedCashoutTransaction>> GetAll()
+        public async Task<IEnumerable<ICashoutTransaction>> GetAll()
         {
             return await _storage.GetDataAsync(TrackedCashoutTransactionEntity.CreatePartitionKey());
         }
 
-        public Task Insert(ITrackedCashoutTransaction tx)
+        public Task Insert(ICashoutTransaction tx)
         {
             return _storage.InsertOrReplaceAsync(TrackedCashoutTransactionEntity.Create(tx));
         }

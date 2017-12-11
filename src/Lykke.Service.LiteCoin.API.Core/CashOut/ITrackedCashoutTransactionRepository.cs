@@ -1,27 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
-namespace Lykke.Service.LiteCoin.API.Core.TrackedEntites
+namespace Lykke.Service.LiteCoin.API.Core.CashOut
 {
-    public interface ITrackedCashoutTransaction
+    public interface ICashoutTransaction
     {
         string TxHash { get; }
         string OperationId { get; }
         DateTime InsertedAt { get; }
     }
 
-    public class TrackedCashOutTransaction: ITrackedCashoutTransaction
+    public class CashOutTransaction: ICashoutTransaction
     {
         public string TxHash { get; set; }
         public string OperationId { get; set; }
         public DateTime InsertedAt { get; set; }
 
 
-        public static TrackedCashOutTransaction Create(string txHash, string operationId, DateTime? insertedAt = null)
+        public static CashOutTransaction Create(string txHash, string operationId, DateTime? insertedAt = null)
         {
-            return new TrackedCashOutTransaction
+            return new CashOutTransaction
             {
                 OperationId = operationId,
                 TxHash = txHash,
@@ -31,8 +30,8 @@ namespace Lykke.Service.LiteCoin.API.Core.TrackedEntites
     }
     public interface ITrackedCashoutTransactionRepository
     {
-        Task<IEnumerable<ITrackedCashoutTransaction>> GetAll();
-        Task Insert(ITrackedCashoutTransaction tx);
+        Task<IEnumerable<ICashoutTransaction>> GetAll();
+        Task Insert(ICashoutTransaction tx);
         Task Remove(string txHash);
     }
 }

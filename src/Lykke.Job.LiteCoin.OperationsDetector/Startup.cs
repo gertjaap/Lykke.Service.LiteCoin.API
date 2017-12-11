@@ -66,7 +66,7 @@ namespace Lykke.Job.LiteCoin.OperationsDetector
 
                 var modules = new Module[]
                 {
-                    new OperationsNotificationsJobModule (appSettings.Nested(x => x.LiteCoinAPI), Log),
+                    new OperationsDetecortorJobModule (appSettings.Nested(x => x.LiteCoinAPI), Log),
                     new RepositoryModule(appSettings.Nested(x=>x.LiteCoinAPI), Log),
                     new ServiceModule(appSettings.Nested(x=>x.LiteCoinAPI), Log)
                 };

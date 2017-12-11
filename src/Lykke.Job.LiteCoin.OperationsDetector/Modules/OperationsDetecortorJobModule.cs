@@ -11,14 +11,14 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Lykke.Job.LiteCoin.OperationsDetector.Modules
 {
-    public class OperationsNotificationsJobModule : Module
+    public class OperationsDetecortorJobModule : Module
     {
         private readonly IReloadingManager<LiteCoinAPISettings> _settings;
         private readonly ILog _log;
         // NOTE: you can remove it if you don't need to use IServiceCollection extensions to register service specific dependencies
         private readonly IServiceCollection _services;
 
-        public OperationsNotificationsJobModule(IReloadingManager<LiteCoinAPISettings> settings, ILog log)
+        public OperationsDetecortorJobModule(IReloadingManager<LiteCoinAPISettings> settings, ILog log)
         {
             _settings = settings;
             _log = log;

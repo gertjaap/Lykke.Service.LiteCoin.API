@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Lykke.Service.LiteCoin.API.Core.SourceWallets;
-using Lykke.Service.LiteCoin.API.Core.TrackedEntites;
 using Lykke.Service.LiteCoin.API.Services.SourceWallet;
 using NBitcoin;
 

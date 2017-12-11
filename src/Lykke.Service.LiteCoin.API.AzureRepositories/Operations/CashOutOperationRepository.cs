@@ -72,5 +72,11 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Operations
                     return entity;
                 });
         }
+
+        public Task Get(string operationId)
+        {
+            return _storage.GetDataAsync(CashOutOperationTableEntity.CreatePartitionKey(),
+                CashOutOperationTableEntity.CreateRowKey(operationId));
+        }
     }
 }

@@ -3,13 +3,14 @@ using Common.Log;
 using Lykke.Service.LiteCoin.API.Core;
 using Lykke.Service.LiteCoin.API.Core.Address;
 using Lykke.Service.LiteCoin.API.Core.BlockChainReaders;
+using Lykke.Service.LiteCoin.API.Core.CashOut;
 using Lykke.Service.LiteCoin.API.Core.Fee;
 using Lykke.Service.LiteCoin.API.Core.Settings.ServiceSettings;
 using Lykke.Service.LiteCoin.API.Core.SourceWallets;
-using Lykke.Service.LiteCoin.API.Core.TrackedEntites;
 using Lykke.Service.LiteCoin.API.Core.WebHook;
 using Lykke.Service.LiteCoin.API.Services.Address;
 using Lykke.Service.LiteCoin.API.Services.BlockChainProviders.InsightApi;
+using Lykke.Service.LiteCoin.API.Services.CashOut;
 using Lykke.Service.LiteCoin.API.Services.Fee;
 using Lykke.Service.LiteCoin.API.Services.SignFacade;
 using Lykke.Service.LiteCoin.API.Services.SourceWallet;
@@ -37,6 +38,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Binder
             RegisterInsightApiBlockChainReaders(builder);
             RegisterWebHookServices(builder);
             RegisterSignFacadeServices(builder);
+            RegisterCashOutServices(builder);
         }
 
         private void RegisterNetwork(ContainerBuilder builder)
@@ -93,6 +95,12 @@ namespace Lykke.Service.LiteCoin.API.Services.Binder
             }).SingleInstance();
             
             builder.RegisterType<SignFacadeService>().As<ISignFacadeService>().SingleInstance();
+        }
+
+        private void RegisterCashOutServices(ContainerBuilder builder)
+        {
+
+            builder.RegisterType<CashOutSettlementDetector>().As<ICashOutSettlementDetector>().SingleInstance();
         }
     }
 }
