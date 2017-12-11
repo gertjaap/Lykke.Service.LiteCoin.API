@@ -37,8 +37,8 @@ namespace Lykke.Job.LiteCoin.OperationsDetector.AzureQueueHandlers
                 destAddress: context.DestAddress, txHash:context.TxHash);
         }
 
-        [QueueTrigger(CashOutStartedNotificationContext.QueueName, notify: true)]
-        public async Task SendCashOutCompletedNotification(CashOutStartedNotificationContext context)
+        [QueueTrigger(CashOutCompletedNotificationContext.QueueName, notify: true)]
+        public async Task SendCashOutCompletedNotification(CashOutCompletedNotificationContext context)
         {
             await _webHookSender.ProcessCashOutStarted(operationId: context.OperationId, dateTime: context.DateTime,
                 walletId: context.WalletId, assetId: context.AssetId, amount: context.Amount,
