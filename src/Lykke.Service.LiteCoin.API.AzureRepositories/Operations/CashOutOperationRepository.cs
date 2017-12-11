@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using AzureStorage;
-using Lykke.Service.LiteCoin.API.Core.Operations;
+using Lykke.Service.LiteCoin.API.Core.CashOut;
 using Microsoft.WindowsAzure.Storage.Table;
 
 namespace Lykke.Service.LiteCoin.API.AzureRepositories.Operations
@@ -18,6 +18,7 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Operations
         public decimal Amount { get; set;}
         public string Address { get; set;}
         public bool Completed { get; set; }
+        public string TxHash { get; set; }
 
         public static string CreatePartitionKey()
         {
@@ -42,7 +43,8 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Operations
                 OperationId = source.OperationId,
                 StartedAt = source.StartedAt,
                 WalletId = source.WalletId,
-                Completed = source.Completed
+                Completed = source.Completed,
+                TxHash = source.TxHash
             };
         }
     }
@@ -73,9 +75,9 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Operations
                 });
         }
 
-        public Task Get(string operationId)
+        public async Task<ICashOutOperation> Get(string operationId)
         {
-            return _storage.GetDataAsync(CashOutOperationTableEntity.CreatePartitionKey(),
+            return await _storage.GetDataAsync(CashOutOperationTableEntity.CreatePartitionKey(),
                 CashOutOperationTableEntity.CreateRowKey(operationId));
         }
     }
