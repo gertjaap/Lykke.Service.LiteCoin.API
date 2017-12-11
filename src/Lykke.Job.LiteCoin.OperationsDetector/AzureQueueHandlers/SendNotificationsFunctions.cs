@@ -7,7 +7,7 @@ using Lykke.JobTriggers.Triggers.Attributes;
 using Lykke.Service.LiteCoin.API.Core.Queue.Contexts;
 using Lykke.Service.LiteCoin.API.Core.WebHook;
 
-namespace Lykke.Job.LiteCoin.OperationsNotifications.AzureQueueHandlers
+namespace Lykke.Job.LiteCoin.OperationsDetector.AzureQueueHandlers
 {
     public class SendNotificationsFunctions
     {

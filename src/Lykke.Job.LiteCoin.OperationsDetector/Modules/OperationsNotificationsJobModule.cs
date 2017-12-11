@@ -9,7 +9,7 @@ using Lykke.Service.LiteCoin.API.Services;
 using Lykke.Service.LiteCoin.API.Services.LifeiteManagers;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Lykke.Job.LiteCoin.OperationsNotifications.Modules
+namespace Lykke.Job.LiteCoin.OperationsDetector.Modules
 {
     public class OperationsNotificationsJobModule : Module
     {

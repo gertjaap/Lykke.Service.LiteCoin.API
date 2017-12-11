@@ -3,7 +3,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 
-namespace Lykke.Job.LiteCoin.OperationsNotifications
+namespace Lykke.Job.LiteCoin.OperationsDetector
 {
     public class Program
     {

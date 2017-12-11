@@ -6,8 +6,8 @@ using AzureStorage.Tables;
 using Common.Log;
 using Lykke.Common.ApiLibrary.Middleware;
 using Lykke.Common.ApiLibrary.Swagger;
-using Lykke.Job.LiteCoin.OperationsNotifications.Models;
-using Lykke.Job.LiteCoin.OperationsNotifications.Modules;
+using Lykke.Job.LiteCoin.OperationsDetector.Models;
+using Lykke.Job.LiteCoin.OperationsDetector.Modules;
 using Lykke.Logs;
 using Lykke.SettingsReader;
 using Lykke.SlackNotification.AzureQueue;
@@ -21,7 +21,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Lykke.Job.LiteCoin.OperationsNotifications
+namespace Lykke.Job.LiteCoin.OperationsDetector
 {
     public class Startup
     {
