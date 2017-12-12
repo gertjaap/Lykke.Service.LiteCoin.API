@@ -18,5 +18,6 @@ namespace Lykke.Service.LiteCoin.API.Core.Exceptions
     public enum ErrorCode
     {
         Exception = 0,
+        CantFindAddressToSignTx = 1,
     }
 }

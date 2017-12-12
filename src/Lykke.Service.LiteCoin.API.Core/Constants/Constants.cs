@@ -8,7 +8,7 @@ namespace Lykke.Service.LiteCoin.API.Core.Constants
     {
         public static class AssetsContants
         {
-            public const string LiteCoint = "LTC";
+            public const string LiteCoin = "LTC";
         }
 
         public static class QueueNames

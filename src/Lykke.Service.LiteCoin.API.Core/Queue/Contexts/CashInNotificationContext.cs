@@ -17,7 +17,7 @@ namespace Lykke.Service.LiteCoin.API.Core.Queue.Contexts
 
         public string AssetId { get; set; }
 
-        public decimal Amount { get; set; }
+        public double AmountSatoshi { get; set; }
 
         public string SourceAddress { get; set; }
     }

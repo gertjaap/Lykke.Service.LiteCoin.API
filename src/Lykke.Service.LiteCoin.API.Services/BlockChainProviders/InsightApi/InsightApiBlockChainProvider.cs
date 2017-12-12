@@ -18,11 +18,12 @@ namespace Lykke.Service.LiteCoin.API.Services.BlockChainProviders.InsightApi
             _insightApiSettings = insightApiSettings;
         }
 
-        public async Task<IEnumerable<string>> GetTransactionsForAddress(string address, int minBlockHeight)
+        public async Task<IEnumerable<string>> GetTransactionsForAddress(string address, int fromHeight, int toHeight)
         {
             var resp = await _insightApiSettings.Url
                 .AppendPathSegment($"insight-lite-api/addr/{address}")
-                .SetQueryParam("from", minBlockHeight)
+                .SetQueryParam("from", fromHeight)
+                .SetQueryParam("to", toHeight)
                 .GetJsonAsync<AddressBalanceResponceContract>();
 
             return resp.Transactions;

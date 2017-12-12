@@ -8,7 +8,7 @@ using Microsoft.WindowsAzure.Storage.Table;
 
 namespace Lykke.Service.LiteCoin.API.AzureRepositories.TxTracker
 {
-    public class LastProcessedBlockEntity : TableEntity
+    public class LastCashInProcessedBlockEntity : TableEntity
     {
         public int Height { get; set; }
         public static string GenerateRowKey()
@@ -21,9 +21,9 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.TxTracker
             return "LPB";
         }
 
-        public static LastProcessedBlockEntity Create(int height)
+        public static LastCashInProcessedBlockEntity Create(int height)
         {
-            return new LastProcessedBlockEntity
+            return new LastCashInProcessedBlockEntity
             {
                 RowKey = GenerateRowKey(),
                 PartitionKey = GeneratePartitionKey(),
@@ -32,11 +32,11 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.TxTracker
         }
     }
 
-    public class LastTrackedBlockRepository: ILastTrackedBlockRepository
+    public class CashInLastProcessedBlockRepository: ICashInLastProcessedBlockRepository
     {
-        private readonly INoSQLTableStorage<LastProcessedBlockEntity> _storage;
+        private readonly INoSQLTableStorage<LastCashInProcessedBlockEntity> _storage;
 
-        public LastTrackedBlockRepository(INoSQLTableStorage<LastProcessedBlockEntity> storage)
+        public CashInLastProcessedBlockRepository(INoSQLTableStorage<LastCashInProcessedBlockEntity> storage)
         {
             _storage = storage;
         }
@@ -44,13 +44,13 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.TxTracker
         public async Task<int> GetLastProcessedBlockHeight()
         {
             return (await _storage.GetDataAsync(
-                LastProcessedBlockEntity.GeneratePartitionKey(),
-                LastProcessedBlockEntity.GenerateRowKey()))?.Height ?? 0;
+                LastCashInProcessedBlockEntity.GeneratePartitionKey(),
+                LastCashInProcessedBlockEntity.GenerateRowKey()))?.Height ?? 0;
         }
 
         public Task SetLastProcessedBlockHeight(int height)
         {
-            return _storage.InsertOrReplaceAsync(LastProcessedBlockEntity.Create(height));
+            return _storage.InsertOrReplaceAsync(LastCashInProcessedBlockEntity.Create(height));
         }
     }
 }

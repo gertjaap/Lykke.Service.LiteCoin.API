@@ -3,10 +3,12 @@ using AzureStorage.Tables;
 using Common.Log;
 using Lykke.Service.LiteCoin.API.AzureRepositories.CashOut;
 using Lykke.Service.LiteCoin.API.AzureRepositories.Operations;
+using Lykke.Service.LiteCoin.API.AzureRepositories.Operations.CashIn;
 using Lykke.Service.LiteCoin.API.AzureRepositories.Queue;
 using Lykke.Service.LiteCoin.API.AzureRepositories.TxTracker;
 using Lykke.Service.LiteCoin.API.AzureRepositories.WebHook;
 using Lykke.Service.LiteCoin.API.Core.BlockChainTracker;
+using Lykke.Service.LiteCoin.API.Core.CashIn;
 using Lykke.Service.LiteCoin.API.Core.CashOut;
 using Lykke.Service.LiteCoin.API.Core.Queue;
 using Lykke.Service.LiteCoin.API.Core.Settings.ServiceSettings;
@@ -33,10 +35,10 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Binder
 
         private void RegisterRepo(ContainerBuilder builder)
         {
-            builder.RegisterInstance(new LastTrackedBlockRepository(
-                AzureTableStorage<LastProcessedBlockEntity>.Create(_settings.Nested(p => p.Db.DataConnString),
-                    "LastProcessedBlocks", _log)))
-                    .As<ILastTrackedBlockRepository>();
+            builder.RegisterInstance(new CashInLastProcessedBlockRepository(
+                AzureTableStorage<LastCashInProcessedBlockEntity>.Create(_settings.Nested(p => p.Db.DataConnString),
+                    "CashInsLastProcessedBlocks", _log)))
+                    .As<ICashInLastProcessedBlockRepository>();
 
             builder.RegisterInstance(new FailedWebHookEventRepository(
                 AzureTableStorage<FailedWebHookEventEntity>.Create(_settings.Nested(p => p.Db.DataConnString),
@@ -52,6 +54,12 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Binder
                 AzureTableStorage<CashOutOperationTableEntity>.Create(_settings.Nested(p => p.Db.DataConnString),
                     "CashOutOperations", _log)))
                     .As<ICashOutOperationRepository>();
+
+
+            builder.RegisterInstance(new CashInOperationRepository(
+                    AzureTableStorage<CashInOperationEntity>.Create(_settings.Nested(p => p.Db.DataConnString),
+                        "CashInOperations", _log)))
+                .As<ICashInOperationRepository>();
         }
 
         private void RegisterQueue(ContainerBuilder builder)

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Lykke.Service.LiteCoin.API.Services.SourceWallet
 {
-    public class SourceWalletsSettings
+    public class HotWalletsSettings
     {
         public IEnumerable<string> SourceWalletIds { get; set; }
     }

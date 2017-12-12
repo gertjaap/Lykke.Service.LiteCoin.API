@@ -24,7 +24,7 @@ namespace Lykke.Job.LiteCoin.OperationsDetector.AzureQueueHandlers
         public async Task SendCashInNotification(CashInNotificationContext context)
         {
             await _webHookSender.ProcessCashIn(operationId: context.OperationId, dateTime: context.DateTime,
-                walletId: context.WalletId, assetId: context.AssetId, amount: context.Amount,
+                walletId: context.WalletId, assetId: context.AssetId, amount: context.AmountSatoshi,
                 sourceAddress: context.SourceAddress);
         }
 

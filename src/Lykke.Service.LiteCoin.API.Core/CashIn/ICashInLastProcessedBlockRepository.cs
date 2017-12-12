@@ -3,7 +3,7 @@
 namespace Lykke.Service.LiteCoin.API.Core.BlockChainTracker
 {
 
-    public interface ILastTrackedBlockRepository
+    public interface ICashInLastProcessedBlockRepository
     {
         Task<int> GetLastProcessedBlockHeight();
         Task SetLastProcessedBlockHeight(int height);
