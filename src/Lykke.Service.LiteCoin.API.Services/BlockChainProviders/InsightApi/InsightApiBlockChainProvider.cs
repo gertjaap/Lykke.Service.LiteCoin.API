@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Threading.Tasks;
 using Flurl;
 using Flurl.Http;
@@ -59,10 +60,18 @@ namespace Lykke.Service.LiteCoin.API.Services.BlockChainProviders.InsightApi
 
         public async Task<int> GetTxConfirmationCount(string txHash)
         {
-            return (await _insightApiSettings.Url
-                .AppendPathSegment($"insight-lite-api/tx/{txHash}")
-                .GetJsonAsync<TxResponceContract>())
-                .Confirmation;
+            try
+            {
+                var resp = await _insightApiSettings.Url
+                    .AppendPathSegment($"insight-lite-api/tx/{txHash}")
+                    .GetJsonAsync<TxResponceContract>();
+
+                return resp.Confirmation;
+            }
+            catch (FlurlHttpException e) when (e.Call.Response.StatusCode == HttpStatusCode.NotFound)
+            {
+                return 0;
+            }
         }
     }
 }
