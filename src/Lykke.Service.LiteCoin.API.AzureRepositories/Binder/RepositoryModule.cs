@@ -5,6 +5,9 @@ using Lykke.Service.LiteCoin.API.AzureRepositories.CashOut;
 using Lykke.Service.LiteCoin.API.AzureRepositories.Operations;
 using Lykke.Service.LiteCoin.API.AzureRepositories.Operations.CashIn;
 using Lykke.Service.LiteCoin.API.AzureRepositories.Queue;
+using Lykke.Service.LiteCoin.API.AzureRepositories.TransactionOutput;
+using Lykke.Service.LiteCoin.API.AzureRepositories.TransactionOutput.BroadcastedOutputs;
+using Lykke.Service.LiteCoin.API.AzureRepositories.TransactionOutput.SpentOutputs;
 using Lykke.Service.LiteCoin.API.AzureRepositories.TxTracker;
 using Lykke.Service.LiteCoin.API.AzureRepositories.WebHook;
 using Lykke.Service.LiteCoin.API.Core.BlockChainTracker;
@@ -59,6 +62,16 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Binder
             builder.RegisterInstance(new CashInOperationRepository(
                     AzureTableStorage<CashInOperationEntity>.Create(_settings.Nested(p => p.Db.DataConnString),
                         "CashInOperations", _log)))
+                .As<ICashInOperationRepository>();
+
+            builder.RegisterInstance(new BroadcastedOutputRepository(
+                    AzureTableStorage<BroadcastedOutputTableEntity>.Create(_settings.Nested(p => p.Db.DataConnString),
+                        "BroadcastedOutputs", _log)))
+                .As<ICashInOperationRepository>();
+
+            builder.RegisterInstance(new SpentOutputRepository(
+                    AzureTableStorage<SpentOutputTableEntity>.Create(_settings.Nested(p => p.Db.DataConnString),
+                        "SpentOutputs", _log)))
                 .As<ICashInOperationRepository>();
         }
 

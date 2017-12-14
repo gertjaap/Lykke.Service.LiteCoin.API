@@ -12,6 +12,7 @@
     <PackageReference Include="Flurl.Http" Version="2.1.0" />
     <PackageReference Include="Lykke.Common" Version="3.0.2" />
     <PackageReference Include="Lykke.SettingsReader" Version="1.0.43" />
+    <PackageReference Include="morelinq" Version="2.8.0" />
     <PackageReference Include="NBitcoin" Version="4.0.0.50" />
     <PackageReference Include="NBitcoin.Litecoin" Version="1.0.0.7" />
   </ItemGroup>
