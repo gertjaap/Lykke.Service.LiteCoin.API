@@ -16,6 +16,7 @@ using Lykke.Service.LiteCoin.API.Core.CashOut;
 using Lykke.Service.LiteCoin.API.Core.Queue;
 using Lykke.Service.LiteCoin.API.Core.Settings.ServiceSettings;
 using Lykke.Service.LiteCoin.API.Core.TransactionOutputs.BroadcastedOutputs;
+using Lykke.Service.LiteCoin.API.Core.TransactionOutputs.SpentOutputs;
 using Lykke.Service.LiteCoin.API.Core.WebHook;
 using Lykke.SettingsReader;
 
@@ -73,7 +74,7 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Binder
             builder.RegisterInstance(new SpentOutputRepository(
                     AzureTableStorage<SpentOutputTableEntity>.Create(_settings.Nested(p => p.Db.DataConnString),
                         "SpentOutputs", _log)))
-                .As<ICashInOperationRepository>();
+                .As<ISpentOutputRepository>();
         }
 
         private void RegisterQueue(ContainerBuilder builder)
