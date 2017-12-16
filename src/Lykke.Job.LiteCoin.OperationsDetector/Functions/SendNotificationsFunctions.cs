@@ -1,23 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using Common.Log;
+﻿using System.Threading.Tasks;
 using Lykke.JobTriggers.Triggers.Attributes;
 using Lykke.Service.LiteCoin.API.Core.Queue.Contexts;
 using Lykke.Service.LiteCoin.API.Core.WebHook;
 
-namespace Lykke.Job.LiteCoin.OperationsDetector.AzureQueueHandlers
+namespace Lykke.Job.LiteCoin.OperationsDetector.Functions
 {
     public class SendNotificationsFunctions
     {
         private readonly IWebHookSender _webHookSender;
-        private readonly ILog _log;
 
-        public SendNotificationsFunctions(IWebHookSender webHookSender, ILog log)
+        public SendNotificationsFunctions(IWebHookSender webHookSender)
         {
             _webHookSender = webHookSender;
-            _log = log;
         }
 
         [QueueTrigger(CashInNotificationContext.QueueName, notify:true)]

@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Flurl;
 using Flurl.Http;
 using Lykke.Service.LiteCoin.API.Core.BlockChainReaders;
+using Lykke.Service.LiteCoin.API.Services.BlockChainProviders.Helpers;
 using Lykke.Service.LiteCoin.API.Services.BlockChainProviders.InsightApi.Contracts;
 using NBitcoin;
 
@@ -72,6 +74,20 @@ namespace Lykke.Service.LiteCoin.API.Services.BlockChainProviders.InsightApi
             {
                 return 0;
             }
+        }
+
+        public async Task<IEnumerable<ICoin>> GetUnspentOutputs(string address, int minConfirmationCount)
+        {
+            var resp =await _insightApiSettings.Url
+                .AppendPathSegment($"insight-lite-api/addr/{address}/utxo")
+                .GetJsonAsync<AddressUnspentOutputsResponce[]>();
+
+            return resp.Where(p => p.Confirmation >= minConfirmationCount).Select(MapUnspentCoun);
+        }
+
+        private ICoin MapUnspentCoun(AddressUnspentOutputsResponce source)
+        {
+            return new Coin(new OutPoint(uint256.Parse(source.TxHash), source.N), new TxOut(new Money(source.Satoshi, MoneyUnit.Satoshi), source.ScriptPubKey.ToScript()));
         }
     }
 }
