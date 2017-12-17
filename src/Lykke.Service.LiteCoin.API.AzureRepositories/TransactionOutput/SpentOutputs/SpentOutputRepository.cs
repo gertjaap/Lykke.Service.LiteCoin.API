@@ -116,15 +116,16 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.TransactionOutput.SpentOu
             }
         }
 
-        public async Task<IEnumerable<ISpentOutput>> GetUnspentOutputs(IEnumerable<ISpentOutput> outputs)
+        public async Task<IEnumerable<ISpentOutput>> GetUnspentOutputs(IEnumerable<IOutput> outputs)
         {
             var enumerable = outputs.ToArray();
 
-            var dbOutputs = await _storage.GetDataAsync(SpentOutputTableEntity.ByTransactionHash.GeneratePartitionKey(), enumerable.Select(x => SpentOutputTableEntity.ByTransactionHash.GenerateRowKey(x.TransactionHash, x.N)), 50);
+            var dbOutputs = (await _storage.GetDataAsync(SpentOutputTableEntity.ByTransactionHash.GeneratePartitionKey(),
+                enumerable.Select(x => SpentOutputTableEntity.ByTransactionHash.GenerateRowKey(x.TransactionHash, x.N)), 50)).ToList();
 
             var setOfSpentRowKeys = new HashSet<string>(dbOutputs.Select(x => x.RowKey));
 
-            return enumerable.Where(x => !setOfSpentRowKeys.Contains(SpentOutputTableEntity.ByTransactionHash.GenerateRowKey(x.TransactionHash, x.N)));
+            return dbOutputs.Where(x => !setOfSpentRowKeys.Contains(SpentOutputTableEntity.ByTransactionHash.GenerateRowKey(x.TransactionHash, x.N)));
         }
 
         public async Task DeleteOldOutputs(DateTime boun)

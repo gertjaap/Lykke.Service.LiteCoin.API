@@ -8,6 +8,7 @@ using Lykke.Service.LiteCoin.API.Core.CashOut;
 using Lykke.Service.LiteCoin.API.Core.Fee;
 using Lykke.Service.LiteCoin.API.Core.Settings.ServiceSettings;
 using Lykke.Service.LiteCoin.API.Core.Sign;
+using Lykke.Service.LiteCoin.API.Core.TransactionOutputs;
 using Lykke.Service.LiteCoin.API.Core.Wallet;
 using Lykke.Service.LiteCoin.API.Core.WebHook;
 using Lykke.Service.LiteCoin.API.Services.Address;
@@ -162,6 +163,8 @@ namespace Lykke.Service.LiteCoin.API.Services.Binder
                 BroadcastedOutputsExpirationDays = _settings.CurrentValue.BroadcastedOutputsExpirationDays,
                 SpentOutputsExpirationDays = _settings.CurrentValue.SpentOutputsExpirationDays
             });
+
+            builder.RegisterType<TransactionOutputsFacade>().As<ITransactionOutputsFacade>();
         }
     }
 }

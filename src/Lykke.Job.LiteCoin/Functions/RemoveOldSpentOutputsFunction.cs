@@ -12,7 +12,7 @@ namespace Lykke.Job.LiteCoin.Functions
         private readonly TransactionOutputsExpirationSettings _settings;
 
         public RemoveOldSpentOutputsFunction(ISpentOutputRepository spentOutputRepository, TransactionOutputsExpirationSettings settings)
-        {            
+        {             
             _spentOutputRepository = spentOutputRepository;
             _settings = settings;
         }
