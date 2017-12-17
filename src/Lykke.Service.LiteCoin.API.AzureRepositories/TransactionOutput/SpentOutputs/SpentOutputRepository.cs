@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AzureStorage;
+using Lykke.Service.LiteCoin.API.Core.Exceptions;
 using Lykke.Service.LiteCoin.API.Core.TransactionOutputs.SpentOutputs;
+using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
 using MoreLinq;
 
@@ -72,6 +74,7 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.TransactionOutput.SpentOu
     public class SpentOutputRepository:ISpentOutputRepository
     {
         private readonly INoSQLTableStorage<SpentOutputTableEntity> _storage;
+        private const int EntityExistsHttpStatusCode = 409;
 
         public SpentOutputRepository(INoSQLTableStorage<SpentOutputTableEntity> storage)
         {
@@ -80,10 +83,36 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.TransactionOutput.SpentOu
 
         public async Task InsertSpentOutputs(IEnumerable<ISpentOutput> outputs)
         {
-            foreach (var batch in outputs.Batch(100, p => p.ToList()))
+            var spentOutputs = outputs as ISpentOutput[] ?? outputs.ToArray();
+
+            async Task ThrowIfBackend(StorageException exception)
             {
-                await _storage.InsertAsync(batch.Select(SpentOutputTableEntity.ByTransactionHash.Create));
-                await _storage.InsertAsync(batch.Select(SpentOutputTableEntity.ByDateTime.Create));
+                if (exception != null && exception.RequestInformation.HttpStatusCode == EntityExistsHttpStatusCode)
+                {
+                    await DeleteOutputs(spentOutputs);
+                    throw new BackendException("entity already exists", ErrorCode.TransactionConcurrentInputsProblem);
+                }
+            }
+
+            foreach (var batch in spentOutputs.Batch(100, p => p.ToList()))
+            {
+                try
+                {
+                    await _storage.InsertAsync(batch.Select(SpentOutputTableEntity.ByTransactionHash.Create));
+                    await _storage.InsertAsync(batch.Select(SpentOutputTableEntity.ByDateTime.Create));
+                }
+                catch (AggregateException e)
+                {
+                    var exception = e.InnerExceptions[0] as StorageException;
+                    await ThrowIfBackend(exception);
+                    throw;
+                }
+                catch (StorageException e)
+                {
+                    await ThrowIfBackend(e);
+                    throw;
+                }
+
             }
         }
 
