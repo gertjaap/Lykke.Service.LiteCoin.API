@@ -3,7 +3,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 
-namespace Lykke.Job.LiteCoin.OperationsDetector
+namespace Lykke.Job.LiteCoin
 {
     public class Program
     {
@@ -11,7 +11,7 @@ namespace Lykke.Job.LiteCoin.OperationsDetector
 
         public static void Main(string[] args)
         {
-            Console.WriteLine($"LiteCoin.OperationsNotifications version {Microsoft.Extensions.PlatformAbstractions.PlatformServices.Default.Application.ApplicationVersion}");
+            Console.WriteLine($"LiteCoin.Job version {Microsoft.Extensions.PlatformAbstractions.PlatformServices.Default.Application.ApplicationVersion}");
 #if DEBUG
             Console.WriteLine("Is DEBUG");
 #else

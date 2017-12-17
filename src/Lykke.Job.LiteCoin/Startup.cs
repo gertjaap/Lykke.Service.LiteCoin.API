@@ -6,22 +6,22 @@ using AzureStorage.Tables;
 using Common.Log;
 using Lykke.Common.ApiLibrary.Middleware;
 using Lykke.Common.ApiLibrary.Swagger;
-using Lykke.Job.LiteCoin.OperationsDetector.Models;
-using Lykke.Job.LiteCoin.OperationsDetector.Modules;
-using Lykke.Logs;
-using Lykke.SettingsReader;
-using Lykke.SlackNotification.AzureQueue;
+using Lykke.Job.LiteCoin.Models;
+using Lykke.Job.LiteCoin.Modules;
 using Lykke.JobTriggers.Triggers;
+using Lykke.Logs;
 using Lykke.Service.LiteCoin.API.AzureRepositories.Binder;
 using Lykke.Service.LiteCoin.API.Core.Services;
 using Lykke.Service.LiteCoin.API.Core.Settings;
 using Lykke.Service.LiteCoin.API.Services.Binder;
+using Lykke.SettingsReader;
+using Lykke.SlackNotification.AzureQueue;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Lykke.Job.LiteCoin.OperationsDetector
+namespace Lykke.Job.LiteCoin
 {
     public class Startup
     {
@@ -56,7 +56,7 @@ namespace Lykke.Job.LiteCoin.OperationsDetector
 
                 services.AddSwaggerGen(options =>
                 {
-                    options.DefaultLykkeConfiguration("v1", "LiteCoin.OperationsNotifications API");
+                    options.DefaultLykkeConfiguration("v1", "LiteCoin.Job");
                 });
 
                 var builder = new ContainerBuilder();
@@ -66,7 +66,7 @@ namespace Lykke.Job.LiteCoin.OperationsDetector
 
                 var modules = new Module[]
                 {
-                    new OperationsDetecortorJobModule (appSettings.Nested(x => x.LiteCoinAPI), Log),
+                    new LiteCoinJobModule (appSettings.Nested(x => x.LiteCoinAPI), Log),
                     new RepositoryModule(appSettings.Nested(x=>x.LiteCoinAPI), Log),
                     new ServiceModule(appSettings.Nested(x=>x.LiteCoinAPI), Log)
                 };
@@ -98,7 +98,7 @@ namespace Lykke.Job.LiteCoin.OperationsDetector
                     app.UseDeveloperExceptionPage();
                 }
 
-                app.UseLykkeMiddleware("LiteCoin.OperationsNotifications", ex => new ErrorResponse {ErrorMessage = "Technical problem"});
+                app.UseLykkeMiddleware("LiteCoin.Job", ex => new ErrorResponse {ErrorMessage = "Technical problem"});
 
                 app.UseMvc();
                 app.UseSwagger();
@@ -210,7 +210,7 @@ namespace Lykke.Job.LiteCoin.OperationsDetector
             if (!string.IsNullOrEmpty(dbLogConnectionString) && !(dbLogConnectionString.StartsWith("${") && dbLogConnectionString.EndsWith("}")))
             {
                 var persistenceManager = new LykkeLogToAzureStoragePersistenceManager(
-                    AzureTableStorage<LogEntity>.Create(dbLogConnectionStringManager, "LiteCoinOperationsNotificationsLog", consoleLogger),
+                    AzureTableStorage<LogEntity>.Create(dbLogConnectionStringManager, "LiteCoinJobLog", consoleLogger),
                     consoleLogger);
 
                 var slackNotificationsManager = new LykkeLogToAzureSlackNotificationsManager(slackService, consoleLogger);

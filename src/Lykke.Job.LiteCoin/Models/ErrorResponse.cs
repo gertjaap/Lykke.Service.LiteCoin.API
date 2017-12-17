@@ -1,4 +1,4 @@
-﻿namespace Lykke.Job.LiteCoin.OperationsDetector.Models
+﻿namespace Lykke.Job.LiteCoin.Models
 {
     public class ErrorResponse
     {

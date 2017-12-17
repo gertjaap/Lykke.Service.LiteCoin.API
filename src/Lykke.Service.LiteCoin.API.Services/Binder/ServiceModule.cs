@@ -19,6 +19,7 @@ using Lykke.Service.LiteCoin.API.Services.Operations.CashIn;
 using Lykke.Service.LiteCoin.API.Services.Operations.CashOut;
 using Lykke.Service.LiteCoin.API.Services.Sign;
 using Lykke.Service.LiteCoin.API.Services.SourceWallet;
+using Lykke.Service.LiteCoin.API.Services.TransactionOutputs;
 using Lykke.Service.LiteCoin.API.Services.Wallet;
 using Lykke.Service.LiteCoin.API.Services.WebHook;
 using Lykke.SettingsReader;
@@ -45,6 +46,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Binder
             RegisterWebHookServices(builder);
             RegisterSignFacadeServices(builder);
             RegisterDetectorServices(builder);
+            RegisterTransactionOutputsServices(builder);
         }
 
         private void RegisterNetwork(ContainerBuilder builder)
@@ -151,6 +153,15 @@ namespace Lykke.Service.LiteCoin.API.Services.Binder
 
             builder.RegisterType<CashOutsOperationDetectorFacade>()
                 .As<ICashOutsOperationDetectorFacade>();
+        }
+
+        private void RegisterTransactionOutputsServices(ContainerBuilder builder)
+        {
+            builder.RegisterInstance(new TransactionOutputsExpirationSettings
+            {
+                BroadcastedOutputsExpirationDays = _settings.CurrentValue.BroadcastedOutputsExpirationDays,
+                SpentOutputsExpirationDays = _settings.CurrentValue.SpentOutputsExpirationDays
+            });
         }
     }
 }

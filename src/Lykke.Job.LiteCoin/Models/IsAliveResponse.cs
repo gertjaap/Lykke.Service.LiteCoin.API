@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Lykke.Job.LiteCoin.OperationsDetector.Models
+namespace Lykke.Job.LiteCoin.Models
 {
     public class IsAliveResponse
     {

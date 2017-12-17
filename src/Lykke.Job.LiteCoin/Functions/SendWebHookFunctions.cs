@@ -3,13 +3,13 @@ using Lykke.JobTriggers.Triggers.Attributes;
 using Lykke.Service.LiteCoin.API.Core.Queue.Contexts;
 using Lykke.Service.LiteCoin.API.Core.WebHook;
 
-namespace Lykke.Job.LiteCoin.OperationsDetector.Functions
+namespace Lykke.Job.LiteCoin.Functions
 {
-    public class SendNotificationsFunctions
+    public class SendWebHookFunctions
     {
         private readonly IWebHookSender _webHookSender;
 
-        public SendNotificationsFunctions(IWebHookSender webHookSender)
+        public SendWebHookFunctions(IWebHookSender webHookSender)
         {
             _webHookSender = webHookSender;
         }

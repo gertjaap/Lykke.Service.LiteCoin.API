@@ -2,7 +2,7 @@
 using Lykke.JobTriggers.Triggers.Attributes;
 using Lykke.Service.LiteCoin.API.Core.CashOut;
 
-namespace Lykke.Job.LiteCoin.OperationsDetector.Functions
+namespace Lykke.Job.LiteCoin.Functions
 {
     public class DetectCashOutFunctions
     {

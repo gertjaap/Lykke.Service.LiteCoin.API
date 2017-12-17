@@ -1,11 +1,11 @@
 ﻿using System.Linq;
 using System.Net;
-using Lykke.Job.LiteCoin.OperationsDetector.Models;
+using Lykke.Job.LiteCoin.Models;
 using Lykke.Service.LiteCoin.API.Core.Services;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
-namespace Lykke.Job.LiteCoin.OperationsDetector.Controllers
+namespace Lykke.Job.LiteCoin.Controllers
 {
     // NOTE: See https://lykkex.atlassian.net/wiki/spaces/LKEWALLET/pages/35755585/Add+your+app+to+Monitoring
     [Route("api/[controller]")]
