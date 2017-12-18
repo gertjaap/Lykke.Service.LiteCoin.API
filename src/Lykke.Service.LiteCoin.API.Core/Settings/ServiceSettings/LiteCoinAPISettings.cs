@@ -35,5 +35,11 @@ namespace Lykke.Service.LiteCoin.API.Core.Settings.ServiceSettings
 
         [Optional]
         public int SpentOutputsExpirationDays { get; set; } = 7;
+
+        [Optional]
+        public int CashInExpirationDays { get; set; } = 180;
+
+        [Optional]
+        public int CashOutExpirationDays { get; set; } = 180;
     }
 }

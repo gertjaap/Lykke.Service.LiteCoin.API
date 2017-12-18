@@ -4,6 +4,7 @@ using Common.Log;
 using Lykke.Service.LiteCoin.API.AzureRepositories.CashOut;
 using Lykke.Service.LiteCoin.API.AzureRepositories.Operations;
 using Lykke.Service.LiteCoin.API.AzureRepositories.Operations.CashIn;
+using Lykke.Service.LiteCoin.API.AzureRepositories.Operations.CashOut;
 using Lykke.Service.LiteCoin.API.AzureRepositories.Queue;
 using Lykke.Service.LiteCoin.API.AzureRepositories.TransactionOutput;
 using Lykke.Service.LiteCoin.API.AzureRepositories.TransactionOutput.BroadcastedOutputs;

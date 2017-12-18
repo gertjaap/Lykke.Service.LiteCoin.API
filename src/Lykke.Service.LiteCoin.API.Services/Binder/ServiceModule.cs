@@ -136,6 +136,12 @@ namespace Lykke.Service.LiteCoin.API.Services.Binder
                 MinCashOutConfirmations = _settings.CurrentValue.MinCashOutConfirmationsCount
             });
 
+            builder.RegisterInstance(new OperationsExpirationSettings
+            {
+                CashOutExpirationDays = _settings.CurrentValue.CashOutExpirationDays,
+                CashInExpirationDays = _settings.CurrentValue.CashInExpirationDays
+            });
+
             RegisterCashInDetectorServices(builder);
             RegisterCashOutsDetectorServices(builder);
         }

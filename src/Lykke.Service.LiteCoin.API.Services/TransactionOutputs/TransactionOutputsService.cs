@@ -43,6 +43,13 @@ namespace Lykke.Service.LiteCoin.API.Services.TransactionOutputs
             return coins;
         }
 
+        public async Task<IEnumerable<ICoin>> GetOnlyBlockChainUnspentOutputs(string address, int confirmationsCount = 0)
+        {
+            var coins = (await _blockChainProvider.GetUnspentOutputs(address, confirmationsCount)).ToList();
+
+            return coins;
+        }
+
         private async Task AddBroadcastedOutputs(List<ICoin> coins, string walletAddress)
         {
             var set = new HashSet<OutPoint>(coins.Select(x => x.Outpoint));

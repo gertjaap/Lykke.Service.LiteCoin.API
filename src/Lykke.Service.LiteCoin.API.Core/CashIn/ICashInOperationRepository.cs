@@ -20,6 +20,10 @@ namespace Lykke.Service.LiteCoin.API.Core.CashIn
         string Address { get; }
 
         string TxHash { get; }
+
+        bool MoneyTransferredToHotWallet { get; }
+
+        DateTime? MoneyTransferredToHotWalletAt { get; }
     }
 
     public class CashInOperation : ICashInOperation
@@ -31,6 +35,8 @@ namespace Lykke.Service.LiteCoin.API.Core.CashIn
         public string AssetId { get; set; }
         public string Address { get; set; }
         public string TxHash { get; set; }
+        public bool MoneyTransferredToHotWallet { get; set; }
+        public DateTime? MoneyTransferredToHotWalletAt { get; set; }
 
         public static CashInOperation Create(string operationId, 
             string walletId,
@@ -38,7 +44,9 @@ namespace Lykke.Service.LiteCoin.API.Core.CashIn
             string txHash,
             decimal amount, 
             string assetId, 
-            DateTime detectedAt)
+            DateTime detectedAt,
+            bool moneyTransferredToHotWallet = false,
+            DateTime? moneyTransferredToHotWalletAt = null)
         {
             return new CashInOperation
             {
@@ -48,7 +56,9 @@ namespace Lykke.Service.LiteCoin.API.Core.CashIn
                 Amount = amount,
                 TxHash = txHash,
                 WalletId = walletId,
-                DetectedAt = detectedAt
+                DetectedAt = detectedAt,
+                MoneyTransferredToHotWallet = moneyTransferredToHotWallet,
+                MoneyTransferredToHotWalletAt = moneyTransferredToHotWalletAt
             };
         }
     }
@@ -56,5 +66,8 @@ namespace Lykke.Service.LiteCoin.API.Core.CashIn
     public interface ICashInOperationRepository
     {
         Task Insert(ICashInOperation operation);
+        Task<ICashInOperation> GetByOperationId(string operationId);
+        Task DeleteOldOperations(DateTime bound);
+        Task SetMoneyTransferred(string operationId, DateTime completedAt);
     }
 }

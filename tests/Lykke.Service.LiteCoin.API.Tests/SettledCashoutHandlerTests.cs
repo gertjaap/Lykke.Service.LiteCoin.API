@@ -40,7 +40,7 @@ namespace Lykke.Service.LiteCoin.API.Tests
         {
             var result = new Mock<ICashOutOperationRepository>();
 
-            result.Setup(p => p.Get(It.Is<string>(x => x == op.OperationId)))
+            result.Setup(p => p.GetByOperationId(It.Is<string>(x => x == op.OperationId)))
                 .ReturnsAsync(op).Verifiable();
 
             result.Setup(p => p.SetCompleted(It.Is<string>(x => x == op.OperationId), It.IsAny<DateTime>()))

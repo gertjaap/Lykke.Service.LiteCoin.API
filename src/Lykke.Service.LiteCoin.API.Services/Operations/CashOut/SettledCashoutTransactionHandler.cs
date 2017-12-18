@@ -37,7 +37,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Operations.CashOut
 
         private async Task HandleSettledTransaction(ICashoutTransaction tx)
         {
-            var operation = await _cashOutOperationRepository.Get(tx.OperationId);
+            var operation = await _cashOutOperationRepository.GetByOperationId(tx.OperationId);
 
             if (operation == null)
             {

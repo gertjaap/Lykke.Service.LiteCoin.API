@@ -1,7 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using AzureStorage;
+using Lykke.Service.LiteCoin.API.AzureRepositories.Operations.CashOut;
 using Lykke.Service.LiteCoin.API.Core.CashIn;
+using Lykke.Service.LiteCoin.API.Core.Exceptions;
 using Microsoft.WindowsAzure.Storage.Table;
 
 namespace Lykke.Service.LiteCoin.API.AzureRepositories.Operations.CashIn
@@ -15,28 +19,83 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Operations.CashIn
         public string AssetId { get; set; }
         public string Address { get; set; }
         public string TxHash { get; set; }
+        public bool MoneyTransferredToHotWallet { get; set; }
+        public DateTime? MoneyTransferredToHotWalletAt { get; set; }
 
-        public static string GeneratePartitionKey()
+
+        public static class ByTxHash
         {
-            return "CIO";
+            public static string GeneratePartitionKey()
+            {
+                return "ByTxHash";
+            }
+
+            public static string GenerateRowKey(string txHash)
+            {
+                return txHash;
+            }
+
+            public static CashInOperationEntity Create(ICashInOperation source)
+            {
+                return Map(source, GeneratePartitionKey(), GenerateRowKey(source.TxHash));
+            }
+
         }
 
-        public static string GenerateRowKey(string txHash)
+        public static class ByDateTime
         {
-            return txHash;
+            public static string GeneratePartitionKey()
+            {
+                return "ByDateTime";
+            }
+
+            public static string GenerateRowKey(DateTime inserted)
+            {
+                return (int.MaxValue - inserted.Ticks).ToString("D");
+            }
+
+            public static CashInOperationEntity Create(ICashInOperation source)
+            {
+                return Map(source, GeneratePartitionKey(),
+                    GenerateRowKey(source.DetectedAt));
+            }
         }
 
-        public static CashInOperationEntity Create(ICashInOperation source)
+        public static class ByOperationId
+        {
+            public static string GeneratePartitionKey()
+            {
+                return "ByOperationId";
+            }
+
+            public static string GenerateRowKey(string operationId)
+            {
+                return operationId;
+            }
+
+            public static CashInOperationEntity Create(ICashInOperation source)
+            {
+                return Map(source, GeneratePartitionKey(),
+                    GenerateRowKey(source.OperationId));
+            }
+        }
+
+
+        private static CashInOperationEntity Map(ICashInOperation source, string partitionKey, string rowKey)
         {
             return new CashInOperationEntity
             {
-                PartitionKey = GeneratePartitionKey(),
-                RowKey = GenerateRowKey(source.TxHash),
+                PartitionKey = partitionKey,
+                RowKey = rowKey,
                 Address = source.Address,
                 OperationId = source.OperationId,
                 AssetId = source.OperationId,
                 Amount = source.Amount,
-                DetectedAt = source.DetectedAt
+                DetectedAt = source.DetectedAt,
+                WalletId = source.WalletId,
+                TxHash = source.TxHash,
+                MoneyTransferredToHotWallet = source.MoneyTransferredToHotWallet,
+                MoneyTransferredToHotWalletAt = source.MoneyTransferredToHotWalletAt
             };
         }
     }
@@ -50,9 +109,79 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Operations.CashIn
             _storage = storage;
         }
 
-        public Task Insert(ICashInOperation operation)
+        public async Task Insert(ICashInOperation operation)
         {
-            return _storage.InsertAsync(CashInOperationEntity.Create(operation));
+            await _storage.InsertAsync(CashInOperationEntity.ByTxHash.Create(operation));
+            await _storage.InsertAsync(CashInOperationEntity.ByDateTime.Create(operation));
+            await _storage.InsertAsync(CashInOperationEntity.ByOperationId.Create(operation));
+        }
+
+        public async Task<ICashInOperation> GetByOperationId(string operationId)
+        {
+            return await _storage.GetDataAsync(CashInOperationEntity.ByOperationId.GeneratePartitionKey(),
+                CashInOperationEntity.ByOperationId.GenerateRowKey(operationId));
+        }
+
+        private async Task<IEnumerable<ICashInOperation>> GetOldOperations(DateTime bound, int count)
+        {
+            return (await _storage.GetTopRecordsAsync(CashInOperationEntity.ByDateTime.GeneratePartitionKey(), count))
+                .Where(p => p.DetectedAt <= bound)
+                .ToList();
+        }
+
+        public async Task DeleteOperations(IEnumerable<ICashInOperation> operations)
+        {
+            foreach (var op in operations)
+            {
+                await _storage.DeleteAsync(CashInOperationEntity.ByDateTime.Create(op));
+                await _storage.DeleteAsync(CashInOperationEntity.ByOperationId.Create(op));
+                await _storage.DeleteAsync(CashInOperationEntity.ByTxHash.Create(op));
+            }
+        }
+
+        public async Task SetMoneyTransferred(string operationId, DateTime completedAt)
+        {
+            var op = await GetByOperationId(operationId);
+
+            if (op == null)
+            {
+                throw new BackendException($"Operation {operationId} not found", ErrorCode.CashOutOperationNotFound);
+            }
+
+            CashInOperationEntity Update(CashInOperationEntity entity)
+            {
+                entity.MoneyTransferredToHotWallet = true;
+                entity.MoneyTransferredToHotWalletAt = completedAt;
+
+                return entity;
+            }
+
+            await _storage.ReplaceAsync(CashInOperationEntity.ByOperationId.GeneratePartitionKey(),
+                CashInOperationEntity.ByOperationId.GenerateRowKey(op.OperationId),
+                Update);
+
+            await _storage.ReplaceAsync(CashInOperationEntity.ByTxHash.GeneratePartitionKey(),
+                CashInOperationEntity.ByTxHash.GenerateRowKey(op.TxHash),
+                Update);
+
+            await _storage.ReplaceAsync(CashInOperationEntity.ByDateTime.GeneratePartitionKey(),
+                CashInOperationEntity.ByDateTime.GenerateRowKey(op.DetectedAt),
+                Update);
+        }
+
+
+        public async Task DeleteOldOperations(DateTime bound)
+        {
+            do
+            {
+                var outputsToRemove = (await GetOldOperations(bound, 10)).ToList();
+                if (!outputsToRemove.Any())
+                {
+                    return;
+                }
+
+                await DeleteOperations(outputsToRemove);
+            } while (true);
         }
     }
 }
