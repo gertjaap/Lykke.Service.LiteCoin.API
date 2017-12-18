@@ -75,7 +75,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Operations.CashIn
 
             if (coins.Any())
             {
-                var amount = coins.Sum(p => p.Amount.Satoshi);
+                var amount = new Money(coins.Sum(p => p.Amount.Satoshi)).ToUnit(MoneyUnit.BTC);
             
                 return CashInOperation.Create(operationId: Guid.NewGuid().ToString("N"), 
                     walletId: wallet.WalletId,

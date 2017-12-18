@@ -24,5 +24,8 @@ namespace Lykke.Service.LiteCoin.API.Core.TransactionOutputs.BroadcastedOutputs
         Task InsertOutputs(IEnumerable<IBroadcastedOutput> outputs);
         Task<IEnumerable<IBroadcastedOutput>> GetOutputs(string address);
         Task DeleteOldOutputs(DateTime boun);
+
+        Task DeleteOutputs(IEnumerable<IBroadcastedOutput> outputs);
+        Task DeleteOutput(string transactionHash, int n);
     }
 }

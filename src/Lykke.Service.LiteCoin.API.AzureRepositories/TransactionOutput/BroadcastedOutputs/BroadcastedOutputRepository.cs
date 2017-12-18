@@ -141,13 +141,22 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.TransactionOutput.Broadca
         }
 
 
-        private async Task DeleteOutputs(IEnumerable<IBroadcastedOutput> outputs)
+        public async Task DeleteOutputs(IEnumerable<IBroadcastedOutput> outputs)
         {
             foreach (var output in outputs)
             {
                 await _storage.DeleteAsync(BroadcastedOutputTableEntity.ByDateTime.Create(output));
                 await _storage.DeleteAsync(BroadcastedOutputTableEntity.ByTransactionHash.Create(output));
                 await _storage.DeleteAsync(BroadcastedOutputTableEntity.ByAddress.Create(output));
+            }
+        }
+
+        public async Task DeleteOutput(string transactionHash, int n)
+        {
+            var output = await _storage.GetDataAsync(BroadcastedOutputTableEntity.ByTransactionHash.GeneratePartition(transactionHash), BroadcastedOutputTableEntity.ByTransactionHash.GenerateRowKey(n));
+            if (output != null)
+            {
+                await DeleteOutputs(new []{output});
             }
         }
 

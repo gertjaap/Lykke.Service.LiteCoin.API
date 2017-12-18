@@ -6,9 +6,13 @@ using Lykke.Service.LiteCoin.API.Core.BlockChainReaders;
 using Lykke.Service.LiteCoin.API.Core.CashIn;
 using Lykke.Service.LiteCoin.API.Core.CashOut;
 using Lykke.Service.LiteCoin.API.Core.Fee;
+using Lykke.Service.LiteCoin.API.Core.Operation;
 using Lykke.Service.LiteCoin.API.Core.Settings.ServiceSettings;
 using Lykke.Service.LiteCoin.API.Core.Sign;
 using Lykke.Service.LiteCoin.API.Core.TransactionOutputs;
+using Lykke.Service.LiteCoin.API.Core.TransactionOutputs.BroadcastedOutputs;
+using Lykke.Service.LiteCoin.API.Core.TransactionOutputs.SpentOutputs;
+using Lykke.Service.LiteCoin.API.Core.Transactions;
 using Lykke.Service.LiteCoin.API.Core.Wallet;
 using Lykke.Service.LiteCoin.API.Core.WebHook;
 using Lykke.Service.LiteCoin.API.Services.Address;
@@ -21,6 +25,9 @@ using Lykke.Service.LiteCoin.API.Services.Operations.CashOut;
 using Lykke.Service.LiteCoin.API.Services.Sign;
 using Lykke.Service.LiteCoin.API.Services.SourceWallet;
 using Lykke.Service.LiteCoin.API.Services.TransactionOutputs;
+using Lykke.Service.LiteCoin.API.Services.TransactionOutputs.BroadcastedOutputs;
+using Lykke.Service.LiteCoin.API.Services.TransactionOutputs.SpentOutputs;
+using Lykke.Service.LiteCoin.API.Services.Transactions;
 using Lykke.Service.LiteCoin.API.Services.Wallet;
 using Lykke.Service.LiteCoin.API.Services.WebHook;
 using Lykke.SettingsReader;
@@ -48,6 +55,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Binder
             RegisterSignFacadeServices(builder);
             RegisterDetectorServices(builder);
             RegisterTransactionOutputsServices(builder);
+            RegisterTransactionBuilderServices(builder);
         }
 
         private void RegisterNetwork(ContainerBuilder builder)
@@ -66,10 +74,10 @@ namespace Lykke.Service.LiteCoin.API.Services.Binder
             builder.Register(x =>
             {
                 var resolver = x.Resolve<IComponentContext>();
-                return new FeeFacade(resolver.Resolve<IFeeRateFacade>(), 
+                return new FeeService(resolver.Resolve<IFeeRateFacade>(), 
                     _settings.CurrentValue.MinFeeValue, 
                     _settings.CurrentValue.MaxFeeValue);
-            });
+            }).As<IFeeService>();
         }
 
         private void RegisterAddressValidatorServices(ContainerBuilder builder)
@@ -164,7 +172,17 @@ namespace Lykke.Service.LiteCoin.API.Services.Binder
                 SpentOutputsExpirationDays = _settings.CurrentValue.SpentOutputsExpirationDays
             });
 
-            builder.RegisterType<TransactionOutputsFacade>().As<ITransactionOutputsFacade>();
+            builder.RegisterType<TransactionOutputsService>().As<ITransactionOutputsService>();
+            builder.RegisterType<SpentOutputService>().As<ISpentOutputService>();
+            builder.RegisterType<BroadcastedOutputsService>().As<IBroadcastedOutputsService>();
+        }
+
+        private void RegisterTransactionBuilderServices(ContainerBuilder builder)
+        {
+            builder.RegisterType<TransactionBuilderService>().As<ITransactionBuilderService>();
+            builder.RegisterType<TransactionBuildContext>().AsSelf().InstancePerDependency();
+            builder.RegisterType<TransactionBuildContextFactory>().AsSelf();
+            builder.RegisterType<OperationService>().As<IOperationService>();
         }
     }
 }

@@ -6,7 +6,7 @@ using NBitcoin;
 
 namespace Lykke.Service.LiteCoin.API.Core.TransactionOutputs
 {
-    public interface ITransactionOutputsFacade
+    public interface ITransactionOutputsService
     {
         Task<IEnumerable<ICoin>> GetUnspentOutputs(string address, int confirmationsCount = 0);
     }

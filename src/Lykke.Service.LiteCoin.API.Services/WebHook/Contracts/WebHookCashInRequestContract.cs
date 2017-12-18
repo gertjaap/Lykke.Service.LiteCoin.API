@@ -19,7 +19,7 @@ namespace Lykke.Service.LiteCoin.API.Services.WebHook.Contracts
     {
         public string AssetId { get; set; }
 
-        public double Amount { get; set; }
+        public decimal Amount { get; set; }
 
         public string Address { get; set; }
     }

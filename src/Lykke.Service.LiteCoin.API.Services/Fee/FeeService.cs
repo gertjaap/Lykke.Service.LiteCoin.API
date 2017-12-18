@@ -7,13 +7,13 @@ using NBitcoin;
 
 namespace Lykke.Service.LiteCoin.API.Services.Fee
 {
-    public class FeeFacade:IFeeFacade
+    public class FeeService:IFeeService
     {
         private readonly IFeeRateFacade _feeRateFacade;
         private readonly decimal _minFeeValue;
         private readonly decimal _maxFeeValue;
 
-        public FeeFacade(IFeeRateFacade feeRateFacade, decimal minFeeValue, decimal maxFeeValue)
+        public FeeService(IFeeRateFacade feeRateFacade, decimal minFeeValue, decimal maxFeeValue)
         {
             _feeRateFacade = feeRateFacade;
             _minFeeValue = minFeeValue;

@@ -41,7 +41,7 @@ namespace Lykke.Service.LiteCoin.API.Tests
 
             Assert.True(op.TxHash == tx.GetHash().ToString());
             
-            Assert.True(op.AmountSatoshi == 100000000d);
+            Assert.True(op.Amount == new Money(100000000).ToUnit(MoneyUnit.BTC));
 
 
             Assert.True(op.AssetId == Constants.AssetsContants.LiteCoin);

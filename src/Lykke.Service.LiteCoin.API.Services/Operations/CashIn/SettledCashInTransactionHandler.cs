@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Lykke.Service.LiteCoin.API.Core.CashIn;
 using Lykke.Service.LiteCoin.API.Core.Queue;
 using Lykke.Service.LiteCoin.API.Core.Queue.Contexts;
+using NBitcoin;
 
 namespace Lykke.Service.LiteCoin.API.Services.Operations.CashIn
 {
@@ -23,10 +24,10 @@ namespace Lykke.Service.LiteCoin.API.Services.Operations.CashIn
             foreach (var settledTransaction in settledTransactions)
             {
                 await _cashInOperationRepository.Insert(settledTransaction);
-
+                
                 await _webHookQueue.AddMessage(new CashInNotificationContext
                 {
-                    AmountSatoshi = settledTransaction.AmountSatoshi,
+                    Amount = settledTransaction.Amount,
                     AssetId = settledTransaction.AssetId,
                     DateTime = settledTransaction.DetectedAt,
                     OperationId = settledTransaction.OperationId,

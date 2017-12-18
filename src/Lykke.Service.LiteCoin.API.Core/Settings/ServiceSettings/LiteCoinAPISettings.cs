@@ -14,7 +14,7 @@ namespace Lykke.Service.LiteCoin.API.Core.Settings.ServiceSettings
         public string[] SourceWallets { get; set; }
 
         [Optional]
-        public int FeePerByte { get; set; } = 100; // use default value 100 000 litoshi per kb = 100 litoshi per b. Ref https://bitcoin.stackexchange.com/questions/53821/where-can-i-find-the-current-fee-level-for-ltc
+        public int FeePerByte { get; set; } = 110; // use value greater than default value 100 000 litoshi per kb = 100 litoshi per b. Ref https://bitcoin.stackexchange.com/questions/53821/where-can-i-find-the-current-fee-level-for-ltc
 
         [Optional]
         public decimal MinFeeValue { get; set; } = 0.1m;

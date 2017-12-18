@@ -11,7 +11,7 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Operations.CashIn
         public string OperationId { get; set; }
         public DateTime DetectedAt { get; set; }
         public string WalletId { get; set; }
-        public double AmountSatoshi { get; set; }
+        public decimal Amount { get; set; }
         public string AssetId { get; set; }
         public string Address { get; set; }
         public string TxHash { get; set; }
@@ -35,7 +35,7 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Operations.CashIn
                 Address = source.Address,
                 OperationId = source.OperationId,
                 AssetId = source.OperationId,
-                AmountSatoshi = source.AmountSatoshi,
+                Amount = source.Amount,
                 DetectedAt = source.DetectedAt
             };
         }

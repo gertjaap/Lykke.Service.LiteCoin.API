@@ -13,14 +13,14 @@ using NBitcoin.OpenAsset;
 
 namespace Lykke.Service.LiteCoin.API.Services.TransactionOutputs
 {
-    public class TransactionOutputsFacade : ITransactionOutputsFacade
+    public class TransactionOutputsService : ITransactionOutputsService
     {
         private readonly Network _network;
         private readonly IBroadcastedOutputRepository _broadcastedOutputRepository;
         private readonly ISpentOutputRepository _spentOutputRepository;
         private readonly IBlockChainProvider _blockChainProvider;
 
-        public TransactionOutputsFacade(Network network, IBroadcastedOutputRepository broadcastedOutputRepository, ISpentOutputRepository spentOutputRepository, IBlockChainProvider blockChainProvider)
+        public TransactionOutputsService(Network network, IBroadcastedOutputRepository broadcastedOutputRepository, ISpentOutputRepository spentOutputRepository, IBlockChainProvider blockChainProvider)
         {
             _network = network;
             _broadcastedOutputRepository = broadcastedOutputRepository;

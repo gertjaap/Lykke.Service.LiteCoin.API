@@ -22,7 +22,7 @@ namespace Lykke.Service.LiteCoin.API.Tests
             var feePerByte = 100;
             var feeRateService = CreateFeeRateFacade(feePerByte);
 
-            var feeFacade = new FeeFacade(feeRateService.Object, 100, 1000);
+            var feeFacade = new FeeService(feeRateService.Object, 100, 1000);
 
             var txBuilder = GetTestTx(Network.RegTest);
 
@@ -38,7 +38,7 @@ namespace Lykke.Service.LiteCoin.API.Tests
             var feePerByte = 100;
             var feeRateService = CreateFeeRateFacade(feePerByte);
 
-            var feeFacade = new FeeFacade(feeRateService.Object, 100, 1000);
+            var feeFacade = new FeeService(feeRateService.Object, 100, 1000);
 
             var txBuilder = GetTestTx(Network.RegTest);
 
@@ -57,7 +57,7 @@ namespace Lykke.Service.LiteCoin.API.Tests
             var feeRateService = CreateFeeRateFacade(feePerByte);
 
             var feeMaxValue = 1000;
-            var feeFacade = new FeeFacade(feeRateService.Object, 100, feeMaxValue);
+            var feeFacade = new FeeService(feeRateService.Object, 100, feeMaxValue);
 
             var txBuilder = GetTestTx(Network.RegTest);
 
@@ -78,7 +78,7 @@ namespace Lykke.Service.LiteCoin.API.Tests
 
             var feeMaxValue = 1000;
             var feeMinValue = 125;
-            var feeFacade = new FeeFacade(feeRateService.Object, feeMinValue, feeMaxValue);
+            var feeFacade = new FeeService(feeRateService.Object, feeMinValue, feeMaxValue);
 
             var txBuilder = GetTestTx(Network.RegTest);
 

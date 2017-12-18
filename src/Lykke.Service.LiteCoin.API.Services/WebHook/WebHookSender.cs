@@ -54,7 +54,7 @@ namespace Lykke.Service.LiteCoin.API.Services.WebHook
             _failedWebHookEventRepository = failedWebHookEventRepository;
         }
 
-        public async Task ProcessCashIn(string operationId, DateTime dateTime, string walletId, string assetId, double amount,
+        public async Task ProcessCashIn(string operationId, DateTime dateTime, string walletId, string assetId, decimal amount,
             string sourceAddress)
         {
             var requestData = new WebHookCashInRequestContract

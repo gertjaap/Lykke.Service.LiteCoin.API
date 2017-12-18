@@ -16,7 +16,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Fee
 
         public Task<int> GetFeePerByte()
         {
-            return Task.FromResult(_feePerByte);
+            return Task.FromResult(_feePerByte * _feeRateMultiplayer);
         }
     }
 }

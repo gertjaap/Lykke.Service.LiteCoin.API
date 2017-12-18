@@ -19,6 +19,9 @@ namespace Lykke.Service.LiteCoin.API.Core.Exceptions
     {
         Exception = 0,
         CantFindAddressToSignTx = 1,
-        TransactionConcurrentInputsProblem = 2
+        TransactionConcurrentInputsProblem = 2,
+        BadInputParameter = 3,
+        NotEnoughFundsAvailable = 4
+
     }
 }

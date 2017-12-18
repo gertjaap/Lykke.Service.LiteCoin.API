@@ -151,6 +151,15 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.TransactionOutput.SpentOu
             }
         }
 
+        public async Task DeleteOutput(string transactionHash, int n)
+        {
+            var output = await _storage.DeleteAsync(SpentOutputTableEntity.ByTransactionHash.GeneratePartitionKey(), SpentOutputTableEntity.ByTransactionHash.GenerateRowKey(transactionHash, n));
+            if (output != null)
+            {
+                await _storage.DeleteAsync(SpentOutputTableEntity.ByDateTime.Create(output));
+            }
+        }
+
         private async Task<IEnumerable<ISpentOutput>> GetOldOutputs(DateTime bound, int count)
         {
             return (await _storage.GetTopRecordsAsync(SpentOutputTableEntity.ByDateTime.GeneratePartition(), count))

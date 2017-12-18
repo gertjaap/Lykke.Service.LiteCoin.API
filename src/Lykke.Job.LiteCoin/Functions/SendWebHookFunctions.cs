@@ -18,7 +18,7 @@ namespace Lykke.Job.LiteCoin.Functions
         public async Task SendCashInNotification(CashInNotificationContext context)
         {
             await _webHookSender.ProcessCashIn(operationId: context.OperationId, dateTime: context.DateTime,
-                walletId: context.WalletId, assetId: context.AssetId, amount: context.AmountSatoshi,
+                walletId: context.WalletId, assetId: context.AssetId, amount: context.Amount,
                 sourceAddress: context.SourceAddress);
         }
 

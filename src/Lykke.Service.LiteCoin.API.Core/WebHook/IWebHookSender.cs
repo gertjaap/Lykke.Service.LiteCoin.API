@@ -9,7 +9,7 @@ namespace Lykke.Service.LiteCoin.API.Core.WebHook
             DateTime dateTime,
             string walletId, 
             string assetId, 
-            double amount, 
+            decimal amount, 
             string sourceAddress);
 
         Task ProcessCashOutStarted(string operationId,

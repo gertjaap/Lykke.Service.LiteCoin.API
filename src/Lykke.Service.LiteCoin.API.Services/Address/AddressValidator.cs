@@ -10,15 +10,20 @@ namespace Lykke.Service.LiteCoin.API.Services.Address
     {
         public bool IsValid(string address)
         {
+            var addr = GetBitcoinAddress(address);
+
+            return addr != null;
+        }
+
+        public BitcoinAddress GetBitcoinAddress(string address)
+        {
             try
             {
-                BitcoinAddress.Create(address);
-
-                return true;
+                return BitcoinAddress.Create(address);
             }
             catch
             {
-                return false;
+                return null;
             }
         }
     }

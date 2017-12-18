@@ -18,6 +18,8 @@ namespace Lykke.Service.LiteCoin.API.Core.TransactionOutputs.SpentOutputs
         int N { get; set; }
     }
 
+
+
     public interface ISpentOutputRepository
     {
         Task InsertSpentOutputs(IEnumerable<ISpentOutput> outputs);
@@ -25,5 +27,7 @@ namespace Lykke.Service.LiteCoin.API.Core.TransactionOutputs.SpentOutputs
         Task<IEnumerable<ISpentOutput>> GetUnspentOutputs(IEnumerable<IOutput> outputs);
 
         Task DeleteOldOutputs(DateTime boun);
+
+        Task DeleteOutput(string transactionHash, int n);
     }
 }
