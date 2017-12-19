@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using NBitcoin;
 
 namespace Lykke.Service.LiteCoin.API.Core.Wallet
 {
     public interface IWallet
     {
-        string Address { get; }
+        BitcoinAddress Address { get; }
 
         string WalletId { get; }
     }

@@ -55,13 +55,12 @@ namespace Lykke.Service.LiteCoin.API.Services.Operations
             {
                 try
                 {
-                    var hotWalletAddr = BitcoinAddress.Create(hotWallet.Address);
 
-                    var tx = await _transactionBuilder.GetTransferTransaction(hotWalletAddr, 
+                    var tx = await _transactionBuilder.GetTransferTransaction(hotWallet.Address, 
                         destAddress,
                         amount);
 
-                    await _signService.SignTransaction(tx.Transaction, hotWalletAddr);
+                    await _signService.SignTransaction(tx.Transaction, hotWallet.Address);
 
                     await _blockChainProvider.BroadCastTransaction(tx.Transaction);
 

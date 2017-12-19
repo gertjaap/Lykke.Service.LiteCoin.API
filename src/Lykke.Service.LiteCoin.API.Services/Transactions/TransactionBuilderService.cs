@@ -80,7 +80,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Transactions
         {
             var fromStr = from.ToString();
             var coins = (await _transactionOutputsService.GetUnspentOutputs(fromStr)).ToList();
-            var balance = coins.Cast<Coin>().Select(o => o.Amount).DefaultIfEmpty()
+            var balance = coins.Select(o => o.Amount).DefaultIfEmpty()
                 .Sum(o => o?.ToDecimal(MoneyUnit.BTC) ?? 0);
             if (sendDust && balance > amount &&
                 balance - amount < new TxOut(Money.Zero, from)
@@ -91,7 +91,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Transactions
         }
 
         public async Task<decimal> SendWithChange(TransactionBuilder builder, TransactionBuildContext context,
-            List<ICoin> coins, IDestination destination, Money amount, IDestination changeDestination,
+            List<Coin> coins, IDestination destination, Money amount, IDestination changeDestination,
             bool addDust = true)
         {
             if (amount.Satoshi <= 0)

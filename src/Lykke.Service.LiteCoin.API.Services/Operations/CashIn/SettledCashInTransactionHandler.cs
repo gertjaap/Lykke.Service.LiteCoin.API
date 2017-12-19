@@ -10,13 +10,16 @@ namespace Lykke.Service.LiteCoin.API.Services.Operations.CashIn
     public class SettledCashInTransactionHandler: ISettledCashInTransactionHandler
     {
         private readonly IQueueRouter<CashInNotificationContext> _webHookQueue;
+        private readonly IQueueRouter<SendCashInToHotWalletContext> _sendCashInToHotWalletQueue;
         private readonly ICashInOperationRepository _cashInOperationRepository;
 
         public SettledCashInTransactionHandler(IQueueRouter<CashInNotificationContext> webHookQueue, 
-            ICashInOperationRepository cashInOperationRepository)
+            ICashInOperationRepository cashInOperationRepository, 
+            IQueueRouter<SendCashInToHotWalletContext> sendCashInToHotWalletQueue)
         {
             _webHookQueue = webHookQueue;
             _cashInOperationRepository = cashInOperationRepository;
+            _sendCashInToHotWalletQueue = sendCashInToHotWalletQueue;
         }
 
         public async Task HandleSettledTransactions(IEnumerable<ICashInOperation> settledTransactions)
@@ -33,6 +36,11 @@ namespace Lykke.Service.LiteCoin.API.Services.Operations.CashIn
                     OperationId = settledTransaction.OperationId,
                     SourceAddress = settledTransaction.Address,
                     WalletId = settledTransaction.WalletId
+                });
+
+                await _sendCashInToHotWalletQueue.AddMessage(new SendCashInToHotWalletContext
+                {
+                    OperationId = settledTransaction.OperationId,
                 });
             }
         }

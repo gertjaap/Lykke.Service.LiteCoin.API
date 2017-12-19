@@ -32,6 +32,11 @@ namespace Lykke.Service.LiteCoin.API.Services.BlockChainProviders.InsightApi
             return resp.Transactions;
         }
 
+        public Task<IEnumerable<string>> GetTransactionsForAddress(BitcoinAddress address, int fromHeight, int toHeight)
+        {
+            return GetTransactionsForAddress(address.ToString(), fromHeight, toHeight);
+        }
+
         public async Task<int> GetLastBlockHeight()
         {
             var resp = await _insightApiSettings.Url
@@ -76,7 +81,7 @@ namespace Lykke.Service.LiteCoin.API.Services.BlockChainProviders.InsightApi
             }
         }
 
-        public async Task<IEnumerable<ICoin>> GetUnspentOutputs(string address, int minConfirmationCount)
+        public async Task<IEnumerable<Coin>> GetUnspentOutputs(string address, int minConfirmationCount)
         {
             var resp =await _insightApiSettings.Url
                 .AppendPathSegment($"insight-lite-api/addr/{address}/utxo")
@@ -85,7 +90,7 @@ namespace Lykke.Service.LiteCoin.API.Services.BlockChainProviders.InsightApi
             return resp.Where(p => p.Confirmation >= minConfirmationCount).Select(MapUnspentCoun);
         }
 
-        private ICoin MapUnspentCoun(AddressUnspentOutputsResponce source)
+        private Coin MapUnspentCoun(AddressUnspentOutputsResponce source)
         {
             return new Coin(new OutPoint(uint256.Parse(source.TxHash), source.N), new TxOut(new Money(source.Satoshi, MoneyUnit.Satoshi), source.ScriptPubKey.ToScript()));
         }

@@ -69,9 +69,8 @@ namespace Lykke.Service.LiteCoin.API.Services.Operations.CashIn
         private async Task<ICashInOperation> GetOperationFromTx(string txHash, IWallet wallet)
         {
             var tx = await _blockChainProvider.GetRawTx(txHash);
-            var addr = BitcoinAddress.Create(wallet.Address, _network);
 
-            var coins = tx.Outputs.AsCoins().Where(p => p.ScriptPubKey.GetDestinationAddress(_network) == addr).ToList();
+            var coins = tx.Outputs.AsCoins().Where(p => p.ScriptPubKey.GetDestinationAddress(_network) == wallet.Address).ToList();
 
             if (coins.Any())
             {
@@ -79,7 +78,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Operations.CashIn
             
                 return CashInOperation.Create(operationId: Guid.NewGuid().ToString("N"), 
                     walletId: wallet.WalletId,
-                    address: wallet.Address,
+                    address: wallet.Address.ToString(),
                     txHash: txHash,
                     amount: amount,
                     assetId: Constants.AssetsContants.LiteCoin, detectedAt: DateTime.UtcNow);

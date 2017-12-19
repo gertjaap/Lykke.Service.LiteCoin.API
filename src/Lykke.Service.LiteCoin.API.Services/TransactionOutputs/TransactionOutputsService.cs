@@ -28,7 +28,7 @@ namespace Lykke.Service.LiteCoin.API.Services.TransactionOutputs
             _blockChainProvider = blockChainProvider;
         }
 
-        public async Task<IEnumerable<ICoin>> GetUnspentOutputs(string address, int confirmationsCount = 0)
+        public async Task<IEnumerable<Coin>> GetUnspentOutputs(string address, int confirmationsCount = 0)
         {
             var coins = (await _blockChainProvider.GetUnspentOutputs(address, confirmationsCount)).ToList();
 
@@ -43,14 +43,14 @@ namespace Lykke.Service.LiteCoin.API.Services.TransactionOutputs
             return coins;
         }
 
-        public async Task<IEnumerable<ICoin>> GetOnlyBlockChainUnspentOutputs(string address, int confirmationsCount = 0)
+        public async Task<IEnumerable<Coin>> GetOnlyBlockChainUnspentOutputs(string address, int confirmationsCount = 0)
         {
             var coins = (await _blockChainProvider.GetUnspentOutputs(address, confirmationsCount)).ToList();
 
             return coins;
         }
 
-        private async Task AddBroadcastedOutputs(List<ICoin> coins, string walletAddress)
+        private async Task AddBroadcastedOutputs(List<Coin> coins, string walletAddress)
         {
             var set = new HashSet<OutPoint>(coins.Select(x => x.Outpoint));
 
@@ -66,7 +66,7 @@ namespace Lykke.Service.LiteCoin.API.Services.TransactionOutputs
             }));
         }
 
-        private async Task<List<ICoin>> FilterCoins(List<ICoin> coins)
+        private async Task<List<Coin>> FilterCoins(List<Coin> coins)
         {
             var unspentOutputs = await _spentOutputRepository.GetUnspentOutputs(coins.Select(o => new Output(o.Outpoint)));
 
