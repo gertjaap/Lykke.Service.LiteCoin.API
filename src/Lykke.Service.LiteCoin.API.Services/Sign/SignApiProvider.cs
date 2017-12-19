@@ -27,5 +27,10 @@ namespace Lykke.Service.LiteCoin.API.Services.Sign
         {
             throw new NotImplementedException();
         }
+
+        public Task<(string walletId, string blockChainAddress)> CreateWallet()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

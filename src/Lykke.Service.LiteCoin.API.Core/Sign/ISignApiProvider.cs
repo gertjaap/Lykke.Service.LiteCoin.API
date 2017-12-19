@@ -15,5 +15,8 @@ namespace Lykke.Service.LiteCoin.API.Core.Sign
         Task<(string walletId, string blockChainAddress)> GetByWalletId(string walletId);
 
         Task<IEnumerable<(string walletId, string blockChainAddress)>> GetAllWallets();
+
+
+        Task<(string walletId, string blockChainAddress)> CreateWallet();
     }
 }

@@ -69,5 +69,12 @@ namespace Lykke.Service.LiteCoin.API.Services.Wallet
 
             return Wallet.Create(_addressValidator.GetBitcoinAddress(resp.blockChainAddress), resp.walletId);
         }
+
+        public async Task<IWallet> CreateWallet()
+        {
+            var resp = await _apiProvider.CreateWallet();
+
+            return Wallet.Create(_addressValidator.GetBitcoinAddress(resp.blockChainAddress), resp.walletId);
+        }
     }
 }
