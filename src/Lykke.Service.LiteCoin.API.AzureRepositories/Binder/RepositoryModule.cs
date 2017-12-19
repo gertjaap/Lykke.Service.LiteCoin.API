@@ -1,4 +1,5 @@
 ﻿using Autofac;
+using AzureStorage.Blob;
 using AzureStorage.Tables;
 using Common.Log;
 using Lykke.Service.LiteCoin.API.AzureRepositories.CashOut;
@@ -9,6 +10,7 @@ using Lykke.Service.LiteCoin.API.AzureRepositories.Queue;
 using Lykke.Service.LiteCoin.API.AzureRepositories.TransactionOutput;
 using Lykke.Service.LiteCoin.API.AzureRepositories.TransactionOutput.BroadcastedOutputs;
 using Lykke.Service.LiteCoin.API.AzureRepositories.TransactionOutput.SpentOutputs;
+using Lykke.Service.LiteCoin.API.AzureRepositories.Transactions;
 using Lykke.Service.LiteCoin.API.AzureRepositories.TxTracker;
 using Lykke.Service.LiteCoin.API.AzureRepositories.WebHook;
 using Lykke.Service.LiteCoin.API.Core.BlockChainTracker;
@@ -18,6 +20,7 @@ using Lykke.Service.LiteCoin.API.Core.Queue;
 using Lykke.Service.LiteCoin.API.Core.Settings.ServiceSettings;
 using Lykke.Service.LiteCoin.API.Core.TransactionOutputs.BroadcastedOutputs;
 using Lykke.Service.LiteCoin.API.Core.TransactionOutputs.SpentOutputs;
+using Lykke.Service.LiteCoin.API.Core.Transactions;
 using Lykke.Service.LiteCoin.API.Core.WebHook;
 using Lykke.SettingsReader;
 
@@ -37,6 +40,7 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Binder
         {
             RegisterRepo(builder);
             RegisterQueue(builder);
+            RegisterBlob(builder);
         }
 
         private void RegisterRepo(ContainerBuilder builder)
@@ -84,6 +88,13 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Binder
                 .As<IQueueFactory>();
 
             builder.RegisterGeneric(typeof(QueueRouter<>)).As(typeof(IQueueRouter<>)).InstancePerDependency();
+        }
+
+        private void RegisterBlob(ContainerBuilder builder)
+        {
+            builder.RegisterInstance(
+                new TransactionBlobStorage(AzureBlobStorage.Create(_settings.Nested(p => p.Db.DataConnString))))
+                .As<ITransactionBlobStorage>();
         }
     }
 }

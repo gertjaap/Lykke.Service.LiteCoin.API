@@ -26,6 +26,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Operations
         private readonly ICashOutOperationRepository _cashOutOperationRepository;
         private readonly IPendingCashoutTransactionRepository _pendingCashoutTransactionRepository;
         private readonly ILog _log;
+        private readonly ITransactionBlobStorage _transactionBlobStorage;
 
         public OperationService(IWalletService walletService, 
             ITransactionBuilderService transactionBuilder, 
@@ -34,7 +35,8 @@ namespace Lykke.Service.LiteCoin.API.Services.Operations
             IQueueRouter<CashOutStartedNotificationContext> cashoutCompletedNotificationQueue, 
             ICashOutOperationRepository cashOutOperationRepository,
             IPendingCashoutTransactionRepository pendingCashoutTransactionRepository,
-            ILog log)
+            ILog log, 
+            ITransactionBlobStorage transactionBlobStorage)
         {
             _walletService = walletService;
             _transactionBuilder = transactionBuilder;
@@ -44,6 +46,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Operations
             _cashOutOperationRepository = cashOutOperationRepository;
             _pendingCashoutTransactionRepository = pendingCashoutTransactionRepository;
             _log = log;
+            _transactionBlobStorage = transactionBlobStorage;
         }
 
         public async Task ProceedCashOutOperation(string operationId, IWallet sourceWallet, BitcoinAddress destAddress, decimal amount)
@@ -55,12 +58,15 @@ namespace Lykke.Service.LiteCoin.API.Services.Operations
             {
                 try
                 {
-
                     var tx = await _transactionBuilder.GetTransferTransaction(hotWallet.Address, 
                         destAddress,
                         amount);
 
+                    await _transactionBlobStorage.AddOrReplaceTransaction(operationId, TransactionBlobType.Initial, tx.Transaction.ToHex());
+
                     await _signService.SignTransaction(tx.Transaction, hotWallet.Address);
+
+                    await _transactionBlobStorage.AddOrReplaceTransaction(operationId, TransactionBlobType.Signed, tx.Transaction.ToHex());
 
                     await _blockChainProvider.BroadCastTransaction(tx.Transaction);
 
