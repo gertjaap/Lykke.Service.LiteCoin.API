@@ -40,7 +40,7 @@ namespace Lykke.Service.LiteCoin.API.Core.CashIn
 
         public static CashInOperation Create(string operationId, 
             string walletId,
-            string address,
+            string sourceAddress,
             string txHash,
             decimal amount, 
             string assetId, 
@@ -52,7 +52,7 @@ namespace Lykke.Service.LiteCoin.API.Core.CashIn
             {
                 OperationId = operationId,
                 AssetId = assetId,
-                SourceAddress = address,
+                SourceAddress = sourceAddress,
                 Amount = amount,
                 TxHash = txHash,
                 DestinationWalletId = walletId,
