@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using Lykke.Service.LiteCoin.API.Core.Address;
+﻿using Lykke.Service.LiteCoin.API.Core.Address;
 using Lykke.Service.LiteCoin.API.Models.Address;
 using Microsoft.AspNetCore.Mvc;
-using NBitcoin;
 
 namespace Lykke.Service.LiteCoin.API.Controllers
 {

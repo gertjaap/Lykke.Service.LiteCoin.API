@@ -6,14 +6,9 @@ using NBitcoin;
 
 namespace Lykke.Service.LiteCoin.API.Services.Sign
 {
-    public class SignApiProvider: ISignApiProvider
+    public class BlockchainSignServiceApiProvider: IBlockchainSignServiceApiProvider
     {
         public Task<Transaction> SignTransaction(Transaction unsignedTransaction, params string[] walletIds)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<(string walletId, string blockChainAddress)> GetByBlockChainAddress(string blockChainAddress)
         {
             throw new NotImplementedException();
         }

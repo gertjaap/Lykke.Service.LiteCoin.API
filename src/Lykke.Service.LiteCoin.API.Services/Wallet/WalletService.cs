@@ -28,19 +28,19 @@ namespace Lykke.Service.LiteCoin.API.Services.Wallet
     public class WalletService: IWalletService
     {
         private readonly HotWalletsSettings _hotWalletsSettings;
-        private readonly ISignApiProvider _apiProvider;
+        private readonly IBlockchainSignServiceApiProvider _serviceApiProvider;
         private readonly IAddressValidator _addressValidator;
 
-        public WalletService(HotWalletsSettings hotWalletsSettings, ISignApiProvider apiProvider, IAddressValidator addressValidator)
+        public WalletService(HotWalletsSettings hotWalletsSettings, IBlockchainSignServiceApiProvider serviceApiProvider, IAddressValidator addressValidator)
         {
             _hotWalletsSettings = hotWalletsSettings;
-            _apiProvider = apiProvider;
+            _serviceApiProvider = serviceApiProvider;
             _addressValidator = addressValidator;
         }
 
         public async Task<IEnumerable<IWallet>> GetClientWallets()
         {
-            var allWallets = await _apiProvider.GetAllWallets();
+            var allWallets = await _serviceApiProvider.GetAllWallets();
 
             var hotWallets = _hotWalletsSettings.SourceWalletIds.Distinct().ToDictionary(p => p);
 
@@ -49,7 +49,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Wallet
 
         public async Task<IEnumerable<IWallet>> GetHotWallets()
         {
-            var allWallets = await _apiProvider.GetAllWallets();
+            var allWallets = await _serviceApiProvider.GetAllWallets();
 
             var hotWallets = _hotWalletsSettings.SourceWalletIds.Distinct().ToDictionary(p => p);
 
@@ -58,21 +58,14 @@ namespace Lykke.Service.LiteCoin.API.Services.Wallet
 
         public async Task<IWallet> GetByWalletId(string walletId)
         {
-            var resp = await _apiProvider.GetByWalletId(walletId);
-
-            return Wallet.Create(_addressValidator.GetBitcoinAddress(resp.blockChainAddress), resp.walletId);
-        }
-
-        public async Task<IWallet> GetByBlockChainAddress(string address)
-        {
-            var resp = await _apiProvider.GetByBlockChainAddress(address);
+            var resp = await _serviceApiProvider.GetByWalletId(walletId);
 
             return Wallet.Create(_addressValidator.GetBitcoinAddress(resp.blockChainAddress), resp.walletId);
         }
 
         public async Task<IWallet> CreateWallet()
         {
-            var resp = await _apiProvider.CreateWallet();
+            var resp = await _serviceApiProvider.CreateWallet();
 
             return Wallet.Create(_addressValidator.GetBitcoinAddress(resp.blockChainAddress), resp.walletId);
         }

@@ -57,7 +57,7 @@ namespace Lykke.Service.LiteCoin.API.Tests
             Func<CashOutCompletedNotificationContext, bool> validateContext = p =>
             {
 
-                if (p.OperationId == op.OperationId && p.Amount == op.Amount && p.TxHash == op.TxHash && p.WalletId == op.WalletId && p.DestAddress == op.Address)
+                if (p.OperationId == op.OperationId)
 
                 {
                     return true;

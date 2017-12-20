@@ -9,9 +9,8 @@ using Microsoft.WindowsAzure.Storage.Table;
 
 namespace Lykke.Service.LiteCoin.API.AzureRepositories.WebHook
 {
-    internal class FailedWebHookEventEntity : TableEntity
+    internal class FailedWebHookEventEntity : TableEntity, IFailedWebHookEvent
     {
-        public string Data { get; set; }
         public static string GeneratePartitionKey()
         {
 
@@ -23,15 +22,23 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.WebHook
             return operationId;
         }
 
-        public static FailedWebHookEventEntity Create(object eventData, string operationId)
+        public static FailedWebHookEventEntity Create(IFailedWebHookEvent source)
         {
             return new FailedWebHookEventEntity
             {
                 PartitionKey = GeneratePartitionKey(),
-                Data = eventData.ToJson(),
-                RowKey = GenerateRowKey(operationId)
+                RowKey = GenerateRowKey(source.OperationId),
+                OperationId = source.OperationId,
+                Context = source.Context,
+                WebHookType = source.WebHookType.ToString()
             };
         }
+
+        public string OperationId { get; set; }
+        public string Context { get; set; }
+
+        public string WebHookType { get; set; }
+        WebHookType IFailedWebHookEvent.WebHookType => Enum.Parse<WebHookType>(WebHookType);
     }
 
     internal class FailedWebHookEventRepository: IFailedWebHookEventRepository
@@ -43,15 +50,20 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.WebHook
             _storage = storage;
         }
 
-        public Task Insert(object eventData, string operationId)
+        public Task Insert(IFailedWebHookEvent ev)
         {
-            return _storage.InsertOrReplaceAsync(FailedWebHookEventEntity.Create(eventData, operationId));
+            return _storage.InsertOrReplaceAsync(FailedWebHookEventEntity.Create(ev));
         }
 
         public Task DeleteIfExist(string operationId)
         {
             return _storage.DeleteIfExistAsync(FailedWebHookEventEntity.GeneratePartitionKey(),
                 FailedWebHookEventEntity.GenerateRowKey(operationId));
+        }
+
+        public async Task<IEnumerable<IFailedWebHookEvent>> GetAll()
+        {
+            return await _storage.GetDataAsync(FailedWebHookEventEntity.GeneratePartitionKey());
         }
     }
 }

@@ -50,13 +50,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Operations.CashOut
 
             await _notificationsQueue.AddMessage(new CashOutCompletedNotificationContext
             {
-                Amount = operation.Amount,
-                AssetId = operation.AssetId,
-                DateTime = operation.StartedAt,
-                DestAddress = operation.Address,
-                OperationId = operation.OperationId,
-                TxHash = operation.TxHash,
-                WalletId = operation.WalletId
+                OperationId = operation.OperationId
             });
 
             await _cashOutOperationRepository.SetCompleted(tx.OperationId, DateTime.UtcNow);

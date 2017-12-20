@@ -64,7 +64,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Operations
 
                     await _transactionBlobStorage.AddOrReplaceTransaction(operationId, TransactionBlobType.Initial, tx.Transaction.ToHex());
 
-                    await _signService.SignTransaction(tx.Transaction, hotWallet.Address);
+                    await _signService.SignTransaction(tx.Transaction, hotWallet.WalletId);
 
                     await _transactionBlobStorage.AddOrReplaceTransaction(operationId, TransactionBlobType.Signed, tx.Transaction.ToHex());
 
@@ -78,12 +78,6 @@ namespace Lykke.Service.LiteCoin.API.Services.Operations
 
                     await _cashoutCompletedNotificationQueue.AddMessage(new CashOutStartedNotificationContext
                     {
-                        Amount = amount,
-                        AssetId = assetId,
-                        DateTime = DateTime.UtcNow,
-                        DestAddress = destAddress.ToString(),
-                        TxHash = tx.Transaction.GetHash().ToString(),
-                        WalletId = sourceWallet.WalletId,
                         OperationId = operationId
                     });
 

@@ -30,12 +30,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Operations.CashIn
                 
                 await _webHookQueue.AddMessage(new CashInNotificationContext
                 {
-                    Amount = settledTransaction.Amount,
-                    AssetId = settledTransaction.AssetId,
-                    DateTime = settledTransaction.DetectedAt,
-                    OperationId = settledTransaction.OperationId,
-                    SourceAddress = settledTransaction.Address,
-                    WalletId = settledTransaction.WalletId
+                    OperationId = settledTransaction.OperationId
                 });
 
                 await _sendCashInToHotWalletQueue.AddMessage(new SendCashInToHotWalletContext

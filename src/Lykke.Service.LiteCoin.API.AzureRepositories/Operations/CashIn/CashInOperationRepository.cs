@@ -14,10 +14,10 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Operations.CashIn
     {
         public string OperationId { get; set; }
         public DateTime DetectedAt { get; set; }
-        public string WalletId { get; set; }
+        public string DestinationWalletId { get; set; }
         public decimal Amount { get; set; }
         public string AssetId { get; set; }
-        public string Address { get; set; }
+        public string SourceAddress { get; set; }
         public string TxHash { get; set; }
         public bool MoneyTransferredToHotWallet { get; set; }
         public DateTime? MoneyTransferredToHotWalletAt { get; set; }
@@ -87,12 +87,12 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Operations.CashIn
             {
                 PartitionKey = partitionKey,
                 RowKey = rowKey,
-                Address = source.Address,
+                SourceAddress = source.SourceAddress,
                 OperationId = source.OperationId,
                 AssetId = source.OperationId,
                 Amount = source.Amount,
                 DetectedAt = source.DetectedAt,
-                WalletId = source.WalletId,
+                DestinationWalletId = source.DestinationWalletId,
                 TxHash = source.TxHash,
                 MoneyTransferredToHotWallet = source.MoneyTransferredToHotWallet,
                 MoneyTransferredToHotWalletAt = source.MoneyTransferredToHotWalletAt

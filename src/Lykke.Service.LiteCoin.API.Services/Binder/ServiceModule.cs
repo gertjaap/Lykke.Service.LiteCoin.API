@@ -113,7 +113,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Binder
             }).SingleInstance();
             
             builder.RegisterType<SignService>().As<ISignService>().SingleInstance();
-            builder.RegisterType<SignApiProvider>().As<ISignApiProvider>().SingleInstance();
+            builder.RegisterType<BlockchainSignServiceApiProvider>().As<IBlockchainSignServiceApiProvider>().SingleInstance();
 
             RegisterWalletServices(builder);
         }

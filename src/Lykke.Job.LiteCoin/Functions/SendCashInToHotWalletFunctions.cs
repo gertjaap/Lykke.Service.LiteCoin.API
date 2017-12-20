@@ -59,7 +59,8 @@ namespace Lykke.Job.LiteCoin.Functions
 
                 return;
             }
-            var clientWallet = await _walletService.GetByBlockChainAddress(operation.Address);
+
+            var clientWallet = await _walletService.GetByWalletId(operation.DestinationWalletId);
 
             if (clientWallet == null)
             {
@@ -71,7 +72,7 @@ namespace Lykke.Job.LiteCoin.Functions
 
             var hotWallet = (await _walletService.GetHotWallets()).First();
             
-            var outputs = (await _outputsService.GetOnlyBlockChainUnspentOutputs(operation.Address)).ToList();
+            var outputs = (await _outputsService.GetOnlyBlockChainUnspentOutputs(operation.SourceAddress)).ToList();
             var balance = outputs.Sum(o => o.Amount);
 
             if (outputs.Any())
@@ -96,7 +97,7 @@ namespace Lykke.Job.LiteCoin.Functions
                     TransactionBlobType.Initial,
                     unsignedTx.ToHex());
 
-                var signedTx = await _signService.SignTransaction(unsignedTx, clientWallet.Address);
+                var signedTx = await _signService.SignTransaction(unsignedTx, clientWallet.WalletId);
 
                 await _transactionBlobStorage.AddOrReplaceTransaction(operation.OperationId,
                     TransactionBlobType.Signed,

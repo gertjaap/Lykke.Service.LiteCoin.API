@@ -50,7 +50,7 @@ namespace Lykke.Service.LiteCoin.API.Controllers
 
             if (sourceWallet == null)
             {
-                throw new BackendException($"WalletId {request.SourceWalletId} not found", ErrorCode.BadInputParameter);
+                throw new BackendException($"DestinationWalletId {request.SourceWalletId} not found", ErrorCode.BadInputParameter);
             }
 
             var operationId = Guid.NewGuid().ToString();

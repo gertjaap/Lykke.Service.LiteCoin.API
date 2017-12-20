@@ -20,8 +20,6 @@ namespace Lykke.Service.LiteCoin.API.Core.Wallet
         Task<IEnumerable<IWallet>> GetHotWallets();
 
         Task<IWallet> GetByWalletId(string walletId);
-
-        Task<IWallet> GetByBlockChainAddress(string address);
         Task<IWallet> CreateWallet();
     }
 }

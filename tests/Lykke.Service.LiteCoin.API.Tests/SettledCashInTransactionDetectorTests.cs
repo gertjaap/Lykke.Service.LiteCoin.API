@@ -37,7 +37,7 @@ namespace Lykke.Service.LiteCoin.API.Tests
 
             var op = ops.First();
 
-            Assert.True(op.Address == addr.ToString());
+            Assert.True(op.SourceAddress == addr.ToString());
 
             Assert.True(op.TxHash == tx.GetHash().ToString());
             
@@ -47,7 +47,7 @@ namespace Lykke.Service.LiteCoin.API.Tests
             Assert.True(op.AssetId == Constants.AssetsContants.LiteCoin);
 
 
-            Assert.True(op.WalletId == walletId);
+            Assert.True(op.DestinationWalletId == walletId);
             
         }
 
