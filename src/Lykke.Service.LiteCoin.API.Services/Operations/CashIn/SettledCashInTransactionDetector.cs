@@ -85,10 +85,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Operations.CashIn
                         continue;
                     }
 
-                    sourceAddress = prevTx.Outputs[txInput.PrevOut.N]
-                        .ScriptPubKey
-                        .GetDestinationAddress(_network)
-                        ?.ToString();
+                    sourceAddress = await _blockChainProvider.GetDestinationAddress(txInput.PrevOut.Hash.ToString(), txInput.PrevOut.N); // Nbitcoin library function GetDestitionAddress  returns not valid address
 
                     if (sourceAddress != null)
                     {

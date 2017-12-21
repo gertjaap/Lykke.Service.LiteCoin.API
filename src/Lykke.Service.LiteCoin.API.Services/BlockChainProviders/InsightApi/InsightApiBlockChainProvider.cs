@@ -67,18 +67,7 @@ namespace Lykke.Service.LiteCoin.API.Services.BlockChainProviders.InsightApi
 
         public async Task<int> GetTxConfirmationCount(string txHash)
         {
-            try
-            {
-                var resp = await _insightApiSettings.Url
-                    .AppendPathSegment($"insight-lite-api/tx/{txHash}")
-                    .GetJsonAsync<TxResponceContract>();
-
-                return resp.Confirmation;
-            }
-            catch (FlurlHttpException e) when (e.Call.Response.StatusCode == HttpStatusCode.NotFound)
-            {
-                return 0;
-            }
+            return (await GetTx(txHash))?.Confirmation ?? 0;
         }
 
         public async Task<IEnumerable<Coin>> GetUnspentOutputs(string address, int minConfirmationCount)
@@ -90,9 +79,30 @@ namespace Lykke.Service.LiteCoin.API.Services.BlockChainProviders.InsightApi
             return resp.Where(p => p.Confirmation >= minConfirmationCount).Select(MapUnspentCoun);
         }
 
+        public async Task<string> GetDestinationAddress(string txHash, uint n)
+        {
+            return (await GetTx(txHash))?.Outputs?.FirstOrDefault(p => p.N == n)?.ScriptPubKey?.Addresses?.FirstOrDefault();
+        }
+
         private Coin MapUnspentCoun(AddressUnspentOutputsResponce source)
         {
             return new Coin(new OutPoint(uint256.Parse(source.TxHash), source.N), new TxOut(new Money(source.Satoshi, MoneyUnit.Satoshi), source.ScriptPubKey.ToScript()));
+        }
+
+        private async Task<TxResponceContract> GetTx(string txHash)
+        {
+            try
+            {
+                var resp = await _insightApiSettings.Url
+                    .AppendPathSegment($"insight-lite-api/tx/{txHash}")
+                    .GetJsonAsync<TxResponceContract>();
+
+                return resp;
+            }
+            catch (FlurlHttpException e) when (e.Call.Response.StatusCode == HttpStatusCode.NotFound)
+            {
+                return null;
+            }
         }
     }
 }

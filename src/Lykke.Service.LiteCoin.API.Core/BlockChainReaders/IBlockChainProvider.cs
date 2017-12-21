@@ -13,5 +13,6 @@ namespace Lykke.Service.LiteCoin.API.Core.BlockChainReaders
         Task BroadCastTransaction(Transaction tx);
         Task<int> GetTxConfirmationCount(string txHash);
         Task<IEnumerable<Coin>> GetUnspentOutputs(string address, int minConfirmationCount);
+        Task<string> GetDestinationAddress(string txHash, uint n);
     }
 }
