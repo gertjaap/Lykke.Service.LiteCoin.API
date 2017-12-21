@@ -64,13 +64,13 @@ namespace Lykke.Service.LiteCoin.API.Services.Operations
 
                     await _transactionBlobStorage.AddOrReplaceTransaction(operationId, TransactionBlobType.Initial, tx.Transaction.ToHex());
 
-                    await _signService.SignTransaction(tx.Transaction, hotWallet.WalletId);
+                    await _signService.SignTransaction(tx.Transaction, hotWallet.Address);
 
                     await _transactionBlobStorage.AddOrReplaceTransaction(operationId, TransactionBlobType.Signed, tx.Transaction.ToHex());
 
                     await _blockChainProvider.BroadCastTransaction(tx.Transaction);
 
-                    await _cashOutOperationRepository.Insert(CashOutOperation.Create(operationId, sourceWallet.WalletId,
+                    await _cashOutOperationRepository.Insert(CashOutOperation.Create(operationId, sourceWallet.Address.ToString(),
                         destAddress.ToString(), amount, assetId, DateTime.UtcNow, tx.Transaction.GetHash().ToString()));
 
                     await _pendingCashoutTransactionRepository.Insert(

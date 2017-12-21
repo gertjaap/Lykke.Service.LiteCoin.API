@@ -9,8 +9,7 @@ namespace Lykke.Service.LiteCoin.API.Core.Wallet
     public interface IWallet
     {
         BitcoinAddress Address { get; }
-
-        string WalletId { get; }
+        
     }
 
     public interface IWalletService
@@ -18,8 +17,7 @@ namespace Lykke.Service.LiteCoin.API.Core.Wallet
         Task<IEnumerable<IWallet>> GetClientWallets();
 
         Task<IEnumerable<IWallet>> GetHotWallets();
-
-        Task<IWallet> GetByWalletId(string walletId);
         Task<IWallet> CreateWallet();
+        Task<IWallet> GetByPublicAddress(string address);
     }
 }

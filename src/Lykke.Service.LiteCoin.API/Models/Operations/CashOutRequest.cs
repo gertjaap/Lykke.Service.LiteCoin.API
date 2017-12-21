@@ -6,7 +6,7 @@ namespace Lykke.Service.LiteCoin.API.Models.Operations
 {
     public class CashOutRequest
     {
-        public string SourceWalletId { get; set; } 
+        public string SourceAddress { get; set; } 
 
         public string DestAddress { get; set; }
 

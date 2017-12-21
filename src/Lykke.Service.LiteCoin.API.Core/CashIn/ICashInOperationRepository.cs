@@ -11,7 +11,7 @@ namespace Lykke.Service.LiteCoin.API.Core.CashIn
 
         DateTime DetectedAt { get; }
 
-        string DestinationWalletId { get; }
+        string DestinationAddress { get; }
 
         decimal Amount { get; }
 
@@ -30,7 +30,7 @@ namespace Lykke.Service.LiteCoin.API.Core.CashIn
     {
         public string OperationId { get; set; }
         public DateTime DetectedAt { get; set; }
-        public string DestinationWalletId { get; set; }
+        public string DestinationAddress { get; set; }
         public decimal Amount { get; set; }
         public string AssetId { get; set; }
         public string SourceAddress { get; set; }
@@ -39,7 +39,7 @@ namespace Lykke.Service.LiteCoin.API.Core.CashIn
         public DateTime? MoneyTransferredToHotWalletAt { get; set; }
 
         public static CashInOperation Create(string operationId, 
-            string walletId,
+            string destinationAddress,
             string sourceAddress,
             string txHash,
             decimal amount, 
@@ -55,7 +55,7 @@ namespace Lykke.Service.LiteCoin.API.Core.CashIn
                 SourceAddress = sourceAddress,
                 Amount = amount,
                 TxHash = txHash,
-                DestinationWalletId = walletId,
+                DestinationAddress = destinationAddress,
                 DetectedAt = detectedAt,
                 MoneyTransferredToHotWallet = moneyTransferredToHotWallet,
                 MoneyTransferredToHotWalletAt = moneyTransferredToHotWalletAt

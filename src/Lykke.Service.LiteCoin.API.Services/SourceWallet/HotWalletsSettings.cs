@@ -6,6 +6,6 @@ namespace Lykke.Service.LiteCoin.API.Services.SourceWallet
 {
     public class HotWalletsSettings
     {
-        public IEnumerable<string> SourceWalletIds { get; set; }
+        public IEnumerable<string> SourceWalletPublicAddresses { get; set; }
     }
 }

@@ -23,7 +23,8 @@ namespace Lykke.Service.LiteCoin.API.Core.Exceptions
         BadInputParameter = 3,
         NotEnoughFundsAvailable = 4,
         CashOutOperationNotFound = 5,
-        CashInOperationNotFound = 6
+        CashInOperationNotFound = 6,
+        WalletNotFound = 7
 
     }
 }

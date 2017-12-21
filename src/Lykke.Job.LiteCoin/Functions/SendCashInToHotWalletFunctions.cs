@@ -60,7 +60,7 @@ namespace Lykke.Job.LiteCoin.Functions
                 return;
             }
 
-            var clientWallet = await _walletService.GetByWalletId(operation.DestinationWalletId);
+            var clientWallet = await _walletService.GetByPublicAddress(operation.DestinationAddress);
 
             if (clientWallet == null)
             {
@@ -97,7 +97,7 @@ namespace Lykke.Job.LiteCoin.Functions
                     TransactionBlobType.Initial,
                     unsignedTx.ToHex());
 
-                var signedTx = await _signService.SignTransaction(unsignedTx, clientWallet.WalletId);
+                var signedTx = await _signService.SignTransaction(unsignedTx, clientWallet.Address);
 
                 await _transactionBlobStorage.AddOrReplaceTransaction(operation.OperationId,
                     TransactionBlobType.Signed,

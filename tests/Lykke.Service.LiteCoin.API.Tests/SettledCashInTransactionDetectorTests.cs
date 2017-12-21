@@ -29,9 +29,8 @@ namespace Lykke.Service.LiteCoin.API.Tests
             var blockchainProvider = GetBlockChainProvider(addr, tx);
 
             var detector = new SettledCashInTransactionDetector(blockchainProvider.Object, network);
-            var walletId = "walletId";
 
-            var ops = await detector.GetCashInOperations(new[] {WalletMock.Create(addr, walletId) }, 1, 10);
+            var ops = await detector.GetCashInOperations(new[] {WalletMock.Create(addr) }, 1, 10);
 
             Assert.True(ops.Count() == 1);
 
@@ -47,7 +46,7 @@ namespace Lykke.Service.LiteCoin.API.Tests
             Assert.True(op.AssetId == Constants.AssetsContants.LiteCoin);
 
 
-            Assert.True(op.DestinationWalletId == walletId);
+            Assert.True(op.DestinationAddress == addr.ToString());
             
         }
 
@@ -70,14 +69,12 @@ namespace Lykke.Service.LiteCoin.API.Tests
         internal class WalletMock:IWallet
         {
             public BitcoinAddress Address { get; set; }
-            public string WalletId { get; set; }
 
-            public static WalletMock Create(BitcoinAddress addr, string walletId)
+            public static WalletMock Create(BitcoinAddress addr)
             {
                 return new WalletMock
                 {
-                    Address = addr,
-                    WalletId = walletId
+                    Address = addr
                 };
             }
         }

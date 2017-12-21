@@ -69,39 +69,41 @@ namespace Lykke.Service.LiteCoin.API.Services.Operations.CashIn
         private async Task<ICashInOperation> GetOperationFromTx(string txHash, IWallet wallet)
         {
             var tx = await _blockChainProvider.GetRawTx(txHash);
-
-            string sourceAddress = null;
-            foreach (var txInput in tx.Inputs)
-            {
-                var prevTx = await _blockChainProvider.GetRawTx(txInput.PrevOut.Hash.ToString());
-                if (prevTx == null)
-                {
-                    continue;
-                }
-
-                sourceAddress = prevTx.Outputs[txInput.PrevOut.N]
-                    .ScriptPubKey
-                    .GetDestinationAddress(_network)
-                    ?.ToString();
-
-                if (sourceAddress != null)
-                {
-                    break;
-                }
-            }
-
+            
             var coins = tx.Outputs.AsCoins().Where(p => p.ScriptPubKey.GetDestinationAddress(_network) == wallet.Address).ToList();
 
-            if (coins.Any())
+            var amount = new Money(coins.Sum(p => p.Amount.Satoshi)).ToUnit(MoneyUnit.BTC);
+
+            if (amount != 0)
             {
-                var amount = new Money(coins.Sum(p => p.Amount.Satoshi)).ToUnit(MoneyUnit.BTC);
+                string sourceAddress = null;
+                foreach (var txInput in tx.Inputs)
+                {
+                    var prevTx = await _blockChainProvider.GetRawTx(txInput.PrevOut.Hash.ToString());
+                    if (prevTx == null)
+                    {
+                        continue;
+                    }
+
+                    sourceAddress = prevTx.Outputs[txInput.PrevOut.N]
+                        .ScriptPubKey
+                        .GetDestinationAddress(_network)
+                        ?.ToString();
+
+                    if (sourceAddress != null)
+                    {
+                        break;
+                    }
+                }
             
-                return CashInOperation.Create(operationId: Guid.NewGuid().ToString("N"), 
-                    walletId: wallet.WalletId,
+                return CashInOperation.Create(
+                    operationId: Guid.NewGuid().ToString("N"), 
+                    destinationAddress: wallet.Address.ToString(),
                     sourceAddress: sourceAddress,
                     txHash: txHash,
                     amount: amount,
-                    assetId: Constants.AssetsContants.LiteCoin, detectedAt: DateTime.UtcNow);
+                    assetId: Constants.AssetsContants.LiteCoin, 
+                    detectedAt: DateTime.UtcNow);
             }
 
             return null;

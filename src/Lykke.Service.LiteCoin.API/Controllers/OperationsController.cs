@@ -46,11 +46,11 @@ namespace Lykke.Service.LiteCoin.API.Controllers
                 throw new BackendException($"Invalid DestAddress {request.DestAddress}", ErrorCode.BadInputParameter);
             }
 
-            var sourceWallet = await _walletService.GetByWalletId(request.SourceWalletId);
+            var sourceWallet = await _walletService.GetByPublicAddress(request.SourceAddress);
 
             if (sourceWallet == null)
             {
-                throw new BackendException($"DestinationWalletId {request.SourceWalletId} not found", ErrorCode.BadInputParameter);
+                throw new BackendException($"Source wallet {request.SourceAddress} not found", ErrorCode.BadInputParameter);
             }
 
             var operationId = Guid.NewGuid().ToString();

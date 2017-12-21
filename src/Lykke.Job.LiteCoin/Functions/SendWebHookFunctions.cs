@@ -28,7 +28,7 @@ namespace Lykke.Job.LiteCoin.Functions
             var operation = await _cashInOperationRepository.GetByOperationId(context.OperationId);
 
             await _webHookSender.ProcessCashIn(operationId: context.OperationId, dateTime: operation.DetectedAt,
-                walletId: operation.DestinationWalletId, assetId: operation.AssetId, amount: operation.Amount,
+                walletId: operation.DestinationAddress, assetId: operation.AssetId, amount: operation.Amount,
                 sourceAddress: operation.SourceAddress);
         }
 

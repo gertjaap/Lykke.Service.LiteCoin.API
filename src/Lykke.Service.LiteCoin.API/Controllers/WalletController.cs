@@ -31,7 +31,6 @@ namespace Lykke.Service.LiteCoin.API.Controllers
             return Ok(new WalletCreationResponse
             {
                 PublicAddress = result.Address.ToString(),
-                WalletId = result.WalletId
             });
         }
     }

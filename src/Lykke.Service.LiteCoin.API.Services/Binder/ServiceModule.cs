@@ -1,5 +1,6 @@
 ﻿using Autofac;
 using Common.Log;
+using Lykke.Service.BlockchainSignService.Client;
 using Lykke.Service.LiteCoin.API.Core;
 using Lykke.Service.LiteCoin.API.Core.Address;
 using Lykke.Service.LiteCoin.API.Core.BlockChainReaders;
@@ -111,7 +112,8 @@ namespace Lykke.Service.LiteCoin.API.Services.Binder
             {
                 Url = _settings.CurrentValue.SignFacadeUrl
             }).SingleInstance();
-            
+
+            builder.RegisterInstance(new BlockchainSignServiceClient(_settings.CurrentValue.SignFacadeUrl, _log)).AsSelf();
             builder.RegisterType<SignService>().As<ISignService>().SingleInstance();
             builder.RegisterType<BlockchainSignServiceApiProvider>().As<IBlockchainSignServiceApiProvider>().SingleInstance();
 
@@ -122,7 +124,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Binder
         {
             builder.RegisterInstance(new HotWalletsSettings
             {
-                SourceWalletIds = _settings.CurrentValue.SourceWallets
+                SourceWalletPublicAddresses = _settings.CurrentValue.SourceWallets
             }).SingleInstance();
 
             builder.RegisterType<WalletService>().As<IWalletService>();
