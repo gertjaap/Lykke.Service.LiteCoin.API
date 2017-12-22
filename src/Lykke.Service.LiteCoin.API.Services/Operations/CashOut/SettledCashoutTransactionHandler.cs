@@ -15,16 +15,18 @@ namespace Lykke.Service.LiteCoin.API.Services.Operations.CashOut
         private readonly ILog _log;
         private readonly IQueueRouter<CashOutCompletedNotificationContext> _notificationsQueue;
         private readonly IPendingCashoutTransactionRepository _pendingCashoutTransactionRepository;
+        private readonly ICashOutEventRepository _eventRepository;
         
         public SettledCashoutTransactionHandler(ICashOutOperationRepository cashOutOperationRepository, 
             ILog log, 
             IQueueRouter<CashOutCompletedNotificationContext> notificationsQueue,
-            IPendingCashoutTransactionRepository pendingCashoutTransactionRepository)
+            IPendingCashoutTransactionRepository pendingCashoutTransactionRepository, ICashOutEventRepository eventRepository)
         {
             _cashOutOperationRepository = cashOutOperationRepository;
             _log = log;
             _notificationsQueue = notificationsQueue;
             _pendingCashoutTransactionRepository = pendingCashoutTransactionRepository;
+            _eventRepository = eventRepository;
         }
 
         public async Task HandleSettledTransactions(IEnumerable<ICashoutTransaction> settledTransactions)
@@ -53,9 +55,10 @@ namespace Lykke.Service.LiteCoin.API.Services.Operations.CashOut
                 OperationId = operation.OperationId
             });
 
-            await _cashOutOperationRepository.SetCompleted(tx.OperationId, DateTime.UtcNow);
 
             await _pendingCashoutTransactionRepository.Remove(tx.TxHash);
+            await _eventRepository.InsertEvent(CashOutEvent.Create(operation.OperationId,
+                CashOutEventType.DetectedOnBlockChain));
         }
     }
 }

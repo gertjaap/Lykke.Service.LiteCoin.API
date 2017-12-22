@@ -24,9 +24,10 @@ namespace Lykke.Service.LiteCoin.API.Tests
             var cashOutRepo = GetCashOutOperationRepository(op);
             var queueRouter = GetQueueRouter(op);
             var txRepo = GetTrackedCashoutTxRepo(op);
+            var eventRepo = GetCashOutEventRepository(op);
 
             var handler = new SettledCashoutTransactionHandler(cashOutRepo.Object, new EmptyLog(), queueRouter.Object,
-                txRepo.Object);
+                txRepo.Object, eventRepo.Object);
 
             await handler.HandleSettledTransactions(new[] {CashOutTransaction.Create(op.TxHash, op.OperationId)});
 
@@ -43,7 +44,14 @@ namespace Lykke.Service.LiteCoin.API.Tests
             result.Setup(p => p.GetByOperationId(It.Is<string>(x => x == op.OperationId)))
                 .ReturnsAsync(op).Verifiable();
 
-            result.Setup(p => p.SetCompleted(It.Is<string>(x => x == op.OperationId), It.IsAny<DateTime>()))
+            return result;
+        }
+
+        private Mock<ICashOutEventRepository> GetCashOutEventRepository(ICashOutOperation op)
+        {
+            var result = new Mock<ICashOutEventRepository>();
+            
+            result.Setup(p => p.InsertEvent(It.Is<ICashOutEvent>(x => x.OperationId == op.OperationId && x.Type == CashOutEventType.DetectedOnBlockChain)))
                 .Returns(Task.CompletedTask)
                 .Verifiable();
 

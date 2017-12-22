@@ -65,11 +65,22 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Binder
                     "CashOutOperations", _log)))
                     .As<ICashOutOperationRepository>();
 
+            builder.RegisterInstance(new CashOutEventRepository(
+                    AzureTableStorage<CashOutEventTableEntity>.Create(_settings.Nested(p => p.Db.DataConnString),
+                        "CashOutEvents", _log)))
+                .As<ICashOutEventRepository>();
+
 
             builder.RegisterInstance(new CashInOperationRepository(
                     AzureTableStorage<CashInOperationEntity>.Create(_settings.Nested(p => p.Db.DataConnString),
                         "CashInOperations", _log)))
                 .As<ICashInOperationRepository>();
+
+
+            builder.RegisterInstance(new CashInEventRepository(
+                    AzureTableStorage<CashInEventTableEntity>.Create(_settings.Nested(p => p.Db.DataConnString),
+                        "CashInEvents", _log)))
+                .As<ICashInEventRepository>();
 
             builder.RegisterInstance(new BroadcastedOutputRepository(
                     AzureTableStorage<BroadcastedOutputTableEntity>.Create(_settings.Nested(p => p.Db.DataConnString),

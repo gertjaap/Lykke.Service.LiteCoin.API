@@ -19,8 +19,6 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Operations.CashIn
         public string AssetId { get; set; }
         public string SourceAddress { get; set; }
         public string TxHash { get; set; }
-        public bool MoneyTransferredToHotWallet { get; set; }
-        public DateTime? MoneyTransferredToHotWalletAt { get; set; }
 
 
         public static class ByTxHash
@@ -93,9 +91,7 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Operations.CashIn
                 Amount = source.Amount,
                 DetectedAt = source.DetectedAt,
                 DestinationAddress = source.DestinationAddress,
-                TxHash = source.TxHash,
-                MoneyTransferredToHotWallet = source.MoneyTransferredToHotWallet,
-                MoneyTransferredToHotWalletAt = source.MoneyTransferredToHotWalletAt
+                TxHash = source.TxHash
             };
         }
     }
@@ -138,36 +134,7 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Operations.CashIn
                 await _storage.DeleteAsync(CashInOperationEntity.ByTxHash.Create(op));
             }
         }
-
-        public async Task SetMoneyTransferred(string operationId, DateTime completedAt)
-        {
-            var op = await GetByOperationId(operationId);
-
-            if (op == null)
-            {
-                throw new BackendException($"Operation {operationId} not found", ErrorCode.CashOutOperationNotFound);
-            }
-
-            CashInOperationEntity Update(CashInOperationEntity entity)
-            {
-                entity.MoneyTransferredToHotWallet = true;
-                entity.MoneyTransferredToHotWalletAt = completedAt;
-
-                return entity;
-            }
-
-            await _storage.ReplaceAsync(CashInOperationEntity.ByOperationId.GeneratePartitionKey(),
-                CashInOperationEntity.ByOperationId.GenerateRowKey(op.OperationId),
-                Update);
-
-            await _storage.ReplaceAsync(CashInOperationEntity.ByTxHash.GeneratePartitionKey(),
-                CashInOperationEntity.ByTxHash.GenerateRowKey(op.TxHash),
-                Update);
-
-            await _storage.ReplaceAsync(CashInOperationEntity.ByDateTime.GeneratePartitionKey(),
-                CashInOperationEntity.ByDateTime.GenerateRowKey(op.DetectedAt),
-                Update);
-        }
+        
 
 
         public async Task DeleteOldOperations(DateTime bound)
