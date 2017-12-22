@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Text;
 using System.Threading.Tasks;
 using AzureStorage;
 using Lykke.Service.LiteCoin.API.Core.Transactions;

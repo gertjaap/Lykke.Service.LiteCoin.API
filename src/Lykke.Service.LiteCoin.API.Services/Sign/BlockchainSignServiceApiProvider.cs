@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Lykke.Service.BlockchainSignService.Client;
 using Lykke.Service.BlockchainSignService.Client.Models;
+using Lykke.Service.LiteCoin.API.Core.Exceptions;
 using Lykke.Service.LiteCoin.API.Core.Sign;
 using NBitcoin;
 
@@ -20,14 +21,18 @@ namespace Lykke.Service.LiteCoin.API.Services.Sign
 
         public async Task<Transaction> SignTransaction(Transaction unsignedTransaction, params string[] publicAddresses)
         {
-            var guids = new List<Guid>();
             foreach (var publicAddress in publicAddresses)
             {
                 var wallet = await _client.GetWalletByPublicAddressAsync(publicAddress);
-                guids.Add(wallet.WalletId);
+
+                if (wallet == null)
+                {
+                    throw new BackendException("Cant find address to signTx", ErrorCode.CantFindAddressToSignTx);
+                }
+
                 
             }
-            var signed = await _client.SignTransactionAsync(new SignRequestModel(guids, unsignedTransaction.ToHex()));
+            var signed = await _client.SignTransactionAsync(new SignRequestModel(publicAddresses, unsignedTransaction.ToHex()));
 
             return Transaction.Parse(signed.SignedTransaction);
         }
