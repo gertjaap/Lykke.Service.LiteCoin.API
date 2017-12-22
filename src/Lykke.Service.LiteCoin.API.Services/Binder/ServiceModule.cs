@@ -1,9 +1,9 @@
 ﻿using Autofac;
 using Common.Log;
 using Lykke.Service.BlockchainSignService.Client;
-using Lykke.Service.LiteCoin.API.Core;
 using Lykke.Service.LiteCoin.API.Core.Address;
 using Lykke.Service.LiteCoin.API.Core.BlockChainReaders;
+using Lykke.Service.LiteCoin.API.Core.Broadcast;
 using Lykke.Service.LiteCoin.API.Core.CashIn;
 using Lykke.Service.LiteCoin.API.Core.CashOut;
 using Lykke.Service.LiteCoin.API.Core.Fee;
@@ -18,6 +18,7 @@ using Lykke.Service.LiteCoin.API.Core.Wallet;
 using Lykke.Service.LiteCoin.API.Core.WebHook;
 using Lykke.Service.LiteCoin.API.Services.Address;
 using Lykke.Service.LiteCoin.API.Services.BlockChainProviders.InsightApi;
+using Lykke.Service.LiteCoin.API.Services.Broadcast;
 using Lykke.Service.LiteCoin.API.Services.CashOut;
 using Lykke.Service.LiteCoin.API.Services.Fee;
 using Lykke.Service.LiteCoin.API.Services.Operations;
@@ -57,6 +58,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Binder
             RegisterDetectorServices(builder);
             RegisterTransactionOutputsServices(builder);
             RegisterTransactionBuilderServices(builder);
+            RegisterBroadcastServices(builder);
         }
 
         private void RegisterNetwork(ContainerBuilder builder)
@@ -191,6 +193,11 @@ namespace Lykke.Service.LiteCoin.API.Services.Binder
             builder.RegisterType<TransactionBuildContext>().AsSelf().InstancePerDependency();
             builder.RegisterType<TransactionBuildContextFactory>().AsSelf();
             builder.RegisterType<OperationService>().As<IOperationService>();
+        }
+
+        private void RegisterBroadcastServices(ContainerBuilder builder)
+        {
+            builder.RegisterType<BroadcastService>().As<IBroadcastService>();
         }
     }
 }

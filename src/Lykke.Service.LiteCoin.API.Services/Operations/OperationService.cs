@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Common;
 using Common.Log;
-using Lykke.Service.LiteCoin.API.Core.BlockChainReaders;
+using Lykke.Service.LiteCoin.API.Core.Broadcast;
 using Lykke.Service.LiteCoin.API.Core.CashOut;
 using Lykke.Service.LiteCoin.API.Core.Constants;
 using Lykke.Service.LiteCoin.API.Core.Exceptions;
@@ -21,32 +21,32 @@ namespace Lykke.Service.LiteCoin.API.Services.Operations
         private readonly IWalletService _walletService;
         private readonly ITransactionBuilderService _transactionBuilder;
         private readonly ISignService _signService;
-        private readonly IBlockChainProvider _blockChainProvider;
         private readonly IQueueRouter<CashOutStartedNotificationContext> _cashoutCompletedNotificationQueue;
         private readonly ICashOutOperationRepository _cashOutOperationRepository;
         private readonly IPendingCashoutTransactionRepository _pendingCashoutTransactionRepository;
         private readonly ILog _log;
         private readonly ITransactionBlobStorage _transactionBlobStorage;
+        private readonly IBroadcastService _broadcastService;
 
         public OperationService(IWalletService walletService, 
             ITransactionBuilderService transactionBuilder, 
             ISignService signService,
-            IBlockChainProvider blockChainProvider, 
             IQueueRouter<CashOutStartedNotificationContext> cashoutCompletedNotificationQueue, 
             ICashOutOperationRepository cashOutOperationRepository,
             IPendingCashoutTransactionRepository pendingCashoutTransactionRepository,
             ILog log, 
-            ITransactionBlobStorage transactionBlobStorage)
+            ITransactionBlobStorage transactionBlobStorage, 
+            IBroadcastService broadcastService)
         {
             _walletService = walletService;
             _transactionBuilder = transactionBuilder;
             _signService = signService;
-            _blockChainProvider = blockChainProvider;
             _cashoutCompletedNotificationQueue = cashoutCompletedNotificationQueue;
             _cashOutOperationRepository = cashOutOperationRepository;
             _pendingCashoutTransactionRepository = pendingCashoutTransactionRepository;
             _log = log;
             _transactionBlobStorage = transactionBlobStorage;
+            _broadcastService = broadcastService;
         }
 
         public async Task ProceedCashOutOperation(string operationId, IWallet sourceWallet, BitcoinAddress destAddress, decimal amount)
@@ -64,11 +64,11 @@ namespace Lykke.Service.LiteCoin.API.Services.Operations
 
                     await _transactionBlobStorage.AddOrReplaceTransaction(operationId, TransactionBlobType.Initial, tx.Transaction.ToHex());
 
-                    await _signService.SignTransaction(tx.Transaction, hotWallet.Address);
+                    var signedtx = await _signService.SignTransaction(tx.Transaction, hotWallet.Address);
 
-                    await _transactionBlobStorage.AddOrReplaceTransaction(operationId, TransactionBlobType.Signed, tx.Transaction.ToHex());
+                    await _transactionBlobStorage.AddOrReplaceTransaction(operationId, TransactionBlobType.Signed, signedtx.ToHex());
 
-                    await _blockChainProvider.BroadCastTransaction(tx.Transaction);
+                    await _broadcastService.BroadCastTransaction(signedtx);
 
                     await _cashOutOperationRepository.Insert(CashOutOperation.Create(operationId, sourceWallet.Address.ToString(),
                         destAddress.ToString(), amount, assetId, DateTime.UtcNow, tx.Transaction.GetHash().ToString()));

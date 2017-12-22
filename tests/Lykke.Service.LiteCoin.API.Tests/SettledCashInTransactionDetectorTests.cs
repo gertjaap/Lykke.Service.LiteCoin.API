@@ -76,6 +76,7 @@ namespace Lykke.Service.LiteCoin.API.Tests
         internal class WalletMock:IWallet
         {
             public BitcoinAddress Address { get; set; }
+            public bool IsClientWallet => true;
 
             public static WalletMock Create(BitcoinAddress addr)
             {

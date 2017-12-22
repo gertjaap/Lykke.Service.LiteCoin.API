@@ -9,6 +9,7 @@ namespace Lykke.Service.LiteCoin.API.Core.TransactionOutputs.SpentOutputs
     public interface ISpentOutputService
     {
         Task SaveSpentOutputs(Transaction transaction);
-        
+        Task<IEnumerable<ISpentOutput>> GetUnspentOutputs(IEnumerable<IOutput> outputs);
+
     }
 }

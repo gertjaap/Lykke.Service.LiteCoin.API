@@ -53,6 +53,12 @@ namespace Lykke.Service.LiteCoin.API.Controllers
                 throw new BackendException($"Source wallet {request.SourceAddress} not found", ErrorCode.BadInputParameter);
             }
 
+            if (!sourceWallet.IsClientWallet)
+            {
+                throw new BackendException($"Source wallet {request.SourceAddress} is not client wallet", ErrorCode.BadInputParameter);
+            }
+
+
             var operationId = Guid.NewGuid().ToString();
 
             await _operationService.ProceedCashOutOperation(operationId, sourceWallet,

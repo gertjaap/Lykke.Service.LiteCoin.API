@@ -24,5 +24,10 @@ namespace Lykke.Service.LiteCoin.API.Services.TransactionOutputs.BroadcastedOutp
             await _broadcastedOutputRepository.InsertOutputs(
                 tr.Outputs.AsCoins().Select(o => new BroadcastedOutput(o, tr.GetHash().ToString(), _network)).ToList());
         }
+
+        public async Task<IEnumerable<IBroadcastedOutput>> GetOutputs(string address)
+        {
+            return await _broadcastedOutputRepository.GetOutputs(address);
+        }
     }
 }

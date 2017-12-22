@@ -9,6 +9,7 @@ namespace Lykke.Service.LiteCoin.API.Core.Wallet
     public interface IWallet
     {
         BitcoinAddress Address { get; }
+        bool IsClientWallet { get; }
         
     }
 

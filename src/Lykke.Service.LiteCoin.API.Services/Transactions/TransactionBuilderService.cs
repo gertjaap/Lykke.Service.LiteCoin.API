@@ -25,21 +25,16 @@ namespace Lykke.Service.LiteCoin.API.Services.Transactions
         private readonly ITransactionOutputsService _transactionOutputsService;
         private readonly TransactionBuildContextFactory _transactionBuildContextFactory;
         private readonly ILog _log;
-        private readonly ISpentOutputService _spentOutputService;
-        private readonly IBroadcastedOutputsService _broadcastedOutputsService;
         private readonly IFeeService _feeService;
 
         public TransactionBuilderService(ITransactionOutputsService transactionOutputsService,
             TransactionBuildContextFactory transactionBuildContextFactory,
-            ILog log, ISpentOutputService spentOutputService,
-            IBroadcastedOutputsService broadcastedOutputsService,
+            ILog log,
             IFeeService feeService)
         {
             _transactionOutputsService = transactionOutputsService;
             _transactionBuildContextFactory = transactionBuildContextFactory;
             _log = log;
-            _spentOutputService = spentOutputService;
-            _broadcastedOutputsService = broadcastedOutputsService;
             _feeService = feeService;
         }
 
@@ -60,9 +55,6 @@ namespace Lykke.Service.LiteCoin.API.Services.Transactions
                         var buildedTransaction = builder.BuildTransaction(true);
 
 
-                        await _spentOutputService.SaveSpentOutputs(buildedTransaction);
-
-                        await _broadcastedOutputsService.SaveNewOutputs(buildedTransaction);
 
                         return new BuildedTx
                         {
@@ -142,8 +134,8 @@ namespace Lykke.Service.LiteCoin.API.Services.Transactions
 
             var sent = await Send(builder, destination, amount, addDust);
 
-            if (sendAmount - amount > 0)
-                await Send(builder, changeDestination, sendAmount - amount, addDust);
+            builder.SetChange(changeDestination);
+
             return sent;
         }
 

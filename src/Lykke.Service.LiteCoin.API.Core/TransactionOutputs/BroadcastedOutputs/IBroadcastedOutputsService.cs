@@ -9,5 +9,6 @@ namespace Lykke.Service.LiteCoin.API.Core.TransactionOutputs.BroadcastedOutputs
     public interface IBroadcastedOutputsService
     {
         Task SaveNewOutputs(Transaction tr);
+        Task<IEnumerable<IBroadcastedOutput>> GetOutputs(string address);
     }
 }

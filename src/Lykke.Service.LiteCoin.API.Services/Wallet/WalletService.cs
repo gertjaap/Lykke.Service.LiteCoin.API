@@ -14,14 +14,16 @@ namespace Lykke.Service.LiteCoin.API.Services.Wallet
     public class Wallet : IWallet
     {
         public BitcoinAddress Address { get; set; }
+        public bool IsClientWallet { get; set; }
 
-        public static Wallet Create(BitcoinAddress address)
+        public static Wallet Create(BitcoinAddress address, bool isClientWallet)
         {
             if (address != null)
             {
                 return new Wallet
                 {
-                    Address = address
+                    Address = address,
+                    IsClientWallet = isClientWallet
                 };
             }
 
@@ -47,7 +49,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Wallet
 
             var hotWallets = _hotWalletsSettings.SourceWalletPublicAddresses.Distinct().ToDictionary(p => p);
 
-            return allWallets.Where(p => !hotWallets.ContainsKey(p)).Select(p=>Wallet.Create(_addressValidator.GetBitcoinAddress(p))).ToList();
+            return allWallets.Where(p => !hotWallets.ContainsKey(p)).Select(p=>Wallet.Create(_addressValidator.GetBitcoinAddress(p), IsClientWallet(p))).ToList();
         }
 
         public async Task<IEnumerable<IWallet>> GetHotWallets()
@@ -56,7 +58,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Wallet
 
             var hotWallets = _hotWalletsSettings.SourceWalletPublicAddresses.Distinct().ToDictionary(p => p);
 
-            return allWallets.Where(p => hotWallets.ContainsKey(p)).Select(p => Wallet.Create(_addressValidator.GetBitcoinAddress(p))).ToList();
+            return allWallets.Where(p => hotWallets.ContainsKey(p)).Select(p => Wallet.Create(_addressValidator.GetBitcoinAddress(p), IsClientWallet(p))).ToList();
         }
         
 
@@ -64,13 +66,18 @@ namespace Lykke.Service.LiteCoin.API.Services.Wallet
         {
             var resp = await _serviceApiProvider.CreateWallet();
 
-            return Wallet.Create(_addressValidator.GetBitcoinAddress(resp));
+            return Wallet.Create(_addressValidator.GetBitcoinAddress(resp), IsClientWallet(resp));
         }
 
         public async Task<IWallet> GetByPublicAddress(string address)
         {
             var resp = await _serviceApiProvider.GetByPublicAddress(address);
-            return Wallet.Create(_addressValidator.GetBitcoinAddress(resp));
+            return Wallet.Create(_addressValidator.GetBitcoinAddress(resp), IsClientWallet(resp));
+        }
+
+        private bool IsClientWallet(string address)
+        {
+            return _hotWalletsSettings.SourceWalletPublicAddresses.All(x => !string.Equals(x, address, StringComparison.InvariantCultureIgnoreCase));
         }
     }
 }

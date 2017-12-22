@@ -28,5 +28,10 @@ namespace Lykke.Service.LiteCoin.API.Services.TransactionOutputs.SpentOutputs
                 tasks.Add(_broadcastedOutputRepository.DeleteOutput(outPoint.Hash.ToString(), (int)outPoint.N));
             await Task.WhenAll(tasks);
         }
+
+        public async Task<IEnumerable<ISpentOutput>> GetUnspentOutputs(IEnumerable<IOutput> outputs)
+        {
+            return await _spentOutputRepository.GetUnspentOutputs(outputs);;
+        }
     }
 }

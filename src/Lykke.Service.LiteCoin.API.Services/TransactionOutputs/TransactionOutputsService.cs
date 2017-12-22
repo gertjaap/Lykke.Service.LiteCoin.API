@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Lykke.Service.LiteCoin.API.Core.BlockChainReaders;
 using Lykke.Service.LiteCoin.API.Core.TransactionOutputs;
@@ -9,23 +7,22 @@ using Lykke.Service.LiteCoin.API.Core.TransactionOutputs.BroadcastedOutputs;
 using Lykke.Service.LiteCoin.API.Core.TransactionOutputs.SpentOutputs;
 using Lykke.Service.LiteCoin.API.Services.BlockChainProviders.Helpers;
 using NBitcoin;
-using NBitcoin.OpenAsset;
 
 namespace Lykke.Service.LiteCoin.API.Services.TransactionOutputs
 {
     public class TransactionOutputsService : ITransactionOutputsService
     {
-        private readonly Network _network;
-        private readonly IBroadcastedOutputRepository _broadcastedOutputRepository;
-        private readonly ISpentOutputRepository _spentOutputRepository;
         private readonly IBlockChainProvider _blockChainProvider;
+        private readonly ISpentOutputService _spentOutputService;
+        private readonly IBroadcastedOutputsService _broadcastedOutputsService;
 
-        public TransactionOutputsService(Network network, IBroadcastedOutputRepository broadcastedOutputRepository, ISpentOutputRepository spentOutputRepository, IBlockChainProvider blockChainProvider)
+        public TransactionOutputsService(IBlockChainProvider blockChainProvider, 
+            ISpentOutputService spentOutputService, 
+            IBroadcastedOutputsService broadcastedOutputsService)
         {
-            _network = network;
-            _broadcastedOutputRepository = broadcastedOutputRepository;
-            _spentOutputRepository = spentOutputRepository;
             _blockChainProvider = blockChainProvider;
+            _spentOutputService = spentOutputService;
+            _broadcastedOutputsService = broadcastedOutputsService;
         }
 
         public async Task<IEnumerable<Coin>> GetUnspentOutputs(string address, int confirmationsCount = 0)
@@ -50,11 +47,17 @@ namespace Lykke.Service.LiteCoin.API.Services.TransactionOutputs
             return coins;
         }
 
+        public async Task SaveOuputs(Transaction tx)
+        {
+            await _spentOutputService.SaveSpentOutputs(tx);
+            await _broadcastedOutputsService.SaveNewOutputs(tx);
+        }
+
         private async Task AddBroadcastedOutputs(List<Coin> coins, string walletAddress)
         {
             var set = new HashSet<OutPoint>(coins.Select(x => x.Outpoint));
 
-            var internalSavedOutputs = (await _broadcastedOutputRepository.GetOutputs(walletAddress))
+            var internalSavedOutputs = (await _broadcastedOutputsService.GetOutputs(walletAddress))
                 .Where(o => !set.Contains(new OutPoint(uint256.Parse(o.TransactionHash), o.N)));
 
             coins.AddRange(internalSavedOutputs.Select(o =>
@@ -68,13 +71,11 @@ namespace Lykke.Service.LiteCoin.API.Services.TransactionOutputs
 
         private async Task<List<Coin>> FilterCoins(List<Coin> coins)
         {
-            var unspentOutputs = await _spentOutputRepository.GetUnspentOutputs(coins.Select(o => new Output(o.Outpoint)));
+            var spentcoins = await _spentOutputService.GetUnspentOutputs(coins.Select(o => new Output(o.Outpoint)));
 
-            var unspentSet = new HashSet<OutPoint>(unspentOutputs.Select(x => new OutPoint(uint256.Parse(x.TransactionHash), x.N)));
-
-
+            var spentSet = new HashSet<OutPoint>(spentcoins.Select(x => new OutPoint(uint256.Parse(x.TransactionHash), x.N)));
             
-            return coins.Where(o => unspentSet.Contains(o.Outpoint)).ToList();
+            return coins.Where(o => !spentSet.Contains(o.Outpoint)).ToList();
         }
 
     }
