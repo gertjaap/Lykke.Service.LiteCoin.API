@@ -24,7 +24,9 @@ namespace Lykke.Service.LiteCoin.API.Core.Exceptions
         NotEnoughFundsAvailable = 4,
         CashOutOperationNotFound = 5,
         CashInOperationNotFound = 6,
-        WalletNotFound = 7
+        WalletNotFound = 7,
+        BroadcastError = 8,
+        SignError
 
     }
 }

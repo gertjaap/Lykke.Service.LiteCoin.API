@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Common.Log;
 using Lykke.Service.LiteCoin.API.Core.Exceptions;
 using Lykke.Service.LiteCoin.API.Core.Sign;
 using Lykke.Service.LiteCoin.API.Core.Wallet;
@@ -12,11 +13,15 @@ namespace Lykke.Service.LiteCoin.API.Services.Sign
     {
         private readonly IBlockchainSignServiceApiProvider _serviceApiProvider;
         private readonly IWalletService _walletService;
+        private readonly ILog _log;
 
-        public SignService(IBlockchainSignServiceApiProvider serviceApiProvider, IWalletService walletService)
+        public SignService(IBlockchainSignServiceApiProvider serviceApiProvider,
+            IWalletService walletService, 
+            ILog log)
         {
             _serviceApiProvider = serviceApiProvider;
             _walletService = walletService;
+            _log = log;
         }
 
         public async Task<Transaction> SignTransaction(Transaction unsignedTransaction, params BitcoinAddress[] publicAddress)
@@ -29,7 +34,18 @@ namespace Lykke.Service.LiteCoin.API.Services.Sign
                     throw new BackendException($"Wallet {bitcoinAddress} not found", ErrorCode.WalletNotFound);
                 }
             }
-            return await _serviceApiProvider.SignTransaction(unsignedTransaction, publicAddress.Select(p=>p.ToString()).ToArray());
+            try
+            {
+                return await _serviceApiProvider.SignTransaction(unsignedTransaction, publicAddress.Select(p => p.ToString()).ToArray());
+            }
+            catch (Exception e)
+            {
+                await _log.WriteErrorAsync(nameof(SignService), nameof(SignTransaction),
+                    unsignedTransaction.ToHex(), e);
+
+                throw new BackendException("Sign error", ErrorCode.SignError);
+            }
+            
         }
     }
 }
