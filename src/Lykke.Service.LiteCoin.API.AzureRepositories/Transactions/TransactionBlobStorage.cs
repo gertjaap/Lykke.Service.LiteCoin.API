@@ -24,17 +24,17 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Transactions
             return null;
         }
 
-        public async Task AddOrReplaceTransaction(string transactionId, TransactionBlobType type, string transactionHex)
+        public async Task AddOrReplaceTransaction(string txHash, TransactionBlobType type, string transactionHex)
         {
-            var key = GenerateKey(transactionId, type);
+            var key = GenerateKey(txHash, type);
             if (await _blobStorage.HasBlobAsync(BlobContainer, key))
                 await _blobStorage.DelBlobAsync(BlobContainer, key);
             await _blobStorage.SaveBlobAsync(BlobContainer, key, Encoding.UTF8.GetBytes(transactionHex));
         }
 
-        private string GenerateKey(string transactionId, TransactionBlobType type)
+        private string GenerateKey(string txHash, TransactionBlobType type)
         {
-            return $"{transactionId}.{type}.txt";
+            return $"{txHash}.{type}.txt";
         }
     }
 }

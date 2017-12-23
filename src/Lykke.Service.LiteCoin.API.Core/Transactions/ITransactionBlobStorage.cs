@@ -15,6 +15,6 @@ namespace Lykke.Service.LiteCoin.API.Core.Transactions
     {
         Task<string> GetTransaction(string transactionId, TransactionBlobType type);
 
-        Task AddOrReplaceTransaction(string transactionId, TransactionBlobType type, string transactionHex);
+        Task AddOrReplaceTransaction(string txHash, TransactionBlobType type, string transactionHex);
     }
 }

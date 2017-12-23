@@ -25,7 +25,6 @@ namespace Lykke.Service.LiteCoin.API.Services.Operations
         private readonly ICashOutOperationRepository _cashOutOperationRepository;
         private readonly IPendingCashoutTransactionRepository _pendingCashoutTransactionRepository;
         private readonly ILog _log;
-        private readonly ITransactionBlobStorage _transactionBlobStorage;
         private readonly IBroadcastService _broadcastService;
 
         public OperationService(IWalletService walletService, 
@@ -35,7 +34,6 @@ namespace Lykke.Service.LiteCoin.API.Services.Operations
             ICashOutOperationRepository cashOutOperationRepository,
             IPendingCashoutTransactionRepository pendingCashoutTransactionRepository,
             ILog log, 
-            ITransactionBlobStorage transactionBlobStorage, 
             IBroadcastService broadcastService)
         {
             _walletService = walletService;
@@ -45,7 +43,6 @@ namespace Lykke.Service.LiteCoin.API.Services.Operations
             _cashOutOperationRepository = cashOutOperationRepository;
             _pendingCashoutTransactionRepository = pendingCashoutTransactionRepository;
             _log = log;
-            _transactionBlobStorage = transactionBlobStorage;
             _broadcastService = broadcastService;
         }
 
@@ -61,13 +58,9 @@ namespace Lykke.Service.LiteCoin.API.Services.Operations
                     var tx = await _transactionBuilder.GetTransferTransaction(hotWallet.Address, 
                         destAddress,
                         amount);
-
-                    await _transactionBlobStorage.AddOrReplaceTransaction(operationId, TransactionBlobType.Initial, tx.Transaction.ToHex());
-
+                    
                     var signedtx = await _signService.SignTransaction(tx.Transaction, hotWallet.Address);
-
-                    await _transactionBlobStorage.AddOrReplaceTransaction(operationId, TransactionBlobType.Signed, signedtx.ToHex());
-
+                    
                     await _broadcastService.BroadCastTransaction(signedtx);
 
                     await _cashOutOperationRepository.Insert(CashOutOperation.Create(operationId, sourceWallet.Address.ToString(),
