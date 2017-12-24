@@ -13,7 +13,7 @@ namespace Lykke.Service.LiteCoin.API.Core.Transactions
 
     public interface ITransactionBlobStorage
     {
-        Task<string> GetTransaction(string transactionId, TransactionBlobType type);
+        Task<string> GetTransaction(string txHash, TransactionBlobType type);
 
         Task AddOrReplaceTransaction(string txHash, TransactionBlobType type, string transactionHex);
     }

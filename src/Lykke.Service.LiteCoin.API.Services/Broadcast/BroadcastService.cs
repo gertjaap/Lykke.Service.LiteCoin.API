@@ -34,7 +34,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Broadcast
             {
                 await _log.WriteErrorAsync(nameof(BroadcastService), nameof(BroadCastTransaction),
                     tx.GetHash().ToString(), e);
-                throw new BackendException("Broadcast error", ErrorCode.BroadcastError);
+                throw new BusinessException("Broadcast error", ErrorCode.BroadcastError);
             }
 
             await _transactionOutputsService.SaveOuputs(tx);

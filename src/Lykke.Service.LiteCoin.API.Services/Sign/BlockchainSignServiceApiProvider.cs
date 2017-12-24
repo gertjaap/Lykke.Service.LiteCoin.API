@@ -27,7 +27,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Sign
 
                 if (wallet == null)
                 {
-                    throw new BackendException("Cant find address to signTx", ErrorCode.CantFindAddressToSignTx);
+                    throw new BusinessException("Cant find address to signTx", ErrorCode.CantFindAddressToSignTx);
                 }
 
                 

@@ -16,9 +16,9 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Transactions
             _blobStorage = blobStorage;
         }
 
-        public async Task<string> GetTransaction(string transactionId, TransactionBlobType type)
+        public async Task<string> GetTransaction(string txHash, TransactionBlobType type)
         {
-            var key = GenerateKey(transactionId, type);
+            var key = GenerateKey(txHash, type);
             if (await _blobStorage.HasBlobAsync(BlobContainer, key))
                 return await _blobStorage.GetAsTextAsync(BlobContainer, key);
             return null;

@@ -38,24 +38,24 @@ namespace Lykke.Service.LiteCoin.API.Controllers
         public async Task<CashOutResponce> CashOut([FromBody] CashOutRequest request)
         {
             if (request.Amount <= 0)
-                throw new BackendException("Amount can't be less or equal to zero", ErrorCode.BadInputParameter);
+                throw new BusinessException("Amount can't be less or equal to zero", ErrorCode.BadInputParameter);
 
             if (!_addressValidator.IsValid(request.DestAddress))
             {
 
-                throw new BackendException($"Invalid DestAddress {request.DestAddress}", ErrorCode.BadInputParameter);
+                throw new BusinessException($"Invalid DestAddress {request.DestAddress}", ErrorCode.BadInputParameter);
             }
 
             var sourceWallet = await _walletService.GetByPublicAddress(request.SourceAddress);
 
             if (sourceWallet == null)
             {
-                throw new BackendException($"Source wallet {request.SourceAddress} not found", ErrorCode.BadInputParameter);
+                throw new BusinessException($"Source wallet {request.SourceAddress} not found", ErrorCode.BadInputParameter);
             }
 
             if (!sourceWallet.IsClientWallet)
             {
-                throw new BackendException($"Source wallet {request.SourceAddress} is not client wallet", ErrorCode.BadInputParameter);
+                throw new BusinessException($"Source wallet {request.SourceAddress} is not client wallet", ErrorCode.BadInputParameter);
             }
 
 

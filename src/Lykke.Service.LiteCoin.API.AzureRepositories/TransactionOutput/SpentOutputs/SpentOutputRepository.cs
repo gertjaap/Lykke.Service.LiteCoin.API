@@ -90,7 +90,7 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.TransactionOutput.SpentOu
                 if (exception != null && exception.RequestInformation.HttpStatusCode == EntityExistsHttpStatusCode)
                 {
                     await DeleteOutputs(spentOutputs);
-                    throw new BackendException("entity already exists", ErrorCode.TransactionConcurrentInputsProblem);
+                    throw new BusinessException("entity already exists", ErrorCode.TransactionConcurrentInputsProblem);
                 }
             }
 

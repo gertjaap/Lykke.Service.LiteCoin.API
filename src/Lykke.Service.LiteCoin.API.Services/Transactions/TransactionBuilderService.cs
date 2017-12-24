@@ -62,7 +62,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Transactions
                         };
 
                     });
-                }, exception => (exception as BackendException)?.Code == ErrorCode.TransactionConcurrentInputsProblem,
+                }, exception => (exception as BusinessException)?.Code == ErrorCode.TransactionConcurrentInputsProblem,
                 3,
                 _log);
         }
@@ -87,11 +87,11 @@ namespace Lykke.Service.LiteCoin.API.Services.Transactions
             bool addDust = true)
         {
             if (amount.Satoshi <= 0)
-                throw new BackendException("Amount can't be less or equal to zero", ErrorCode.BadInputParameter);
+                throw new BusinessException("Amount can't be less or equal to zero", ErrorCode.BadInputParameter);
 
             void ThrowError()
             {
-                throw new BackendException(
+                throw new BusinessException(
                     $"The sum of total applicable outputs is less than the required: {amount.Satoshi} satoshis.",
                     ErrorCode.NotEnoughFundsAvailable);
             }

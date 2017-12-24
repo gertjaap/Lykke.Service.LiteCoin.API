@@ -22,7 +22,7 @@ namespace Lykke.Service.LiteCoin.API.Filters
             ApiException ex;
 
             var statusCode = 500;
-            var exception = context.Exception as BackendException;
+            var exception = context.Exception as BusinessException;
             if (exception != null)
             {
                 ex = new ApiException

@@ -37,7 +37,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Sign
                 var wallet = await _walletService.GetByPublicAddress(bitcoinAddress.ToString());
                 if (wallet == null)
                 {
-                    throw new BackendException($"Wallet {bitcoinAddress} not found", ErrorCode.WalletNotFound);
+                    throw new BusinessException($"Wallet {bitcoinAddress} not found", ErrorCode.WalletNotFound);
                 }
             }
 
@@ -55,7 +55,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Sign
                 await _log.WriteErrorAsync(nameof(SignService), nameof(SignTransaction),
                     unsignedTransaction.GetHash().ToString(), e);
 
-                throw new BackendException("Sign error", ErrorCode.SignError);
+                throw new BusinessException("Sign error", ErrorCode.SignError);
             }
 
             return signedTx;

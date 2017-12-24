@@ -76,7 +76,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Operations
 
                     return;
                 }
-                catch (BackendException e) when(e.Code == ErrorCode.NotEnoughFundsAvailable)
+                catch (BusinessException e) when(e.Code == ErrorCode.NotEnoughFundsAvailable)
                 {
                     await _log.WriteInfoAsync(nameof(OperationService), nameof(ProceedCashOutOperation), new
                     {
@@ -86,7 +86,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Operations
                 }
             }
             
-            throw new BackendException("Not enoughFunds on Hot wallets", ErrorCode.NotEnoughFundsAvailable);
+            throw new BusinessException("Not enoughFunds on Hot wallets", ErrorCode.NotEnoughFundsAvailable);
         }
     }
 }
