@@ -47,7 +47,7 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.TransactionOutput.SpentOu
 
             public static string GenerateRowKey(DateTime inserted)
             {
-                return (int.MaxValue - inserted.Ticks).ToString("D");
+                return (DateTime.MaxValue.Ticks - inserted.Ticks).ToString("d19");
             }
 
             public static SpentOutputTableEntity Create(ISpentOutput output)
@@ -146,8 +146,11 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.TransactionOutput.SpentOu
         {
             foreach (var output in outputs)
             {
-                await _storage.DeleteAsync(SpentOutputTableEntity.ByTransactionHash.Create(output));
-                await _storage.DeleteAsync(SpentOutputTableEntity.ByDateTime.Create(output));
+                await _storage.DeleteAsync(SpentOutputTableEntity.ByDateTime.GeneratePartition(),
+                    SpentOutputTableEntity.ByDateTime.GenerateRowKey(output.InsertedAt));
+
+                await _storage.DeleteAsync(SpentOutputTableEntity.ByTransactionHash.GeneratePartitionKey(),
+                    SpentOutputTableEntity.ByTransactionHash.GenerateRowKey(output.TransactionHash, output.N));
             }
         }
 

@@ -70,8 +70,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Binder
 
         private void RegisterFeeServices(ContainerBuilder builder)
         {
-            builder.RegisterInstance(new FeeRateFacade(_settings.CurrentValue.FeePerByte, 
-                    _settings.CurrentValue.FeeRateMultiplayer))
+            builder.RegisterInstance(new FeeRateFacade(_settings.CurrentValue.FeePerByte))
                 .As<IFeeRateFacade>();
 
             builder.Register(x =>

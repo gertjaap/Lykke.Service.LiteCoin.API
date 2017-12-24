@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AzureStorage;
-using Lykke.Service.LiteCoin.API.Core.TransactionOutputs;
 using Lykke.Service.LiteCoin.API.Core.TransactionOutputs.BroadcastedOutputs;
 using Microsoft.WindowsAzure.Storage.Table;
 using MoreLinq;
@@ -70,7 +69,7 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.TransactionOutput.Broadca
 
             public static string GenerateRowKey(DateTime inserted)
             {
-                return (int.MaxValue - inserted.Ticks).ToString("D");
+                return (DateTime.MaxValue.Ticks - inserted.Ticks).ToString("d19");
             }
 
             public static BroadcastedOutputTableEntity Create(IBroadcastedOutput output)
@@ -145,9 +144,14 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.TransactionOutput.Broadca
         {
             foreach (var output in outputs)
             {
-                await _storage.DeleteAsync(BroadcastedOutputTableEntity.ByDateTime.Create(output));
-                await _storage.DeleteAsync(BroadcastedOutputTableEntity.ByTransactionHash.Create(output));
-                await _storage.DeleteAsync(BroadcastedOutputTableEntity.ByAddress.Create(output));
+                await _storage.DeleteAsync(BroadcastedOutputTableEntity.ByDateTime.GeneratePartition(), 
+                    BroadcastedOutputTableEntity.ByDateTime.GenerateRowKey(output.InsertedAt));
+
+                await _storage.DeleteAsync(BroadcastedOutputTableEntity.ByTransactionHash.GeneratePartition(output.TransactionHash),
+                    BroadcastedOutputTableEntity.ByTransactionHash.GenerateRowKey(output.N));
+
+                await _storage.DeleteAsync(BroadcastedOutputTableEntity.ByAddress.GeneratePartition(output.Address),
+                    BroadcastedOutputTableEntity.ByAddress.GenerateRowKey(output.TransactionHash, output.N));
             }
         }
 

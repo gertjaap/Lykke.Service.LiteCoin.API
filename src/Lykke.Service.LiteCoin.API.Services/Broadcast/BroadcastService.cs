@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Common.Log;
+using Flurl.Http;
 using Lykke.Service.LiteCoin.API.Core.BlockChainReaders;
 using Lykke.Service.LiteCoin.API.Core.Broadcast;
 using Lykke.Service.LiteCoin.API.Core.Exceptions;
@@ -27,14 +28,13 @@ namespace Lykke.Service.LiteCoin.API.Services.Broadcast
         {
             try
             {
-
                 await _blockChainProvider.BroadCastTransaction(tx);
             }
-            catch (Exception e)
+            catch (FlurlHttpException e)
             {
                 await _log.WriteErrorAsync(nameof(BroadcastService), nameof(BroadCastTransaction),
                     tx.GetHash().ToString(), e);
-                throw new BusinessException("Broadcast error", ErrorCode.BroadcastError);
+                throw new BusinessException($"Broadcast error - {e.Call.ErrorResponseBody}", ErrorCode.BroadcastError);
             }
 
             await _transactionOutputsService.SaveOuputs(tx);
