@@ -10,14 +10,14 @@ namespace Lykke.Service.LiteCoin.API.Services.Fee
     public class FeeService:IFeeService
     {
         private readonly IFeeRateFacade _feeRateFacade;
-        private readonly decimal _minFeeValue;
-        private readonly decimal _maxFeeValue;
+        private readonly decimal _minFeeValueSatoshi;
+        private readonly decimal _maxFeeValueSatoshi;
 
-        public FeeService(IFeeRateFacade feeRateFacade, decimal minFeeValue, decimal maxFeeValue)
+        public FeeService(IFeeRateFacade feeRateFacade, decimal minFeeValueSatoshi, decimal maxFeeValueSatoshi)
         {
             _feeRateFacade = feeRateFacade;
-            _minFeeValue = minFeeValue;
-            _maxFeeValue = maxFeeValue;
+            _minFeeValueSatoshi = minFeeValueSatoshi;
+            _maxFeeValueSatoshi = maxFeeValueSatoshi;
         }
 
         public async Task<Money> CalcFeeForTransaction(Transaction tx)
@@ -27,9 +27,9 @@ namespace Lykke.Service.LiteCoin.API.Services.Fee
             return await CalcFee(size);
         }
 
-        public async Task<Money> CalcFeeForTransaction(TransactionBuilder builder)
+        public  Task<Money> CalcFeeForTransaction(TransactionBuilder builder)
         {
-            return builder.EstimateFees(builder.BuildTransaction(false), await GetFeeRate());
+            return CalcFeeForTransaction(builder.BuildTransaction(false));
         }
 
         public async Task<FeeRate> GetFeeRate()
@@ -43,14 +43,14 @@ namespace Lykke.Service.LiteCoin.API.Services.Fee
         {
             var  fromFeeRate = (await GetFeeRate()).GetFee(size);
 
-            if (fromFeeRate.Satoshi > _maxFeeValue)
+            if (fromFeeRate.Satoshi > _maxFeeValueSatoshi)
             {
-                return new Money(_maxFeeValue, MoneyUnit.Satoshi);
+                return new Money(_maxFeeValueSatoshi, MoneyUnit.Satoshi);
             }
 
-            if (fromFeeRate.Satoshi < _minFeeValue)
+            if (fromFeeRate.Satoshi < _minFeeValueSatoshi)
             {
-                return new Money(_minFeeValue, MoneyUnit.Satoshi);
+                return new Money(_minFeeValueSatoshi, MoneyUnit.Satoshi);
             }
 
             return fromFeeRate;

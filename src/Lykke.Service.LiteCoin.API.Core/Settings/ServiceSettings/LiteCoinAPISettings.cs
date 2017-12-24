@@ -17,9 +17,9 @@ namespace Lykke.Service.LiteCoin.API.Core.Settings.ServiceSettings
         public int FeePerByte { get; set; } = 100; // use value greater than default value 100 000 litoshi per kb = 100 litoshi per b. Ref https://bitcoin.stackexchange.com/questions/53821/where-can-i-find-the-current-fee-level-for-ltc
 
         [Optional]
-        public decimal MinFeeValue { get; set; } = 0.1m;
+        public decimal MinFeeValue { get; set; } = 100000;
         [Optional]
-        public decimal MaxFeeValue { get; set; } = 1m;
+        public decimal MaxFeeValue { get; set; } = 10000000;
         
         [Optional]
         public int MinCashInConfirmationsCount { get; set; } = 3;
