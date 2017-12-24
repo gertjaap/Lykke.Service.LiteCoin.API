@@ -55,19 +55,19 @@ namespace Lykke.Service.LiteCoin.API.Services.Operations
             {
                 try
                 {
-                    var tx = await _transactionBuilder.GetTransferTransaction(hotWallet.Address, 
+                    var unsignedTx = await _transactionBuilder.GetTransferTransaction(hotWallet.Address, 
                         destAddress,
                         amount);
                     
-                    var signedtx = await _signService.SignTransaction(tx.Transaction, hotWallet.Address);
+                    var signedtx = await _signService.SignTransaction(operationId, unsignedTx, hotWallet.Address);
                     
                     await _broadcastService.BroadCastTransaction(signedtx);
 
                     await _cashOutOperationRepository.Insert(CashOutOperation.Create(operationId, sourceWallet.Address.ToString(),
-                        destAddress.ToString(), amount, assetId, DateTime.UtcNow, tx.Transaction.GetHash().ToString()));
+                        destAddress.ToString(), amount, assetId, DateTime.UtcNow, signedtx.GetHash().ToString()));
 
                     await _pendingCashoutTransactionRepository.Insert(
-                        CashOutTransaction.Create(tx.Transaction.GetHash().ToString(), operationId));
+                        CashOutTransaction.Create(signedtx.GetHash().ToString(), operationId));
 
                     await _cashoutCompletedNotificationQueue.AddMessage(new CashOutStartedNotificationContext
                     {

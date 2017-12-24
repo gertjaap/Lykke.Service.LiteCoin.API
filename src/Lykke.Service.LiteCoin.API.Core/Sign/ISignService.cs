@@ -5,6 +5,6 @@ namespace Lykke.Service.LiteCoin.API.Core.Sign
 {
     public interface ISignService
     {
-        Task<Transaction> SignTransaction(Transaction unsignedTransaction, params BitcoinAddress[] publicAddress);
+        Task<Transaction> SignTransaction(string operationId, Transaction unsignedTransaction, params BitcoinAddress[] publicAddress);
     }
 }

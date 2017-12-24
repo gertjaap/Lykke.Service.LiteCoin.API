@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Common;
 using Common.Log;
 using Lykke.Service.LiteCoin.API.Core.Exceptions;
 using Lykke.Service.LiteCoin.API.Core.Sign;
@@ -28,9 +29,9 @@ namespace Lykke.Service.LiteCoin.API.Services.Sign
             _transactionBlobStorage = transactionBlobStorage;
         }
 
-        public async Task<Transaction> SignTransaction(Transaction unsignedTransaction, params BitcoinAddress[] publicAddress)
+        public async Task<Transaction> SignTransaction(string operationId, Transaction unsignedTransaction, params BitcoinAddress[] publicAddress)
         {
-            await _transactionBlobStorage.AddOrReplaceTransaction(unsignedTransaction.GetHash().ToString(), TransactionBlobType.Initial, unsignedTransaction.ToHex());
+            await _transactionBlobStorage.AddOrReplaceTransaction(operationId, TransactionBlobType.Initial, unsignedTransaction.ToHex());
 
             foreach (var bitcoinAddress in publicAddress)
             {
@@ -46,20 +47,18 @@ namespace Lykke.Service.LiteCoin.API.Services.Sign
             try
             {
                 signedTx =  await _serviceApiProvider.SignTransaction(unsignedTransaction, publicAddress.Select(p => p.ToString()).ToArray());
-
-                await _transactionBlobStorage.AddOrReplaceTransaction(signedTx.GetHash().ToString(), TransactionBlobType.Signed, signedTx.ToHex());
-
             }
             catch (Exception e)
             {
                 await _log.WriteErrorAsync(nameof(SignService), nameof(SignTransaction),
-                    unsignedTransaction.GetHash().ToString(), e);
+                    new {operationId}.ToJson(), e);
 
                 throw new BusinessException("Sign error", ErrorCode.SignError);
             }
 
-            return signedTx;
+            await _transactionBlobStorage.AddOrReplaceTransaction(operationId, TransactionBlobType.Signed, signedTx.ToHex());
 
+            return signedTx;
         }
     }
 }

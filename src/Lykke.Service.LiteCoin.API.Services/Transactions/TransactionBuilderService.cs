@@ -15,11 +15,6 @@ using NBitcoin.Policy;
 
 namespace Lykke.Service.LiteCoin.API.Services.Transactions
 {
-    public class BuildedTx : IBuildedTx
-    {
-        public Transaction Transaction { get; set; }
-    }
-
     public class TransactionBuilderService : ITransactionBuilderService
     {
         private readonly ITransactionOutputsService _transactionOutputsService;
@@ -38,7 +33,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Transactions
             _feeService = feeService;
         }
 
-        public async Task<IBuildedTx> GetTransferTransaction(BitcoinAddress source,
+        public async Task<Transaction> GetTransferTransaction(BitcoinAddress source,
             BitcoinAddress destination, decimal amount, bool sentDust = false)
         {
             return await Retry.Try(async () =>
@@ -53,13 +48,8 @@ namespace Lykke.Service.LiteCoin.API.Services.Transactions
 
 
                         var buildedTransaction = builder.BuildTransaction(true);
-
-
-
-                        return new BuildedTx
-                        {
-                            Transaction = buildedTransaction
-                        };
+                        
+                        return buildedTransaction;
 
                     });
                 }, exception => (exception as BusinessException)?.Code == ErrorCode.TransactionConcurrentInputsProblem,
