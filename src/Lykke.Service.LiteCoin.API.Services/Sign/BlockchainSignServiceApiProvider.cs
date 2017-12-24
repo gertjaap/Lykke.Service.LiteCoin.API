@@ -29,9 +29,8 @@ namespace Lykke.Service.LiteCoin.API.Services.Sign
                 {
                     throw new BusinessException("Cant find address to signTx", ErrorCode.CantFindAddressToSignTx);
                 }
-
-                
             }
+
             var signed = await _client.SignTransactionAsync(new SignRequestModel(publicAddresses, unsignedTransaction.ToHex()));
 
             return Transaction.Parse(signed.SignedTransaction);
