@@ -97,7 +97,7 @@ namespace Lykke.Job.LiteCoin.Functions
                     TransactionBlobType.Initial,
                     unsignedTx.ToHex());
 
-                var signedTx = await _signService.SignTransaction(unsignedTx, clientWallet.Address);
+                var signedTx = await _signService.SignTransaction(context.OperationId, unsignedTx, clientWallet.Address);
 
                 await _transactionBlobStorage.AddOrReplaceTransaction(operation.OperationId,
                     TransactionBlobType.Signed,
