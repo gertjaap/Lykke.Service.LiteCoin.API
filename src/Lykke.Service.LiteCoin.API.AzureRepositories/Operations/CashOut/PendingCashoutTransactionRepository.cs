@@ -46,7 +46,6 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Operations.CashOut
 
         public async Task<IEnumerable<ICashoutTransaction>> GetAll()
         {
-            var t = await _storage.GetDataAsync("TCTH", "4eb687f5dac0091b0ac7883f17be385acb424171f71a01a03eed65b76c6aa22a");
             return await _storage.GetDataAsync(PendingCashoutTransactionEntity.CreatePartitionKey());
         }
 
