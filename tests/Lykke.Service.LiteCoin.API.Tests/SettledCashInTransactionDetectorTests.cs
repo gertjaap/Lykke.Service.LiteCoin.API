@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Common.Log;
 using Lykke.Service.LiteCoin.API.Core.BlockChainReaders;
 using Lykke.Service.LiteCoin.API.Core.Constants;
 using Lykke.Service.LiteCoin.API.Core.Wallet;
@@ -29,7 +30,7 @@ namespace Lykke.Service.LiteCoin.API.Tests
             var sourceAddress = "QccPnuA18HA7CM8dBuZnWGHKNYsBFJJXX8";
             var blockchainProvider = GetBlockChainProvider(addr, sourceAddress, "5bdc8d4d879374c92f1f582e951fb316d617c16c939796f50b1956d35ee1d2c6", 1, tx1, tx2);
 
-            var detector = new SettledCashInTransactionDetector(blockchainProvider.Object, network);
+            var detector = new SettledCashInTransactionDetector(blockchainProvider.Object, network, new EmptyLog());
 
             var ops = await detector.GetCashInOperations(new[] {WalletMock.Create(addr) }, 1, 10);
 
@@ -57,7 +58,7 @@ namespace Lykke.Service.LiteCoin.API.Tests
         {
             var result = new Mock<IBlockChainProvider>();
 
-            result.Setup(p =>p.GetTransactionsForAddress(It.Is<BitcoinAddress>(x => x == address), It.IsAny<int>(), It.IsAny<int>()))
+            result.Setup(p =>p.GetTransactionsForAddress(It.Is<BitcoinAddress>(x => x == address), It.IsAny<int>()))
                 .ReturnsAsync(txs.Select(x=>x.GetHash().ToString()))
                 .Verifiable();
 

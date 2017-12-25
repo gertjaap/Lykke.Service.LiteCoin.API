@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Common;
+using Common.Log;
 using Lykke.Service.LiteCoin.API.Core.BlockChainReaders;
 using Lykke.Service.LiteCoin.API.Core.BlockChainTracker;
 using Lykke.Service.LiteCoin.API.Core.CashIn;
@@ -17,12 +19,15 @@ namespace Lykke.Service.LiteCoin.API.Services.Operations.CashIn
         private readonly IBlockChainProvider _blockChainProvider;
 
         private readonly Network _network;
+        private readonly ILog _log;
 
         public SettledCashInTransactionDetector(IBlockChainProvider blockChainProvider, 
-            Network network)
+            Network network, 
+            ILog log)
         {
             _blockChainProvider = blockChainProvider;
             _network = network;
+            _log = log;
         }
 
         public async Task<IEnumerable<ICashInOperation>> GetCashInOperations(IEnumerable<IWallet> wallets,
@@ -47,17 +52,18 @@ namespace Lykke.Service.LiteCoin.API.Services.Operations.CashIn
             int toHeight)
         {
             var txHashes = await _blockChainProvider.GetTransactionsForAddress(wallet.Address, fromHeight, toHeight);
-
-
+            
             var result = new List<ICashInOperation>();
 
             foreach (var txHash in txHashes)
             {
                 var op = await GetOperationFromTx(txHash, wallet);
 
-
                 if (op != null)
                 {
+                    await _log.WriteInfoAsync(nameof(SettledCashInTransactionDetector), nameof(GetCashInOperations),
+                        op.ToJson(), "CashIn detected");
+
                     result.Add(op);
                 }
             }

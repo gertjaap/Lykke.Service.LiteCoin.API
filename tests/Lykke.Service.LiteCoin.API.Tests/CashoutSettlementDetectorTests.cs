@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Common.Log;
 using Lykke.Service.LiteCoin.API.Core.BlockChainReaders;
 using Lykke.Service.LiteCoin.API.Core.CashOut;
-using Lykke.Service.LiteCoin.API.Services.CashOut;
+using Lykke.Service.LiteCoin.API.Services.Operations.CashOut;
 using Moq;
 using Xunit;
 
@@ -25,7 +26,7 @@ namespace Lykke.Service.LiteCoin.API.Tests
 
             var provider = GetBlockChainProvider(tx, txConfirmationCount);
 
-            var txDetector = new SettledCashOutTransactionDetector(provider.Object);
+            var txDetector = new SettledCashOutTransactionDetector(provider.Object, new EmptyLog());
 
             var detectedTx = await txDetector.CheckSettlement(new[] {tx}, minConfirmationsCount: 1);
 
@@ -50,7 +51,7 @@ namespace Lykke.Service.LiteCoin.API.Tests
 
             var provider = GetBlockChainProvider(tx, txConfirmationCount);
 
-            var txDetector = new SettledCashOutTransactionDetector(provider.Object);
+            var txDetector = new SettledCashOutTransactionDetector(provider.Object, new EmptyLog());
 
             var detectedTx = await txDetector.CheckSettlement(new[] { tx }, minConfirmationsCount: 10);
 

@@ -124,14 +124,12 @@ namespace Lykke.Service.LiteCoin.API.Services.WebHook
                 //remove previous attempt 
                 await _failedWebHookEventRepository.DeleteIfExist(operationId);
             }
-            catch (Exception e)
+            catch (FlurlHttpException e)
             {
                 await _log.WriteErrorAsync(nameof(WebHookSender), nameof(ProcessWebHook), operationId, e);
                 
                 var failedEvent =  WebHookEvent.Fail(requestData, e.ToString());
-                await _failedWebHookEventRepository.Insert(FailedWebHookEvent.Create(operationId, failedEvent, webHookType));
-
-                throw;
+                await _failedWebHookEventRepository.Insert(FailedWebHookEvent.Create(operationId, failedEvent, webHookType));                
             }
         }
     }

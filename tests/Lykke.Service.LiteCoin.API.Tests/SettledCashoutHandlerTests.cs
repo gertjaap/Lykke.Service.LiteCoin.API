@@ -6,7 +6,6 @@ using Common.Log;
 using Lykke.Service.LiteCoin.API.Core.CashOut;
 using Lykke.Service.LiteCoin.API.Core.Queue;
 using Lykke.Service.LiteCoin.API.Core.Queue.Contexts;
-using Lykke.Service.LiteCoin.API.Services.CashOut;
 using Lykke.Service.LiteCoin.API.Services.Operations.CashOut;
 using Moq;
 using Xunit;

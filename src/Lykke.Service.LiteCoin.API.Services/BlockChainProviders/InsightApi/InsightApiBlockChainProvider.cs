@@ -8,6 +8,7 @@ using Flurl.Http;
 using Lykke.Service.LiteCoin.API.Core.BlockChainReaders;
 using Lykke.Service.LiteCoin.API.Services.BlockChainProviders.Helpers;
 using Lykke.Service.LiteCoin.API.Services.BlockChainProviders.InsightApi.Contracts;
+using MoreLinq;
 using NBitcoin;
 
 namespace Lykke.Service.LiteCoin.API.Services.BlockChainProviders.InsightApi
@@ -23,13 +24,25 @@ namespace Lykke.Service.LiteCoin.API.Services.BlockChainProviders.InsightApi
 
         public async Task<IEnumerable<string>> GetTransactionsForAddress(string address, int fromHeight, int toHeight)
         {
-            var resp = await _insightApiSettings.Url
-                .AppendPathSegment($"insight-lite-api/addr/{address}")
-                .SetQueryParam("from", fromHeight)
-                .SetQueryParam("to", toHeight)
-                .GetJsonAsync<AddressBalanceResponceContract>();
+            var result = new List<string>();
 
-            return resp.Transactions;
+            //insight api have limitaion 
+            //"from" and "to" range should be less than or equal to 1000
+            var batchSize = 1000;
+            var blocksEnum = Enumerable.Range(fromHeight, toHeight - fromHeight + 1);
+
+            foreach (var heightBatch in blocksEnum.Batch(batchSize, x => x.ToList()))
+            {
+                var resp = await _insightApiSettings.Url
+                    .AppendPathSegment($"insight-lite-api/addr/{address}")
+                    .SetQueryParam("from", heightBatch.First())
+                    .SetQueryParam("to", heightBatch.Last())
+                    .GetJsonAsync<AddressBalanceResponceContract>();
+
+                result.AddRange(resp.Transactions);
+            }
+
+            return result;
         }
 
         public Task<IEnumerable<string>> GetTransactionsForAddress(BitcoinAddress address, int fromHeight, int toHeight)

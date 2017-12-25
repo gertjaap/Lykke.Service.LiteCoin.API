@@ -1,21 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Common;
+using Common.Log;
 using Lykke.Service.LiteCoin.API.Core.BlockChainReaders;
 using Lykke.Service.LiteCoin.API.Core.CashOut;
 
-namespace Lykke.Service.LiteCoin.API.Services.CashOut
+namespace Lykke.Service.LiteCoin.API.Services.Operations.CashOut
 {
 
     public class SettledCashOutTransactionDetector: ISettledCashOutTransactionDetector
     {
         private readonly IBlockChainProvider _blockChainProvider;
+        private readonly ILog _log;
 
-        public SettledCashOutTransactionDetector(IBlockChainProvider blockChainProvider)
+        public SettledCashOutTransactionDetector(IBlockChainProvider blockChainProvider, 
+            ILog log)
         {
             _blockChainProvider = blockChainProvider;
+            _log = log;
         }
 
 
@@ -29,6 +31,9 @@ namespace Lykke.Service.LiteCoin.API.Services.CashOut
 
                 if (confirmationCount >= minConfirmationsCount)
                 {
+                    await _log.WriteInfoAsync(nameof(SettledCashOutTransactionDetector), nameof(CheckSettlement),
+                        tx.ToJson(), "Cashout settlement detected");
+
                     settledTransactions.Add(tx);
                 }
             }

@@ -72,7 +72,7 @@ namespace Lykke.Job.LiteCoin.Functions
 
             var hotWallet = (await _walletService.GetHotWallets()).First();
             
-            var outputs = (await _outputsService.GetOnlyBlockChainUnspentOutputs(operation.SourceAddress)).ToList();
+            var outputs = (await _outputsService.GetOnlyBlockChainUnspentOutputs(operation.DestinationAddress)).ToList();
             var balance = outputs.Sum(o => o.Amount);
 
             if (outputs.Any())
