@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Lykke.Service.BlockchainSignService.Client;
 using Lykke.Service.BlockchainSignService.Client.Models;
 using Lykke.Service.LiteCoin.API.Core.Exceptions;
 using Lykke.Service.LiteCoin.API.Core.Sign;
+using Microsoft.Rest;
 using NBitcoin;
 
 namespace Lykke.Service.LiteCoin.API.Services.Sign
@@ -48,7 +50,14 @@ namespace Lykke.Service.LiteCoin.API.Services.Sign
 
         public async Task<string> GetByPublicAddress(string address)
         {
-            return (await _client.GetWalletByPublicAddressAsync(address))?.PublicAddress;
+            try
+            {
+                return (await _client.GetWalletByPublicAddressAsync(address))?.PublicAddress;
+            }
+            catch (HttpOperationException e) when(e.Response.StatusCode == HttpStatusCode.NotFound)
+            {
+                return null;
+            }
         }
     }
 }
