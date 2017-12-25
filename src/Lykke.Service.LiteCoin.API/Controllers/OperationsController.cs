@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Lykke.Service.LiteCoin.API.Core.Address;
+using Lykke.Service.LiteCoin.API.Core.Constants;
 using Lykke.Service.LiteCoin.API.Core.Exceptions;
 using Lykke.Service.LiteCoin.API.Core.Operation;
 using Lykke.Service.LiteCoin.API.Core.Wallet;
@@ -39,6 +40,12 @@ namespace Lykke.Service.LiteCoin.API.Controllers
         {
             if (request.Amount <= 0)
                 throw new BusinessException("Amount can't be less or equal to zero", ErrorCode.BadInputParameter);
+
+            if (request.AssetId != Constants.AssetsContants.LiteCoin)
+            {
+
+                throw new BusinessException($"Invalid assetId: availiable asset ids - {Constants.AssetsContants.LiteCoin}", ErrorCode.BadInputParameter);
+            }
 
             if (!_addressValidator.IsValid(request.DestAddress))
             {
