@@ -2,7 +2,6 @@
 using AzureStorage.Blob;
 using AzureStorage.Tables;
 using Common.Log;
-using Lykke.Service.LiteCoin.API.AzureRepositories.CashOut;
 using Lykke.Service.LiteCoin.API.AzureRepositories.Operations;
 using Lykke.Service.LiteCoin.API.AzureRepositories.Operations.CashIn;
 using Lykke.Service.LiteCoin.API.AzureRepositories.Operations.CashOut;
@@ -56,7 +55,7 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Binder
                     .As<IFailedWebHookEventRepository>();
             
             builder.RegisterInstance(new PendingCashoutTransactionRepository(
-                AzureTableStorage<TrackedCashoutTransactionEntity>.Create(_settings.Nested(p => p.Db.DataConnString),
+                AzureTableStorage<PendingCashoutTransactionEntity>.Create(_settings.Nested(p => p.Db.DataConnString),
                     "PengingCashoutTransactions", _log)))
                     .As<IPendingCashoutTransactionRepository>();
 

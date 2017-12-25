@@ -60,7 +60,7 @@ namespace Lykke.Job.LiteCoin.Modules
             builder.AddTriggers(
                 pool =>
                 {
-                    pool.AddDefaultConnection(_settings.CurrentValue.Db.DataConnString);
+                    pool.AddDefaultConnection(_settings.Nested(x=>x.Db.DataConnString));
                 });
         }
 

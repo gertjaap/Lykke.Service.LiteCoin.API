@@ -23,7 +23,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Operations.CashOut
             _cashOutTransactionDetector = cashOutTransactionDetector;
             _pendingCashoutTransactionRepository = pendingCashoutTransactionRepository;
         }
-
+        
         public async Task DetectCashOutOps()
         {
             var pendingTxs = await _pendingCashoutTransactionRepository.GetAll();

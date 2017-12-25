@@ -5,9 +5,9 @@ using AzureStorage;
 using Lykke.Service.LiteCoin.API.Core.CashOut;
 using Microsoft.WindowsAzure.Storage.Table;
 
-namespace Lykke.Service.LiteCoin.API.AzureRepositories.CashOut
+namespace Lykke.Service.LiteCoin.API.AzureRepositories.Operations.CashOut
 {
-    public class TrackedCashoutTransactionEntity : TableEntity, ICashoutTransaction
+    public class PendingCashoutTransactionEntity : TableEntity, ICashoutTransaction
     {
         public string TxHash { get; set; }
         public string OperationId { get; set; }
@@ -23,9 +23,9 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.CashOut
             return "TCTH";
         }
 
-        public static TrackedCashoutTransactionEntity Create(ICashoutTransaction source)
+        public static PendingCashoutTransactionEntity Create(ICashoutTransaction source)
         {
-            return new TrackedCashoutTransactionEntity
+            return new PendingCashoutTransactionEntity
             {
                 OperationId = source.OperationId,
                 InsertedAt = source.InsertedAt,
@@ -37,26 +37,27 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.CashOut
     }
     public class PendingCashoutTransactionRepository: IPendingCashoutTransactionRepository
     {
-        private readonly INoSQLTableStorage<TrackedCashoutTransactionEntity> _storage;
+        private readonly INoSQLTableStorage<PendingCashoutTransactionEntity> _storage;
 
-        public PendingCashoutTransactionRepository(INoSQLTableStorage<TrackedCashoutTransactionEntity> storage)
+        public PendingCashoutTransactionRepository(INoSQLTableStorage<PendingCashoutTransactionEntity> storage)
         {
             _storage = storage;
         }
 
         public async Task<IEnumerable<ICashoutTransaction>> GetAll()
         {
-            return await _storage.GetDataAsync(TrackedCashoutTransactionEntity.CreatePartitionKey());
+            var t = await _storage.GetDataAsync("TCTH", "4eb687f5dac0091b0ac7883f17be385acb424171f71a01a03eed65b76c6aa22a");
+            return await _storage.GetDataAsync(PendingCashoutTransactionEntity.CreatePartitionKey());
         }
 
         public Task Insert(ICashoutTransaction tx)
         {
-            return _storage.InsertOrReplaceAsync(TrackedCashoutTransactionEntity.Create(tx));
+            return _storage.InsertOrReplaceAsync(PendingCashoutTransactionEntity.Create(tx));
         }
 
         public Task Remove(string txHash)
         {
-            return _storage.DeleteAsync(TrackedCashoutTransactionEntity.CreatePartitionKey(), TrackedCashoutTransactionEntity.CreateRowKey(txHash));
+            return _storage.DeleteAsync(PendingCashoutTransactionEntity.CreatePartitionKey(), PendingCashoutTransactionEntity.CreateRowKey(txHash));
         }
     }
 }

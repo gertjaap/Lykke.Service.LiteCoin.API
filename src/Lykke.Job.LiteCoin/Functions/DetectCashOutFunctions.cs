@@ -7,6 +7,7 @@ namespace Lykke.Job.LiteCoin.Functions
     public class DetectCashOutFunctions
     {
         private readonly ICashOutsOperationDetectorFacade _detector;
+  
 
         public DetectCashOutFunctions(ICashOutsOperationDetectorFacade detector)
         {
