@@ -41,7 +41,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Operations.CashIn
 
                 await _settledTransactionsHandler.HandleSettledTransactions(detectResult.DetectedOperations);
 
-                await _detectedAddressTransactionsRepository.InsertIfNotExist(detectResult.AddressTransactions);
+                await _detectedAddressTransactionsRepository.Insert(detectResult.AddressTransactions);
             }
         }
     }
