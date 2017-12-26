@@ -58,7 +58,7 @@ namespace Lykke.Service.LiteCoin.API.Tests
         {
             var result = new Mock<IBlockChainProvider>();
 
-            result.Setup(p =>p.GetTransactionsForAddress(It.Is<BitcoinAddress>(x => x == address), It.IsAny<int>()))
+            result.Setup(p =>p.GetTransactionsForAddress(It.Is<BitcoinAddress>(x => x == address), It.IsAny<int>(), It.IsAny<int>()))
                 .ReturnsAsync(txs.Select(x=>x.GetHash().ToString()))
                 .Verifiable();
 
