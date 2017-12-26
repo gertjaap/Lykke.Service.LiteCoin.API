@@ -2,17 +2,13 @@
 using AzureStorage.Blob;
 using AzureStorage.Tables;
 using Common.Log;
-using Lykke.Service.LiteCoin.API.AzureRepositories.Operations;
 using Lykke.Service.LiteCoin.API.AzureRepositories.Operations.CashIn;
 using Lykke.Service.LiteCoin.API.AzureRepositories.Operations.CashOut;
 using Lykke.Service.LiteCoin.API.AzureRepositories.Queue;
-using Lykke.Service.LiteCoin.API.AzureRepositories.TransactionOutput;
 using Lykke.Service.LiteCoin.API.AzureRepositories.TransactionOutput.BroadcastedOutputs;
 using Lykke.Service.LiteCoin.API.AzureRepositories.TransactionOutput.SpentOutputs;
 using Lykke.Service.LiteCoin.API.AzureRepositories.Transactions;
-using Lykke.Service.LiteCoin.API.AzureRepositories.TxTracker;
 using Lykke.Service.LiteCoin.API.AzureRepositories.WebHook;
-using Lykke.Service.LiteCoin.API.Core.BlockChainTracker;
 using Lykke.Service.LiteCoin.API.Core.CashIn;
 using Lykke.Service.LiteCoin.API.Core.CashOut;
 using Lykke.Service.LiteCoin.API.Core.Queue;
@@ -44,11 +40,6 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Binder
 
         private void RegisterRepo(ContainerBuilder builder)
         {
-            builder.RegisterInstance(new CashInLastProcessedBlockRepository(
-                AzureTableStorage<LastCashInProcessedBlockEntity>.Create(_settings.Nested(p => p.Db.DataConnString),
-                    "CashInsLastProcessedBlocks", _log)))
-                    .As<ICashInLastProcessedBlockRepository>();
-
             builder.RegisterInstance(new FailedWebHookEventRepository(
                 AzureTableStorage<FailedWebHookEventEntity>.Create(_settings.Nested(p => p.Db.DataConnString),
                     "FailedWebHookEvents", _log)))
@@ -75,7 +66,6 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Binder
                         "CashInOperations", _log)))
                 .As<ICashInOperationRepository>();
 
-
             builder.RegisterInstance(new CashInEventRepository(
                     AzureTableStorage<CashInEventTableEntity>.Create(_settings.Nested(p => p.Db.DataConnString),
                         "CashInEvents", _log)))
@@ -90,6 +80,11 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Binder
                     AzureTableStorage<SpentOutputTableEntity>.Create(_settings.Nested(p => p.Db.DataConnString),
                         "SpentOutputs", _log)))
                 .As<ISpentOutputRepository>();
+
+            builder.RegisterInstance(new DetectedAddressTransactionsRepository(
+                    AzureTableStorage<DetectedAddressTransactionEntity>.Create(_settings.Nested(p => p.Db.DataConnString),
+                        "DetectedAddressTransactions", _log)))
+                .As<IDetectedAddressTransactionsRepository>();
         }
 
         private void RegisterQueue(ContainerBuilder builder)

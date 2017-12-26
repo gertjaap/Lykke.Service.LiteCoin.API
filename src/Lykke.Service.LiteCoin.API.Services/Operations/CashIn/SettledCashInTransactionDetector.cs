@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Common;
 using Common.Log;
 using Lykke.Service.LiteCoin.API.Core.BlockChainReaders;
-using Lykke.Service.LiteCoin.API.Core.BlockChainTracker;
 using Lykke.Service.LiteCoin.API.Core.CashIn;
 using Lykke.Service.LiteCoin.API.Core.Constants;
 using Lykke.Service.LiteCoin.API.Core.Wallet;
@@ -14,6 +12,23 @@ using NBitcoin;
 
 namespace Lykke.Service.LiteCoin.API.Services.Operations.CashIn
 {
+    public class DetectCashInOperationsResult : IDetectCashInOperationsResult
+    {
+        public IEnumerable<ICashInOperation> DetectedOperations { get; set; }
+
+        public IEnumerable<IDetectedAddressTransaction> AddressTransactions { get; set; }
+
+        public static DetectCashInOperationsResult Create(IEnumerable<ICashInOperation> cashInOperations,
+            IEnumerable<IDetectedAddressTransaction> detectedTransactions)
+        {
+            return new DetectCashInOperationsResult
+            {
+                DetectedOperations = cashInOperations,
+                AddressTransactions = detectedTransactions
+            };
+        }
+    }
+
     public class SettledCashInTransactionDetector: ISettledCashInTransactionDetector
     {
         private readonly IBlockChainProvider _blockChainProvider;
@@ -29,48 +44,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Operations.CashIn
             _network = network;
             _log = log;
         }
-
-        public async Task<IEnumerable<ICashInOperation>> GetCashInOperations(IEnumerable<IWallet> wallets,
-            int fromHeight,
-            int toHeight)
-        {
-            var result = new List<ICashInOperation>();
-
-            foreach (var wallet in wallets)
-            {
-                var operationsForWallet = await GetCashInOperations(wallet, fromHeight, toHeight);
-
-                result.AddRange(operationsForWallet);
-            }
-
-
-            return result;
-        }
-
-        private async Task<IEnumerable<ICashInOperation>> GetCashInOperations(IWallet wallet, 
-            int fromHeight,
-            int toHeight)
-        {
-            var txHashes = await _blockChainProvider.GetTransactionsForAddress(wallet.Address, fromHeight, toHeight);
-            
-            var result = new List<ICashInOperation>();
-
-            foreach (var txHash in txHashes)
-            {
-                var op = await GetOperationFromTx(txHash, wallet);
-
-                if (op != null)
-                {
-                    await _log.WriteInfoAsync(nameof(SettledCashInTransactionDetector), nameof(GetCashInOperations),
-                        op.ToJson(), "CashIn detected");
-
-                    result.Add(op);
-                }
-            }
-
-
-            return result;
-        }
+        
 
         private async Task<ICashInOperation> GetOperationFromTx(string txHash, IWallet wallet)
         {
@@ -110,6 +84,47 @@ namespace Lykke.Service.LiteCoin.API.Services.Operations.CashIn
             }
 
             return null;
+        }
+
+        public async Task<IDetectCashInOperationsResult> GetCashInOperations(IWallet wallet,
+            IEnumerable<IDetectedAddressTransaction> prevDetectedTransactions,
+            int minTxConfirmationCount)
+        {
+            var detectedTransactionsDictionary =
+                prevDetectedTransactions.Select(p => p.TransactionHash).Distinct().ToDictionary(p => p);
+
+            var txHashes = (await _blockChainProvider.GetTransactionsForAddress(wallet.Address)).ToList();
+            var newTransactions = txHashes.Where(p => !detectedTransactionsDictionary.ContainsKey(p)).ToList();
+
+
+            var cashInOperations = new List<ICashInOperation>();
+            var newDetectedAddressTransactions = new List<IDetectedAddressTransaction>();
+
+            foreach (var txHash in newTransactions)
+            {
+                var confirmationCount = await _blockChainProvider.GetTxConfirmationCount(txHash);
+                if (confirmationCount >= minTxConfirmationCount)
+                {
+                    newDetectedAddressTransactions.Add(DetectedAddressTransaction.Create(txHash, wallet.Address.ToString()));
+
+
+                    if (!detectedTransactionsDictionary.ContainsKey(txHash))
+                    {
+                        var op = await GetOperationFromTx(txHash, wallet);
+
+                        if (op != null)
+                        {
+                            await _log.WriteInfoAsync(nameof(SettledCashInTransactionDetector), nameof(GetCashInOperations),
+                                op.ToJson(), "CashIn detected");
+
+                            cashInOperations.Add(op);
+                        }
+                    }
+                }
+
+            }
+            
+            return DetectCashInOperationsResult.Create(cashInOperations, newDetectedAddressTransactions);
         }
     }
 }

@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Common.Log;
 using Flurl;
 using Flurl.Http;
 using Lykke.Service.LiteCoin.API.Core.BlockChainReaders;
 using Lykke.Service.LiteCoin.API.Services.BlockChainProviders.Helpers;
 using Lykke.Service.LiteCoin.API.Services.BlockChainProviders.InsightApi.Contracts;
+using Lykke.Service.LiteCoin.API.Services.Helpers;
 using MoreLinq;
 using NBitcoin;
 
@@ -16,54 +18,63 @@ namespace Lykke.Service.LiteCoin.API.Services.BlockChainProviders.InsightApi
     internal class InsightApiBlockChainProvider: IBlockChainProvider
     {
         private readonly InsightApiSettings _insightApiSettings;
+        private readonly ILog _log;
 
-        public InsightApiBlockChainProvider(InsightApiSettings insightApiSettings)
+        public InsightApiBlockChainProvider(InsightApiSettings insightApiSettings, ILog log)
         {
             _insightApiSettings = insightApiSettings;
+            _log = log;
         }
 
-        public async Task<IEnumerable<string>> GetTransactionsForAddress(string address, int fromHeight, int toHeight)
+        public async Task<IEnumerable<string>> GetTransactionsForAddress(string address)
         {
             var result = new List<string>();
 
-            //insight api have limitaion 
-            //"from" and "to" range should be less than or equal to 1000
-            var batchSize = 1000;
-            var blocksEnum = Enumerable.Range(fromHeight, toHeight - fromHeight + 1);
+            const int batchSize = 1000;
+            
+            var allTxLoaded = false;
+            int counter = 0;
 
-            foreach (var heightBatch in blocksEnum.Batch(batchSize, x => x.ToList()))
+            while (!allTxLoaded)
             {
-                var resp = await _insightApiSettings.Url
+                var url = _insightApiSettings.Url
                     .AppendPathSegment($"insight-lite-api/addr/{address}")
-                    .SetQueryParam("from", heightBatch.First())
-                    .SetQueryParam("to", heightBatch.Last())
-                    .GetJsonAsync<AddressBalanceResponceContract>();
+                    .SetQueryParam("from", counter)
+                    .SetQueryParam("to", counter + batchSize);
+
+                var resp = await GetJson<AddressBalanceResponceContract>(url);
 
                 result.AddRange(resp.Transactions);
+                allTxLoaded = resp.Transactions.Any();
+
+                counter += batchSize;
             }
 
             return result;
         }
 
-        public Task<IEnumerable<string>> GetTransactionsForAddress(BitcoinAddress address, int fromHeight, int toHeight)
+        public Task<IEnumerable<string>> GetTransactionsForAddress(BitcoinAddress address)
         {
-            return GetTransactionsForAddress(address.ToString(), fromHeight, toHeight);
+            return GetTransactionsForAddress(address.ToString());
         }
 
         public async Task<int> GetLastBlockHeight()
         {
-            var resp = await _insightApiSettings.Url
-                .AppendPathSegment("insight-lite-api/status")
-                .GetJsonAsync<StatusResponceContract>();
+            var url = _insightApiSettings.Url
+                .AppendPathSegment("insight-lite-api/status");
+
+
+            var resp = await GetJson<StatusResponceContract>(url);
 
             return resp.Info.LastBlockHeight;
         }
 
         public async Task<Transaction> GetRawTx(string tx)
         {
-            var resp = await _insightApiSettings.Url
-                .AppendPathSegment($"insight-lite-api/rawtx/{tx}")
-                .GetJsonAsync<RawTxResponce>();
+            var url = _insightApiSettings.Url
+                .AppendPathSegment($"insight-lite-api/rawtx/{tx}");
+
+            var resp = await GetJson<RawTxResponce>(url);
 
             return Transaction.Parse(resp.RawTx);
         }
@@ -85,9 +96,10 @@ namespace Lykke.Service.LiteCoin.API.Services.BlockChainProviders.InsightApi
 
         public async Task<IEnumerable<Coin>> GetUnspentOutputs(string address, int minConfirmationCount)
         {
-            var resp =await _insightApiSettings.Url
-                .AppendPathSegment($"insight-lite-api/addr/{address}/utxo")
-                .GetJsonAsync<AddressUnspentOutputsResponce[]>();
+            var url = _insightApiSettings.Url
+                .AppendPathSegment($"insight-lite-api/addr/{address}/utxo");
+
+            var resp = await GetJson<AddressUnspentOutputsResponce[]>(url);
 
             return resp.Where(p => p.Confirmation >= minConfirmationCount).Select(MapUnspentCoun);
         }
@@ -106,16 +118,47 @@ namespace Lykke.Service.LiteCoin.API.Services.BlockChainProviders.InsightApi
         {
             try
             {
-                var resp = await _insightApiSettings.Url
-                    .AppendPathSegment($"insight-lite-api/tx/{txHash}")
-                    .GetJsonAsync<TxResponceContract>();
 
+                var url = _insightApiSettings.Url
+                    .AppendPathSegment($"insight-lite-api/tx/{txHash}");
+
+                var resp = await GetJson<TxResponceContract>(url);
+                
                 return resp;
             }
             catch (FlurlHttpException e) when (e.Call.Response.StatusCode == HttpStatusCode.NotFound)
             {
                 return null;
             }
+        }
+
+        private async Task<T> GetJson<T>(Url url, int tryCount = 3)
+        {
+            bool NeedToRetryException(Exception ex)
+            {
+
+                if (!(ex is FlurlHttpException flurlException))
+                {
+                    return false;
+                }
+
+                var isTimeout = flurlException is FlurlHttpTimeoutException;
+                if (isTimeout)
+                {
+                    return true;
+                }
+
+                if (flurlException.Call.HttpStatus == HttpStatusCode.ServiceUnavailable ||
+                    flurlException.Call.HttpStatus == HttpStatusCode.InternalServerError)
+                {
+                    return true;
+                }
+
+                return false;
+            }
+
+            
+            return await Retry.Try(() => url.GetJsonAsync<T>(), NeedToRetryException, tryCount, _log);
         }
     }
 }
