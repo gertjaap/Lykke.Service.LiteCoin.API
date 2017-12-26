@@ -47,9 +47,9 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Operations.CashIn
             _storage = storage;
         }
 
-        public Task InsertIfNotExist(IEnumerable<IDetectedAddressTransaction> transactions)
+        public Task Insert(IEnumerable<IDetectedAddressTransaction> transactions)
         {
-            return _storage.InsertOrMergeBatchAsync(transactions.Select(DetectedAddressTransactionEntity.Create));
+            return _storage.InsertAsync(transactions.Select(DetectedAddressTransactionEntity.Create));
         }
 
         public async Task<IEnumerable<IDetectedAddressTransaction>> GetTxsForAddress(string address)

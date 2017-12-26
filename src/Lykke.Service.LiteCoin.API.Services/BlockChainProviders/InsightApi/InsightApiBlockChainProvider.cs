@@ -45,7 +45,7 @@ namespace Lykke.Service.LiteCoin.API.Services.BlockChainProviders.InsightApi
                 var resp = await GetJson<AddressBalanceResponceContract>(url);
 
                 result.AddRange(resp.Transactions);
-                allTxLoaded = resp.Transactions.Any();
+                allTxLoaded = !resp.Transactions.Any();
 
                 counter += batchSize;
             }

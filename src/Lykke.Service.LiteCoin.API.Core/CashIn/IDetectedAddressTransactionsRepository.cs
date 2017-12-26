@@ -33,7 +33,7 @@ namespace Lykke.Service.LiteCoin.API.Core.CashIn
 
     public interface IDetectedAddressTransactionsRepository
     {
-        Task InsertIfNotExist(IEnumerable<IDetectedAddressTransaction> transactions);
+        Task Insert(IEnumerable<IDetectedAddressTransaction> transactions);
 
         Task<IEnumerable<IDetectedAddressTransaction>> GetTxsForAddress(string address);
     }

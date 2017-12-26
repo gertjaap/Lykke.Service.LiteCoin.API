@@ -100,25 +100,21 @@ namespace Lykke.Service.LiteCoin.API.Services.Operations.CashIn
             var cashInOperations = new List<ICashInOperation>();
             var newDetectedAddressTransactions = new List<IDetectedAddressTransaction>();
 
-            foreach (var txHash in newTransactions)
+            foreach (var txHash in newTransactions.Where(hash=> !detectedTransactionsDictionary.ContainsKey(hash)))
             {
                 var confirmationCount = await _blockChainProvider.GetTxConfirmationCount(txHash);
                 if (confirmationCount >= minTxConfirmationCount)
                 {
                     newDetectedAddressTransactions.Add(DetectedAddressTransaction.Create(txHash, wallet.Address.ToString()));
 
+                    var op = await GetOperationFromTx(txHash, wallet);
 
-                    if (!detectedTransactionsDictionary.ContainsKey(txHash))
+                    if (op != null)
                     {
-                        var op = await GetOperationFromTx(txHash, wallet);
+                        await _log.WriteInfoAsync(nameof(SettledCashInTransactionDetector), nameof(GetCashInOperations),
+                            op.ToJson(), "CashIn detected");
 
-                        if (op != null)
-                        {
-                            await _log.WriteInfoAsync(nameof(SettledCashInTransactionDetector), nameof(GetCashInOperations),
-                                op.ToJson(), "CashIn detected");
-
-                            cashInOperations.Add(op);
-                        }
+                        cashInOperations.Add(op);
                     }
                 }
 
