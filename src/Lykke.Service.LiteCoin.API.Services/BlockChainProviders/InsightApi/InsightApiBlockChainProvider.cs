@@ -106,7 +106,9 @@ namespace Lykke.Service.LiteCoin.API.Services.BlockChainProviders.InsightApi
 
         public async Task<string> GetDestinationAddress(string txHash, uint n)
         {
-            return (await GetTx(txHash))?.Outputs?.FirstOrDefault(p => p.N == n)?.ScriptPubKey?.Addresses?.FirstOrDefault();
+            var tx = await GetTx(txHash);
+
+            return tx?.Outputs?.FirstOrDefault(p => p.N == n)?.ScriptPubKey?.Addresses?.FirstOrDefault();
         }
 
         private Coin MapUnspentCoun(AddressUnspentOutputsResponce source)
@@ -118,7 +120,6 @@ namespace Lykke.Service.LiteCoin.API.Services.BlockChainProviders.InsightApi
         {
             try
             {
-
                 var url = _insightApiSettings.Url
                     .AppendPathSegment($"insight-lite-api/tx/{txHash}");
 

@@ -93,7 +93,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Operations.CashIn
             var detectedTransactionsDictionary =
                 prevDetectedTransactions.Select(p => p.TransactionHash).Distinct().ToDictionary(p => p);
 
-            var txHashes = (await _blockChainProvider.GetTransactionsForAddress(wallet.Address)).ToList();
+            var txHashes = (await _blockChainProvider.GetTransactionsForAddress(wallet.Address)).Distinct().ToList();
             var newTransactions = txHashes.Where(p => !detectedTransactionsDictionary.ContainsKey(p)).ToList();
 
 

@@ -7,7 +7,7 @@ namespace Lykke.Service.LiteCoin.API.Services.BlockChainProviders.InsightApi.Con
         [JsonProperty("confirmations")]
         public int Confirmation { get; set; }
 
-        [JsonProperty("vin")]
+        [JsonProperty("vout")]
         public OutputContract[] Outputs { get; set; }
 
         public class OutputContract
