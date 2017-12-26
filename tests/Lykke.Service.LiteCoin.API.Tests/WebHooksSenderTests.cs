@@ -18,7 +18,7 @@ namespace Lykke.Service.LiteCoin.API.Tests
         {
             var webHookSettings = new WebHookSettings
             {
-                Url = "127.0.0.1"
+                Url = "http://127.0.0.1/"
             };
 
             var opId = Guid.NewGuid().ToString();
@@ -26,10 +26,10 @@ namespace Lykke.Service.LiteCoin.API.Tests
 
             var whSender = new WebHookSender(webHookSettings, new EmptyLog(), failedEventRepo.Object);
 
-            
-            await Assert.ThrowsAnyAsync<Exception>(async () =>
-                await whSender.ProcessCashIn(opId, DateTime.UtcNow, "walletId", "assetId", 123, "asda"));
-           
+
+            await whSender.ProcessCashIn(opId, DateTime.UtcNow, "walletId", "assetId", 123, "asda");
+
+
 
             failedEventRepo.Verify();
 
@@ -40,7 +40,7 @@ namespace Lykke.Service.LiteCoin.API.Tests
         {
             var webHookSettings = new WebHookSettings
             {
-                Url = "127.0.0.1"
+                Url = "http://127.0.0.1/"
             };
 
             var opId = Guid.NewGuid().ToString();
@@ -48,10 +48,8 @@ namespace Lykke.Service.LiteCoin.API.Tests
 
             var whSender = new WebHookSender(webHookSettings, new EmptyLog(), failedEventRepo.Object);
 
-            await Assert.ThrowsAnyAsync<Exception>(async () =>
-                await whSender.ProcessCashOutCompleted(opId, DateTime.UtcNow, "walletId", "assetId", 123, "asda", "txhash"));
+            await whSender.ProcessCashOutCompleted(opId, DateTime.UtcNow, "walletId", "assetId", 123, "asda", "txhash");
 
-            
             failedEventRepo.Verify();
 
         }
@@ -61,16 +59,16 @@ namespace Lykke.Service.LiteCoin.API.Tests
         {
             var webHookSettings = new WebHookSettings
             {
-                Url = "127.0.0.1"
+                Url = "http://127.0.0.1/"
             };
             var opId = Guid.NewGuid().ToString();
             var failedEventRepo = CreateFailedEventsRepo(opId);
 
             var whSender = new WebHookSender(webHookSettings, new EmptyLog(), failedEventRepo.Object);
 
-            await Assert.ThrowsAnyAsync<Exception>(async () =>
-                await whSender.ProcessCashOutStarted(opId, DateTime.UtcNow, "walletId", "assetId", 123, "asda", "txhash"));
-            
+            await whSender.ProcessCashOutStarted(opId, DateTime.UtcNow, "walletId", "assetId", 123, "asda", "txhash");
+
+
             failedEventRepo.Verify();
 
         }
@@ -84,7 +82,7 @@ namespace Lykke.Service.LiteCoin.API.Tests
             var repo = new Mock<IFailedWebHookEventRepository>();
 
 
-            repo.Setup(x => x.Insert(It.Is<IFailedWebHookEvent>(p=>p!=null)))
+            repo.Setup(x => x.Insert(It.Is<IFailedWebHookEvent>(p=> p !=null && p.OperationId == operationId)))
                 .Returns(Task.CompletedTask)
                 .Verifiable();
             return repo;
