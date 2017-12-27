@@ -18,17 +18,14 @@ namespace Lykke.Service.LiteCoin.API.Services.Transactions
     public class TransactionBuilderService : ITransactionBuilderService
     {
         private readonly ITransactionOutputsService _transactionOutputsService;
-        private readonly TransactionBuildContextFactory _transactionBuildContextFactory;
         private readonly ILog _log;
         private readonly IFeeService _feeService;
 
         public TransactionBuilderService(ITransactionOutputsService transactionOutputsService,
-            TransactionBuildContextFactory transactionBuildContextFactory,
             ILog log,
             IFeeService feeService)
         {
             _transactionOutputsService = transactionOutputsService;
-            _transactionBuildContextFactory = transactionBuildContextFactory;
             _log = log;
             _feeService = feeService;
         }
@@ -38,20 +35,14 @@ namespace Lykke.Service.LiteCoin.API.Services.Transactions
         {
             return await Retry.Try(async () =>
                 {
-                    var context = _transactionBuildContextFactory.Create();
+                    var builder = new TransactionBuilder();
 
-                    return await context.Build(async () =>
-                    {
-                        var builder = new TransactionBuilder();
-
-                        await TransferOneDirection(builder, context, source, amount, destination, sentDust);
+                    await TransferOneDirection(builder,  source, amount, destination, sentDust);
 
 
-                        var buildedTransaction = builder.BuildTransaction(true);
-                        
-                        return buildedTransaction;
+                    var buildedTransaction = builder.BuildTransaction(true);
 
-                    });
+                    return buildedTransaction;
                 }, exception => (exception as BusinessException)?.Code == ErrorCode.TransactionConcurrentInputsProblem,
                 3,
                 _log);
@@ -78,7 +69,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Transactions
             return builder.BuildTransaction(false);
         }
 
-        private async Task TransferOneDirection(TransactionBuilder builder, TransactionBuildContext context,
+        private async Task TransferOneDirection(TransactionBuilder builder, 
             BitcoinAddress @from, decimal amount, BitcoinAddress to, bool addDust = true, bool sendDust = false)
         {
             var fromStr = from.ToString();
@@ -89,11 +80,11 @@ namespace Lykke.Service.LiteCoin.API.Services.Transactions
                 balance - amount < new TxOut(Money.Zero, from)
                     .GetDustThreshold(builder.StandardTransactionPolicy.MinRelayTxFee).ToDecimal(MoneyUnit.BTC))
                 amount = balance;
-            await SendWithChange(builder, context, coins, to, new Money(amount, MoneyUnit.BTC),
+            await SendWithChange(builder,  coins, to, new Money(amount, MoneyUnit.BTC),
                 from, addDust);
         }
 
-        public async Task<decimal> SendWithChange(TransactionBuilder builder, TransactionBuildContext context,
+        public async Task<decimal> SendWithChange(TransactionBuilder builder, 
             List<CoinWithSettlementInfo> coins, IDestination destination, Money amount, IDestination changeDestination,
             bool addDust = true)
         {
@@ -117,8 +108,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Transactions
             }
             if (sendAmount < amount)
                 ThrowError();
-
-            context.AddCoins(orderedCoins.Take(cnt));
+            
             builder.AddCoins(orderedCoins.Take(cnt));
 
             var precalculatedFee = await _feeService.CalcFeeForTransaction(builder);
@@ -136,8 +126,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Transactions
                     sendAmount += orderedFeeCoins[cnt].TxOut.Value;
                     feeCoinsCnt++;
                 }
-
-                context.AddCoins(orderedFeeCoins.Take(feeCoinsCnt));
+                
                 builder.AddCoins(orderedFeeCoins.Take(feeCoinsCnt));
             }
 

@@ -183,8 +183,6 @@ namespace Lykke.Service.LiteCoin.API.Services.Binder
         private void RegisterTransactionBuilderServices(ContainerBuilder builder)
         {
             builder.RegisterType<TransactionBuilderService>().As<ITransactionBuilderService>();
-            builder.RegisterType<TransactionBuildContext>().AsSelf().InstancePerDependency();
-            builder.RegisterType<TransactionBuildContextFactory>().AsSelf();
             builder.RegisterType<OperationService>().As<IOperationService>();
         }
 
