@@ -28,6 +28,9 @@ namespace Lykke.Service.LiteCoin.API.Core.Settings.ServiceSettings
         public int MinCashOutConfirmationsCount { get; set; } = 3;
 
         [Optional]
+        public int MinCashInRetryConfirmationsCount { get; set; } = 100;
+
+        [Optional]
         public int BroadcastedOutputsExpirationDays { get; set; } = 7;
 
         [Optional]

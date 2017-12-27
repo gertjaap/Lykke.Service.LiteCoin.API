@@ -57,6 +57,27 @@ namespace Lykke.Service.LiteCoin.API.Services.Transactions
                 _log);
         }
 
+        public async Task<Transaction> GetSendMoneyToHotWalletTransaction(BitcoinAddress fromAddress, BitcoinAddress destination, string fromTxHash)
+        {
+            var builder = new TransactionBuilder();
+            var outputs = (await _transactionOutputsService.GetUnspentOutputs(fromAddress.ToString())).Where(p => p.Outpoint.Hash.ToString() == fromTxHash).ToArray();
+            var amount = outputs.Sum(o => o.Amount);
+            var fee = await _feeService.GetMinFee();
+
+            if (fee.Satoshi > amount)
+            {
+                throw new BusinessException(
+                    $"The sum of total applicable outputs is less than the required fee: {fee.Satoshi} satoshis.",
+                    ErrorCode.BalanceIsLessThanFee);
+            }
+
+            builder.AddCoins(outputs.Cast<Coin>());
+            builder.Send(destination, amount - fee);
+            builder.SendFees(fee);
+
+            return builder.BuildTransaction(false);
+        }
+
         private async Task TransferOneDirection(TransactionBuilder builder, TransactionBuildContext context,
             BitcoinAddress @from, decimal amount, BitcoinAddress to, bool addDust = true, bool sendDust = false)
         {
@@ -73,7 +94,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Transactions
         }
 
         public async Task<decimal> SendWithChange(TransactionBuilder builder, TransactionBuildContext context,
-            List<Coin> coins, IDestination destination, Money amount, IDestination changeDestination,
+            List<CoinWithSettlementInfo> coins, IDestination destination, Money amount, IDestination changeDestination,
             bool addDust = true)
         {
             if (amount.Satoshi <= 0)
@@ -86,7 +107,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Transactions
                     ErrorCode.NotEnoughFundsAvailable);
             }
             
-            var orderedCoins = coins.OrderBy(o => o.Amount).ToList();
+            var orderedCoins = coins.OrderByDescending(p => p.IsSettled).ThenBy(o => o.Amount).ToList(); //use settled in blockchain outputs first
             var sendAmount = Money.Zero;
             var cnt = 0;
             while (sendAmount < amount && cnt < orderedCoins.Count)

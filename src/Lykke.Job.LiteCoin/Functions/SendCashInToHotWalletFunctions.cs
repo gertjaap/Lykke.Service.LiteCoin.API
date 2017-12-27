@@ -1,20 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Common;
 using Common.Log;
 using Lykke.JobTriggers.Triggers.Attributes;
-using Lykke.Service.LiteCoin.API.Core.BlockChainReaders;
 using Lykke.Service.LiteCoin.API.Core.CashIn;
-using Lykke.Service.LiteCoin.API.Core.Fee;
+using Lykke.Service.LiteCoin.API.Core.Exceptions;
+using Lykke.Service.LiteCoin.API.Core.Operation;
+using Lykke.Service.LiteCoin.API.Core.Queue;
 using Lykke.Service.LiteCoin.API.Core.Queue.Contexts;
-using Lykke.Service.LiteCoin.API.Core.Sign;
 using Lykke.Service.LiteCoin.API.Core.TransactionOutputs;
-using Lykke.Service.LiteCoin.API.Core.Transactions;
 using Lykke.Service.LiteCoin.API.Core.Wallet;
-using NBitcoin;
+using Lykke.Service.LiteCoin.API.Services.Operations;
 
 namespace Lykke.Job.LiteCoin.Functions
 {
@@ -24,28 +20,28 @@ namespace Lykke.Job.LiteCoin.Functions
         private readonly ITransactionOutputsService _outputsService;
         private readonly ICashInOperationRepository _cashInOperationRepository;
         private readonly ILog _log;
-        private readonly IFeeService _feeService;
-        private readonly ISignService _signService;
-        private readonly IBlockChainProvider _blockChainProvider;
-        private readonly ITransactionBlobStorage _transactionBlobStorage;
+        private readonly ICashInEventRepository _cashInEventRepository;
+        private readonly OperationsConfirmationsSettings _confirmationsSettings;
+        private readonly IQueueRouter<SendCashInToHotWalletContext> _queueRouter;
+        private readonly IOperationService _operationService;
 
         public SendCashInToHotWalletFunctions(IWalletService walletService,
             ITransactionOutputsService outputsService, 
             ICashInOperationRepository cashInOperationRepository,
             ILog log,
-            IFeeService feeService, 
-            ISignService signService,
-            IBlockChainProvider blockChainProvider, 
-            ITransactionBlobStorage transactionBlobStorage)
+            ICashInEventRepository cashInEventRepository, 
+            OperationsConfirmationsSettings confirmationsSettings, 
+            IQueueRouter<SendCashInToHotWalletContext> queueRouter,
+            IOperationService operationService)
         {
             _walletService = walletService;
             _outputsService = outputsService;
             _cashInOperationRepository = cashInOperationRepository;
             _log = log;
-            _feeService = feeService;
-            _signService = signService;
-            _blockChainProvider = blockChainProvider;
-            _transactionBlobStorage = transactionBlobStorage;
+            _cashInEventRepository = cashInEventRepository;
+            _confirmationsSettings = confirmationsSettings;
+            _queueRouter = queueRouter;
+            _operationService = operationService;
         }
 
         [QueueTrigger(SendCashInToHotWalletContext.QueueName)]
@@ -70,45 +66,62 @@ namespace Lykke.Job.LiteCoin.Functions
                 return;
             }
 
-            var hotWallet = (await _walletService.GetHotWallets()).First();
-            
-            var outputs = (await _outputsService.GetOnlyBlockChainUnspentOutputs(operation.DestinationAddress)).ToList();
-            var balance = outputs.Sum(o => o.Amount);
-
-            if (outputs.Any())
+            try
             {
-                var builder = new TransactionBuilder();
-                builder.AddCoins(outputs).Send(hotWallet.Address, balance);
-
-                var fee = await _feeService.CalcFeeForTransaction(builder);
-
-                if (fee > balance)
-                {
-                    await _log.WriteWarningAsync(nameof(SendCashInToHotWalletFunctions), nameof(Send), context.ToJson(),
-                            $"Calculated fee is more than balance ({fee.Satoshi}>{balance})");
-                    return;
-                }
-
-                builder.SendFees(fee);
-
-                var unsignedTx = builder.BuildTransaction(true);
-
-                await _transactionBlobStorage.AddOrReplaceTransaction(operation.OperationId, 
-                    TransactionBlobType.Initial,
-                    unsignedTx.ToHex());
-
-                var signedTx = await _signService.SignTransaction(context.OperationId, unsignedTx, clientWallet.Address);
-
-                await _transactionBlobStorage.AddOrReplaceTransaction(operation.OperationId,
-                    TransactionBlobType.Signed,
-                    signedTx.ToHex());
-
-                await _blockChainProvider.BroadCastTransaction(signedTx);
+                await _operationService.ProceedSendMoneyToHotWalletOperation(operation.OperationId, clientWallet,
+                    operation.TxHash);
             }
-            else
+            catch (BusinessException e) when(e.Code == ErrorCode.BalanceIsLessThanFee)
             {
                 await _log.WriteWarningAsync(nameof(SendCashInToHotWalletFunctions), nameof(Send), context.ToJson(),
-                    "Not found CashIn outputs");
+                    "Balance is less than fee");
+            }
+
+
+            await _cashInEventRepository.InsertEvent(CashInEvent.Create(operation.OperationId,
+                CashInEventType.MoneyTransferredToHotWallet));
+        }
+
+        [TimerTrigger("05:00:00")]
+        public async Task Retry()
+        {
+            var wallets = await _walletService.GetClientWallets();
+
+            foreach (var wallet in wallets)
+            {
+                var outputs = await _outputsService.GetUnspentOutputs(wallet.Address.ToString(),
+                    _confirmationsSettings.MinCashInRetryConfirmations);
+
+                var txHashes = outputs.Select(p => p.Outpoint.Hash.ToString()).Distinct();
+
+                foreach (var txHash in txHashes)
+                {
+                    var operation = await _cashInOperationRepository.GetByTxHash(txHash);
+
+                    if (operation == null)
+                    {
+                        await _log.WriteWarningAsync(nameof(SendCashInToHotWalletFunctions), nameof(Retry), new
+                        {
+                            clientAddress = wallet.Address.ToString(),
+                            txHash
+                        }.ToJson(), "TxHash not found");
+                    }
+                    else
+                    {
+                        await _queueRouter.AddMessage(new SendCashInToHotWalletContext
+                        {
+                            OperationId = operation.OperationId
+                        });
+
+                        await _cashInEventRepository.InsertEvent(CashInEvent.Create(operation.OperationId,
+                            CashInEventType.MoneyTransferredToHoRetry));
+
+                        await _log.WriteWarningAsync(nameof(SendCashInToHotWalletFunctions), nameof(Retry), new
+                        {
+                            operation.OperationId
+                        }.ToJson(), "Operation retry queued");
+                    }
+                }
             }
         }
     }

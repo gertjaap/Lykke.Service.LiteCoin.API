@@ -135,7 +135,8 @@ namespace Lykke.Service.LiteCoin.API.Services.Binder
             builder.RegisterInstance(new OperationsConfirmationsSettings
             {
                 MinCashInConfirmations = _settings.CurrentValue.MinCashInConfirmationsCount,
-                MinCashOutConfirmations = _settings.CurrentValue.MinCashOutConfirmationsCount
+                MinCashOutConfirmations = _settings.CurrentValue.MinCashOutConfirmationsCount,
+                MinCashInRetryConfirmations = _settings.CurrentValue.MinCashInRetryConfirmationsCount
             });
             
             RegisterCashInDetectorServices(builder);

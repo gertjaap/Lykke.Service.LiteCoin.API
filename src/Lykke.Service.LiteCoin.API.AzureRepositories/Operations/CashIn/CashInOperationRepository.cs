@@ -118,6 +118,12 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Operations.CashIn
                 CashInOperationEntity.ByOperationId.GenerateRowKey(operationId));
         }
 
+        public async Task<ICashInOperation> GetByTxHash(string txHash)
+        {
+            return await _storage.GetDataAsync(CashInOperationEntity.ByTxHash.GeneratePartitionKey(),
+                CashInOperationEntity.ByTxHash.GenerateRowKey(txHash));
+        }
+
         private async Task<IEnumerable<ICashInOperation>> GetOldOperations(DateTime bound, int count)
         {
             return (await _storage.GetTopRecordsAsync(CashInOperationEntity.ByDateTime.GeneratePartitionKey(), count))

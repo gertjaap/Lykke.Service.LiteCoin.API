@@ -8,8 +8,9 @@ namespace Lykke.Service.LiteCoin.API.Core.TransactionOutputs
 {
     public interface ITransactionOutputsService
     {
-        Task<IEnumerable<Coin>> GetUnspentOutputs(string address, int confirmationsCount = 0);
-        Task<IEnumerable<Coin>> GetOnlyBlockChainUnspentOutputs(string address, int confirmationsCount = 0);
+        Task<IEnumerable<CoinWithSettlementInfo>> GetUnspentOutputs(string address, int confirmationsCount = 0);
         Task SaveOuputs(Transaction tx);
     }
+    
+
 }

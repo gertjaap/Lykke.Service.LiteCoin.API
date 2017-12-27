@@ -8,5 +8,6 @@ namespace Lykke.Service.LiteCoin.API.Services.Operations
     {
         public int MinCashOutConfirmations { get; set; }
         public int MinCashInConfirmations { get; set; }
+        public int MinCashInRetryConfirmations { get; set; }
     }
 }

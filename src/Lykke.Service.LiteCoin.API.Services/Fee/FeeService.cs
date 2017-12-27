@@ -55,5 +55,10 @@ namespace Lykke.Service.LiteCoin.API.Services.Fee
 
             return fromFeeRate;
         }
+
+        public  Task<Money> GetMinFee()
+        {
+            return Task.FromResult(new Money(_minFeeValueSatoshi, MoneyUnit.Satoshi));
+        }
     }
 }

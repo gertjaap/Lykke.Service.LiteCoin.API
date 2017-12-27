@@ -57,6 +57,7 @@ namespace Lykke.Service.LiteCoin.API.Core.CashIn
     {
         Task Insert(ICashInOperation operation);
         Task<ICashInOperation> GetByOperationId(string operationId);
+        Task<ICashInOperation> GetByTxHash(string txHash);
         Task DeleteOldOperations(DateTime bound);
     }
 }

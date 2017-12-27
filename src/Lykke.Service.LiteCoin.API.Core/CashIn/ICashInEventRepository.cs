@@ -9,7 +9,8 @@ namespace Lykke.Service.LiteCoin.API.Core.CashIn
     public enum CashInEventType
     {
        NotificationSend,
-       MoneyTransferredToHotWallet
+       MoneyTransferredToHotWallet,
+        MoneyTransferredToHoRetry
     }
 
     public interface ICashInEvent

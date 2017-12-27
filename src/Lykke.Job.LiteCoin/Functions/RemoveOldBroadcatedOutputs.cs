@@ -16,9 +16,7 @@ namespace Lykke.Job.LiteCoin.Functions
             _broadcastedOutputRepository = broadcastedOutputRepository;
             _settings = settings;
         }
-
-
-
+        
 
         [TimerTrigger("1.00:00:00")]
         public async Task Clean()

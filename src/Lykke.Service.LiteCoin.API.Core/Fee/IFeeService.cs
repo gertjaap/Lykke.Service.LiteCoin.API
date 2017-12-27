@@ -7,5 +7,6 @@ namespace Lykke.Service.LiteCoin.API.Core.Fee
     {
         Task<Money> CalcFeeForTransaction(Transaction tx);
         Task<Money> CalcFeeForTransaction(TransactionBuilder builder);
+        Task<Money> GetMinFee();
     }
 }

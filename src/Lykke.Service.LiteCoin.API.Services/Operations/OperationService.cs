@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Common;
 using Common.Log;
@@ -21,7 +22,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Operations
         private readonly IWalletService _walletService;
         private readonly ITransactionBuilderService _transactionBuilder;
         private readonly ISignService _signService;
-        private readonly IQueueRouter<CashOutStartedNotificationContext> _cashoutCompletedNotificationQueue;
+        private readonly IQueueRouter<CashOutStartedNotificationContext> _cashoutStartedNotificationQueue;
         private readonly ICashOutOperationRepository _cashOutOperationRepository;
         private readonly IPendingCashoutTransactionRepository _pendingCashoutTransactionRepository;
         private readonly ILog _log;
@@ -30,7 +31,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Operations
         public OperationService(IWalletService walletService, 
             ITransactionBuilderService transactionBuilder, 
             ISignService signService,
-            IQueueRouter<CashOutStartedNotificationContext> cashoutCompletedNotificationQueue, 
+            IQueueRouter<CashOutStartedNotificationContext> cashoutStartedNotificationQueue, 
             ICashOutOperationRepository cashOutOperationRepository,
             IPendingCashoutTransactionRepository pendingCashoutTransactionRepository,
             ILog log, 
@@ -39,14 +40,14 @@ namespace Lykke.Service.LiteCoin.API.Services.Operations
             _walletService = walletService;
             _transactionBuilder = transactionBuilder;
             _signService = signService;
-            _cashoutCompletedNotificationQueue = cashoutCompletedNotificationQueue;
+            _cashoutStartedNotificationQueue = cashoutStartedNotificationQueue;
             _cashOutOperationRepository = cashOutOperationRepository;
             _pendingCashoutTransactionRepository = pendingCashoutTransactionRepository;
             _log = log;
             _broadcastService = broadcastService;
         }
 
-        public async Task ProceedCashOutOperation(string operationId, IWallet sourceWallet, BitcoinAddress destAddress, decimal amount)
+        public async Task<ICashOutOperation> ProceedCashOutOperation(string operationId, IWallet sourceWallet, BitcoinAddress destAddress, decimal amount)
         {
             var hotWallets = await _walletService.GetHotWallets();
             var assetId = Constants.AssetsContants.LiteCoin;
@@ -63,18 +64,20 @@ namespace Lykke.Service.LiteCoin.API.Services.Operations
                     
                     await _broadcastService.BroadCastTransaction(signedtx);
 
-                    await _cashOutOperationRepository.Insert(CashOutOperation.Create(operationId, sourceWallet.Address.ToString(),
-                        destAddress.ToString(), amount, assetId, DateTime.UtcNow, signedtx.GetHash().ToString()));
+                    var operation = CashOutOperation.Create(operationId, sourceWallet.Address.ToString(),
+                        destAddress.ToString(), amount, assetId, DateTime.UtcNow, signedtx.GetHash().ToString());
+
+                    await _cashOutOperationRepository.Insert(operation);
 
                     await _pendingCashoutTransactionRepository.Insert(
                         CashOutTransaction.Create(signedtx.GetHash().ToString(), operationId));
 
-                    await _cashoutCompletedNotificationQueue.AddMessage(new CashOutStartedNotificationContext
+                    await _cashoutStartedNotificationQueue.AddMessage(new CashOutStartedNotificationContext
                     {
                         OperationId = operationId
                     });
 
-                    return;
+                    return operation;
                 }
                 catch (BusinessException e) when(e.Code == ErrorCode.NotEnoughFundsAvailable)
                 {
@@ -87,6 +90,17 @@ namespace Lykke.Service.LiteCoin.API.Services.Operations
             }
             
             throw new BusinessException("Not enoughFunds on Hot wallets", ErrorCode.NotEnoughFundsAvailable);
+        }
+
+        public async Task ProceedSendMoneyToHotWalletOperation(string operationId, IWallet sourceWallet, string thHash)
+        {
+            var hotWallet = (await _walletService.GetHotWallets()).First();
+
+            var unsignedTx = await _transactionBuilder.GetSendMoneyToHotWalletTransaction(sourceWallet.Address, hotWallet.Address,
+                thHash);
+            var signedTx = await _signService.SignTransaction(operationId, unsignedTx, sourceWallet.Address);
+
+            await _broadcastService.BroadCastTransaction(signedTx);
         }
     }
 }

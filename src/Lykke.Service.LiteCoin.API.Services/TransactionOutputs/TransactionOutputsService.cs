@@ -25,9 +25,11 @@ namespace Lykke.Service.LiteCoin.API.Services.TransactionOutputs
             _broadcastedOutputsService = broadcastedOutputsService;
         }
 
-        public async Task<IEnumerable<Coin>> GetUnspentOutputs(string address, int confirmationsCount = 0)
+        public async Task<IEnumerable<CoinWithSettlementInfo>> GetUnspentOutputs(string address, int confirmationsCount = 0)
         {
-            var coins = (await _blockChainProvider.GetUnspentOutputs(address, confirmationsCount)).ToList();
+            var coins = (await _blockChainProvider.GetUnspentOutputs(address, confirmationsCount)).Select(p =>
+                new CoinWithSettlementInfo(p.Outpoint, p.TxOut, isSettled: true)).ToList();
+            
 
             if (confirmationsCount == 0)
             {
@@ -40,20 +42,13 @@ namespace Lykke.Service.LiteCoin.API.Services.TransactionOutputs
             return coins;
         }
 
-        public async Task<IEnumerable<Coin>> GetOnlyBlockChainUnspentOutputs(string address, int confirmationsCount = 0)
-        {
-            var coins = (await _blockChainProvider.GetUnspentOutputs(address, confirmationsCount)).ToList();
-
-            return coins;
-        }
-
         public async Task SaveOuputs(Transaction tx)
         {
             await _spentOutputService.SaveSpentOutputs(tx);
             await _broadcastedOutputsService.SaveNewOutputs(tx);
         }
 
-        private async Task AddBroadcastedOutputs(List<Coin> coins, string walletAddress)
+        private async Task AddBroadcastedOutputs(List<CoinWithSettlementInfo> coins, string walletAddress)
         {
             var set = new HashSet<OutPoint>(coins.Select(x => x.Outpoint));
 
@@ -62,14 +57,14 @@ namespace Lykke.Service.LiteCoin.API.Services.TransactionOutputs
 
             coins.AddRange(internalSavedOutputs.Select(o =>
             {
-                var coin = new Coin(new OutPoint(uint256.Parse(o.TransactionHash), o.N),
-                    new TxOut(new Money(o.Amount, MoneyUnit.Satoshi), o.ScriptPubKey.ToScript()));
+                var coin = new CoinWithSettlementInfo(new OutPoint(uint256.Parse(o.TransactionHash), o.N),
+                    new TxOut(new Money(o.Amount, MoneyUnit.Satoshi), o.ScriptPubKey.ToScript()), isSettled: false);
 
                 return coin;
             }));
         }
 
-        private async Task<List<Coin>> FilterCoins(List<Coin> coins)
+        private async Task<List<CoinWithSettlementInfo>> FilterCoins(List<CoinWithSettlementInfo> coins)
         {
             var spentcoins = await _spentOutputService.GetUnspentOutputs(coins.Select(o => new Output(o.Outpoint)));
 

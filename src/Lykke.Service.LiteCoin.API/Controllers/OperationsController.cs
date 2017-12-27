@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Lykke.Service.LiteCoin.API.Core.Address;
 using Lykke.Service.LiteCoin.API.Core.Constants;
@@ -68,7 +66,7 @@ namespace Lykke.Service.LiteCoin.API.Controllers
 
             var operationId = Guid.NewGuid().ToString();
 
-            await _operationService.ProceedCashOutOperation(operationId, sourceWallet,
+            var op = await _operationService.ProceedCashOutOperation(operationId, sourceWallet,
                 _addressValidator.GetBitcoinAddress(request.DestAddress), request.Amount);
 
 
