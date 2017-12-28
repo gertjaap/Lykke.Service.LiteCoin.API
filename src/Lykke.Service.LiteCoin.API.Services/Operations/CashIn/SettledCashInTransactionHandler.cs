@@ -9,33 +9,29 @@ namespace Lykke.Service.LiteCoin.API.Services.Operations.CashIn
 {
     public class SettledCashInTransactionHandler: ISettledCashInTransactionHandler
     {
-        private readonly IQueueRouter<CashInNotificationContext> _webHookQueue;
         private readonly IQueueRouter<SendCashInToHotWalletContext> _sendCashInToHotWalletQueue;
         private readonly ICashInOperationRepository _cashInOperationRepository;
+        private readonly IPendingCashInNotificationRepository _cashInNotificationRepository;
 
-        public SettledCashInTransactionHandler(IQueueRouter<CashInNotificationContext> webHookQueue, 
-            ICashInOperationRepository cashInOperationRepository, 
-            IQueueRouter<SendCashInToHotWalletContext> sendCashInToHotWalletQueue)
+        public SettledCashInTransactionHandler(ICashInOperationRepository cashInOperationRepository, 
+            IQueueRouter<SendCashInToHotWalletContext> sendCashInToHotWalletQueue, 
+            IPendingCashInNotificationRepository cashInNotificationRepository)
         {
-            _webHookQueue = webHookQueue;
             _cashInOperationRepository = cashInOperationRepository;
             _sendCashInToHotWalletQueue = sendCashInToHotWalletQueue;
+            _cashInNotificationRepository = cashInNotificationRepository;
         }
 
-        public async Task HandleSettledTransactions(IEnumerable<ICashInOperation> settledTransactions)
+        public async Task HandleSettledTransactions(IEnumerable<ICashInOperation> cashInOperations)
         {
-            foreach (var settledTransaction in settledTransactions)
+            foreach (var cashInOperation in cashInOperations)
             {
-                await _cashInOperationRepository.Insert(settledTransaction);
+                await _cashInOperationRepository.Insert(cashInOperation);
+                await _cashInNotificationRepository.Insert(PendingCashInNotification.Create(cashInOperation));
                 
-                await _webHookQueue.AddMessage(new CashInNotificationContext
-                {
-                    OperationId = settledTransaction.OperationId
-                });
-
                 await _sendCashInToHotWalletQueue.AddMessage(new SendCashInToHotWalletContext
                 {
-                    OperationId = settledTransaction.OperationId,
+                    OperationId = cashInOperation.OperationId,
                 });
             }
         }

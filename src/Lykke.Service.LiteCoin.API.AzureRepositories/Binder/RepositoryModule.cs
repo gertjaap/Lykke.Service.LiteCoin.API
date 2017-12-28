@@ -8,7 +8,6 @@ using Lykke.Service.LiteCoin.API.AzureRepositories.Queue;
 using Lykke.Service.LiteCoin.API.AzureRepositories.TransactionOutput.BroadcastedOutputs;
 using Lykke.Service.LiteCoin.API.AzureRepositories.TransactionOutput.SpentOutputs;
 using Lykke.Service.LiteCoin.API.AzureRepositories.Transactions;
-using Lykke.Service.LiteCoin.API.AzureRepositories.WebHook;
 using Lykke.Service.LiteCoin.API.Core.CashIn;
 using Lykke.Service.LiteCoin.API.Core.CashOut;
 using Lykke.Service.LiteCoin.API.Core.Queue;
@@ -16,7 +15,6 @@ using Lykke.Service.LiteCoin.API.Core.Settings.ServiceSettings;
 using Lykke.Service.LiteCoin.API.Core.TransactionOutputs.BroadcastedOutputs;
 using Lykke.Service.LiteCoin.API.Core.TransactionOutputs.SpentOutputs;
 using Lykke.Service.LiteCoin.API.Core.Transactions;
-using Lykke.Service.LiteCoin.API.Core.WebHook;
 using Lykke.SettingsReader;
 
 namespace Lykke.Service.LiteCoin.API.AzureRepositories.Binder
@@ -40,11 +38,6 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Binder
 
         private void RegisterRepo(ContainerBuilder builder)
         {
-            builder.RegisterInstance(new FailedWebHookEventRepository(
-                AzureTableStorage<FailedWebHookEventEntity>.Create(_settings.Nested(p => p.Db.DataConnString),
-                    "FailedWebHookEvents", _log)))
-                    .As<IFailedWebHookEventRepository>();
-            
             builder.RegisterInstance(new PendingCashoutTransactionRepository(
                 AzureTableStorage<PendingCashoutTransactionEntity>.Create(_settings.Nested(p => p.Db.DataConnString),
                     "PengingCashoutTransactions", _log)))
@@ -85,6 +78,18 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Binder
                     AzureTableStorage<DetectedAddressTransactionEntity>.Create(_settings.Nested(p => p.Db.DataConnString),
                         "DetectedAddressTransactions", _log)))
                 .As<IDetectedAddressTransactionsRepository>();
+
+
+
+            builder.RegisterInstance(new PendingCashInNotificationRepository(
+                    AzureTableStorage<PendingCashInNotificationTableEntity>.Create(_settings.Nested(p => p.Db.DataConnString),
+                        "PendingCashInNotifications", _log)))
+                .As<IPendingCashInNotificationRepository>();
+
+            builder.RegisterInstance(new PendingCashOutNotificationRepository(
+                    AzureTableStorage<PendingCashOutNotificationTableEntity>.Create(_settings.Nested(p => p.Db.DataConnString),
+                        "PendingCashOutNotifications", _log)))
+                .As<IPendingCashOutNotificationRepository>();
         }
 
         private void RegisterQueue(ContainerBuilder builder)

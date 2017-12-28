@@ -33,19 +33,14 @@ namespace Lykke.Service.LiteCoin.API.Services.Transactions
         public async Task<Transaction> GetTransferTransaction(BitcoinAddress source,
             BitcoinAddress destination, decimal amount, bool sentDust = false)
         {
-            return await Retry.Try(async () =>
-                {
-                    var builder = new TransactionBuilder();
+            var builder = new TransactionBuilder();
 
-                    await TransferOneDirection(builder,  source, amount, destination, sentDust);
+            await TransferOneDirection(builder, source, amount, destination, sentDust);
 
 
-                    var buildedTransaction = builder.BuildTransaction(true);
+            var buildedTransaction = builder.BuildTransaction(false);
 
-                    return buildedTransaction;
-                }, exception => (exception as BusinessException)?.Code == ErrorCode.TransactionConcurrentInputsProblem,
-                3,
-                _log);
+            return buildedTransaction;
         }
 
         public async Task<Transaction> GetSendMoneyToHotWalletTransaction(BitcoinAddress fromAddress, BitcoinAddress destination, string fromTxHash)
@@ -91,24 +86,11 @@ namespace Lykke.Service.LiteCoin.API.Services.Transactions
             if (amount.Satoshi <= 0)
                 throw new BusinessException("Amount can't be less or equal to zero", ErrorCode.BadInputParameter);
 
-            void ThrowError()
-            {
-                throw new BusinessException(
-                    $"The sum of total applicable outputs is less than the required: {amount.Satoshi} satoshis.",
-                    ErrorCode.NotEnoughFundsAvailable);
-            }
-            
+
             var orderedCoins = coins.OrderByDescending(p => p.IsSettled).ThenBy(o => o.Amount).ToList(); //use settled in blockchain outputs first
             var sendAmount = Money.Zero;
-            var cnt = 0;
-            while (sendAmount < amount && cnt < orderedCoins.Count)
-            {
-                sendAmount += orderedCoins[cnt].TxOut.Value;
-                cnt++;
-            }
-            if (sendAmount < amount)
-                ThrowError();
-            
+            var cnt = NewMethod(amount, orderedCoins, ref sendAmount);
+
             builder.AddCoins(orderedCoins.Take(cnt));
 
             var precalculatedFee = await _feeService.CalcFeeForTransaction(builder);
@@ -126,33 +108,40 @@ namespace Lykke.Service.LiteCoin.API.Services.Transactions
                     sendAmount += orderedFeeCoins[cnt].TxOut.Value;
                     feeCoinsCnt++;
                 }
-                
+
                 builder.AddCoins(orderedFeeCoins.Take(feeCoinsCnt));
             }
 
-            builder.SendFees(precalculatedFee);
 
-            var sent = await Send(builder, destination, amount, addDust);
-
+            builder.Send(destination, amount);
             builder.SetChange(changeDestination);
 
-            return sent;
+
+            builder.SendFees(precalculatedFee);
+            builder.BuildTransaction(false);
+
+
+
+            return amount.ToDecimal(MoneyUnit.BTC);
         }
 
-        private Task<decimal> Send(TransactionBuilder builder, IDestination destination, Money amount, bool addDust)
+        private static int NewMethod(Money amount, List<CoinWithSettlementInfo> orderedCoins, ref Money sendAmount)
         {
-            var newAmount = Money.Max(GetDust(destination, addDust), amount);
-            builder.Send(destination, newAmount);
+            var cnt = 0;
+            while (sendAmount < amount && cnt < orderedCoins.Count)
+            {
+                sendAmount += orderedCoins[cnt].TxOut.Value;
+                cnt++;
+            }
 
-            return Task.FromResult(newAmount.ToDecimal(MoneyUnit.BTC));
-        }
+            if (sendAmount < amount)
+            {
+                throw new BusinessException(
+                    $"The sum of total applicable outputs is less than the required: {amount.Satoshi} satoshis.",
+                    ErrorCode.NotEnoughFundsAvailable);
+            }
 
-        private Money GetDust(IDestination destination, bool addDust = true)
-        {
-            return addDust
-                ? new TxOut(Money.Zero, destination.ScriptPubKey).GetDustThreshold(new StandardTransactionPolicy()
-                    .MinRelayTxFee)
-                : Money.Zero;
+            return cnt;
         }
     }
 

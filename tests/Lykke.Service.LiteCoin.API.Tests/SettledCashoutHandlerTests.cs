@@ -21,18 +21,19 @@ namespace Lykke.Service.LiteCoin.API.Tests
             var op = CashOutOperation.Create("opid", "walletId", "add", 100, "asset", DateTime.UtcNow, "txHash");
 
             var cashOutRepo = GetCashOutOperationRepository(op);
-            var queueRouter = GetQueueRouter(op);
+            var notificationTxRepo = GetNotificationTxRepo(op);
             var txRepo = GetTrackedCashoutTxRepo(op);
             var eventRepo = GetCashOutEventRepository(op);
 
-            var handler = new SettledCashoutTransactionHandler(cashOutRepo.Object, new EmptyLog(), queueRouter.Object,
-                txRepo.Object, eventRepo.Object);
+            var handler = new SettledCashoutTransactionHandler(cashOutRepo.Object, new EmptyLog(),
+                txRepo.Object, eventRepo.Object, notificationTxRepo.Object);
 
             await handler.HandleSettledTransactions(new[] {CashOutTransaction.Create(op.TxHash, op.OperationId)});
 
             cashOutRepo.Verify();
-            queueRouter.Verify();
+            notificationTxRepo.Verify();
             txRepo.Verify();
+            notificationTxRepo.Verify();
 
         }
 
@@ -57,33 +58,22 @@ namespace Lykke.Service.LiteCoin.API.Tests
             return result;
         }
 
-        private Mock<IQueueRouter<CashOutCompletedNotificationContext>> GetQueueRouter(ICashOutOperation op)
+        private Mock<IPendingCashoutTransactionRepository> GetTrackedCashoutTxRepo(ICashOutOperation op)
         {
-            var result = new Mock<IQueueRouter<CashOutCompletedNotificationContext>>();
-
-            Func<CashOutCompletedNotificationContext, bool> validateContext = p =>
-            {
-
-                if (p.OperationId == op.OperationId)
-
-                {
-                    return true;
-                }
-
-                return false;
-            };
-            result.Setup(p=>p.AddMessage(It.Is<CashOutCompletedNotificationContext>(x=>validateContext(x))))
+            var result = new Mock<IPendingCashoutTransactionRepository>();
+            
+            result.Setup(p=>p.Remove(It.Is<string>(x=>x==op.TxHash)))
                 .Returns(Task.CompletedTask)
                 .Verifiable();
 
             return result;
         }
 
-        private Mock<IPendingCashoutTransactionRepository> GetTrackedCashoutTxRepo(ICashOutOperation op)
+        private Mock<IPendingCashOutNotificationRepository> GetNotificationTxRepo(ICashOutOperation op)
         {
-            var result = new Mock<IPendingCashoutTransactionRepository>();
-            
-            result.Setup(p=>p.Remove(It.Is<string>(x=>x==op.TxHash)))
+            var result = new Mock<IPendingCashOutNotificationRepository>();
+
+            result.Setup(p => p.InsertOrReplace(It.Is<IPendingCashOutNotification>(x => x.TxHash == op.TxHash && x.OperationId == op.OperationId)))
                 .Returns(Task.CompletedTask)
                 .Verifiable();
 

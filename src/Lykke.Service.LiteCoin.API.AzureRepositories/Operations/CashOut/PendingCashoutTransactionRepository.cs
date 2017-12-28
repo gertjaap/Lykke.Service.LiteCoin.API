@@ -49,7 +49,7 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Operations.CashOut
             return await _storage.GetDataAsync(PendingCashoutTransactionEntity.CreatePartitionKey());
         }
 
-        public Task Insert(ICashoutTransaction tx)
+        public Task InsertOrReplace(ICashoutTransaction tx)
         {
             return _storage.InsertOrReplaceAsync(PendingCashoutTransactionEntity.Create(tx));
         }

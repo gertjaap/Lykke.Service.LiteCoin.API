@@ -22,77 +22,77 @@ namespace Lykke.Service.LiteCoin.API.Services.Operations
         private readonly IWalletService _walletService;
         private readonly ITransactionBuilderService _transactionBuilder;
         private readonly ISignService _signService;
-        private readonly IQueueRouter<CashOutStartedNotificationContext> _cashoutStartedNotificationQueue;
         private readonly ICashOutOperationRepository _cashOutOperationRepository;
         private readonly IPendingCashoutTransactionRepository _pendingCashoutTransactionRepository;
         private readonly ILog _log;
         private readonly IBroadcastService _broadcastService;
+        private readonly IPendingCashOutNotificationRepository _cashOutNotificationRepository;
 
         public OperationService(IWalletService walletService, 
             ITransactionBuilderService transactionBuilder, 
             ISignService signService,
-            IQueueRouter<CashOutStartedNotificationContext> cashoutStartedNotificationQueue, 
             ICashOutOperationRepository cashOutOperationRepository,
             IPendingCashoutTransactionRepository pendingCashoutTransactionRepository,
             ILog log, 
-            IBroadcastService broadcastService)
+            IBroadcastService broadcastService, 
+            IPendingCashOutNotificationRepository cashOutNotificationRepository)
         {
             _walletService = walletService;
             _transactionBuilder = transactionBuilder;
             _signService = signService;
-            _cashoutStartedNotificationQueue = cashoutStartedNotificationQueue;
             _cashOutOperationRepository = cashOutOperationRepository;
             _pendingCashoutTransactionRepository = pendingCashoutTransactionRepository;
             _log = log;
             _broadcastService = broadcastService;
+            _cashOutNotificationRepository = cashOutNotificationRepository;
         }
 
         public async Task<ICashOutOperation> ProceedCashOutOperation(string operationId, IWallet sourceWallet, BitcoinAddress destAddress, decimal amount)
         {
             var hotWallets = await _walletService.GetHotWallets();
             var assetId = Constants.AssetsContants.LiteCoin;
-
             
             foreach (var hotWallet in hotWallets)
             {
+                Transaction unsignedTx;
                 try
                 {
-                    var unsignedTx = await _transactionBuilder.GetTransferTransaction(hotWallet.Address, 
+                    unsignedTx = await _transactionBuilder.GetTransferTransaction(hotWallet.Address, 
                         destAddress,
                         amount);
-                    
-                    var signedtx = await _signService.SignTransaction(operationId, unsignedTx, hotWallet.Address);
-                    
-                    await _broadcastService.BroadCastTransaction(signedtx);
-
-                    var operation = CashOutOperation.Create(operationId, sourceWallet.Address.ToString(),
-                        destAddress.ToString(), amount, assetId, DateTime.UtcNow, signedtx.GetHash().ToString());
-
-                    await _cashOutOperationRepository.Insert(operation);
-
-                    await _pendingCashoutTransactionRepository.Insert(
-                        CashOutTransaction.Create(signedtx.GetHash().ToString(), operationId));
-
-                    await _cashoutStartedNotificationQueue.AddMessage(new CashOutStartedNotificationContext
-                    {
-                        OperationId = operationId
-                    });
-
-                    return operation;
                 }
-                catch (BusinessException e) when(e.Code == ErrorCode.NotEnoughFundsAvailable) //omit ex
+                catch (BusinessException e) when (e.Code == ErrorCode.NotEnoughFundsAvailable) //go to next hot wallet
                 {
-
+                    continue;
                 }
+
+                var signedtx = await _signService.SignTransaction(operationId, unsignedTx, hotWallet.Address);
+                    
+                await _broadcastService.BroadCastTransaction(signedtx);
+
+                var operation = CashOutOperation.Create(operationId, sourceWallet.Address.ToString(),
+                    destAddress.ToString(), amount, assetId, DateTime.UtcNow, signedtx.GetHash().ToString());
+
+                await _cashOutOperationRepository.Insert(operation);
+
+
+                await _cashOutNotificationRepository.InsertOrReplace(
+                    PendingCashOutNotification.Create(operation, CashOutStatusType.Started));
+                
+                await _pendingCashoutTransactionRepository.InsertOrReplace(
+                    CashOutTransaction.Create(signedtx.GetHash().ToString(), operationId));
+
+
+                return operation;
             }
 
             await _log.WriteWarningAsync(nameof(OperationService), nameof(ProceedCashOutOperation), new
             {
                 operationId,
                 amount
-            }.ToJson(), $"Not enough funds on hotwallets");
+            }.ToJson(), "Not enough funds on hot wallets");
 
-            throw new BusinessException("Not enoughFunds on Hot wallets", ErrorCode.NotEnoughFundsAvailable);
+            throw new BusinessException("Not enough funds on hot wallets", ErrorCode.NotEnoughFundsAvailable);
         }
 
         public async Task ProceedSendMoneyToHotWalletOperation(string operationId, IWallet sourceWallet, string thHash)

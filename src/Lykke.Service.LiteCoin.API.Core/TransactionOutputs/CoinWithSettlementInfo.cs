@@ -14,5 +14,11 @@ namespace Lykke.Service.LiteCoin.API.Core.TransactionOutputs
             IsSettled = isSettled;
         }
 
+
+        public static CoinWithSettlementInfo Create(Coin source, bool isSettled)
+        {
+            return new CoinWithSettlementInfo(source.Outpoint, source.TxOut, isSettled);
+        }
+
     }
 }

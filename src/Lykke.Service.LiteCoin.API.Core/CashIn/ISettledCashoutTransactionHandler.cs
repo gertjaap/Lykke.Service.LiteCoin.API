@@ -5,6 +5,6 @@ namespace Lykke.Service.LiteCoin.API.Core.CashIn
 {
     public interface ISettledCashInTransactionHandler
     {
-        Task HandleSettledTransactions(IEnumerable<ICashInOperation> settledTransactions);
+        Task HandleSettledTransactions(IEnumerable<ICashInOperation> cashInOperations);
     }
 }

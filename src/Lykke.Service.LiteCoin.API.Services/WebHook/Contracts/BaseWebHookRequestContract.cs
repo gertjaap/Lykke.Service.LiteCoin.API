@@ -6,9 +6,9 @@ namespace Lykke.Service.LiteCoin.API.Services.WebHook.Contracts
     {
         string OperationId { get; set; }
 
-        DateTime DateTime { get; set; }
+        DateTime TimeStamp { get; set; }
 
-        string WalletId { get; set; }
+        string Address { get; set; }
 
         string Type { get; set; }
     }

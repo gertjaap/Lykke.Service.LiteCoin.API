@@ -15,7 +15,6 @@ using Lykke.Service.LiteCoin.API.Core.TransactionOutputs.BroadcastedOutputs;
 using Lykke.Service.LiteCoin.API.Core.TransactionOutputs.SpentOutputs;
 using Lykke.Service.LiteCoin.API.Core.Transactions;
 using Lykke.Service.LiteCoin.API.Core.Wallet;
-using Lykke.Service.LiteCoin.API.Core.WebHook;
 using Lykke.Service.LiteCoin.API.Services.Address;
 using Lykke.Service.LiteCoin.API.Services.BlockChainProviders.InsightApi;
 using Lykke.Service.LiteCoin.API.Services.Broadcast;
@@ -30,7 +29,6 @@ using Lykke.Service.LiteCoin.API.Services.TransactionOutputs.BroadcastedOutputs;
 using Lykke.Service.LiteCoin.API.Services.TransactionOutputs.SpentOutputs;
 using Lykke.Service.LiteCoin.API.Services.Transactions;
 using Lykke.Service.LiteCoin.API.Services.Wallet;
-using Lykke.Service.LiteCoin.API.Services.WebHook;
 using Lykke.SettingsReader;
 using NBitcoin;
 
@@ -52,7 +50,6 @@ namespace Lykke.Service.LiteCoin.API.Services.Binder
             RegisterFeeServices(builder);
             RegisterAddressValidatorServices(builder);
             RegisterInsightApiBlockChainReaders(builder);
-            RegisterWebHookServices(builder);
             RegisterSignFacadeServices(builder);
             RegisterDetectorServices(builder);
             RegisterTransactionOutputsServices(builder);
@@ -95,17 +92,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Binder
 
             builder.RegisterType<InsightApiBlockChainProvider>().As<IBlockChainProvider>();
         }
-
-        private void RegisterWebHookServices(ContainerBuilder builder)
-        {
-            builder.RegisterInstance(new WebHookSettings
-            {
-                Url = _settings.CurrentValue.EventsWebHook
-            }).SingleInstance();
-
-            builder.RegisterType<WebHookSender>().As<IWebHookSender>();
-        }
-
+        
         private void RegisterSignFacadeServices(ContainerBuilder builder)
         {
             builder.RegisterInstance(new SignSettings

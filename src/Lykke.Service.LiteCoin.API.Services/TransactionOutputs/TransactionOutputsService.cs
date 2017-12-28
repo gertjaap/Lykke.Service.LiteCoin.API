@@ -27,8 +27,7 @@ namespace Lykke.Service.LiteCoin.API.Services.TransactionOutputs
 
         public async Task<IEnumerable<CoinWithSettlementInfo>> GetUnspentOutputs(string address, int confirmationsCount = 0)
         {
-            var coins = (await _blockChainProvider.GetUnspentOutputs(address, confirmationsCount)).Select(p =>
-                new CoinWithSettlementInfo(p.Outpoint, p.TxOut, isSettled: true)).ToList();
+            var coins = (await _blockChainProvider.GetUnspentOutputs(address, confirmationsCount)).Select(p => CoinWithSettlementInfo.Create(p, isSettled: true)).ToList();
             
 
             if (confirmationsCount == 0)
