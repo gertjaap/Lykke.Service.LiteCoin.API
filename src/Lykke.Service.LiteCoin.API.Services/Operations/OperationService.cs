@@ -52,6 +52,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Operations
             var hotWallets = await _walletService.GetHotWallets();
             var assetId = Constants.AssetsContants.LiteCoin;
 
+            
             foreach (var hotWallet in hotWallets)
             {
                 try
@@ -79,16 +80,18 @@ namespace Lykke.Service.LiteCoin.API.Services.Operations
 
                     return operation;
                 }
-                catch (BusinessException e) when(e.Code == ErrorCode.NotEnoughFundsAvailable)
+                catch (BusinessException e) when(e.Code == ErrorCode.NotEnoughFundsAvailable) //omit ex
                 {
-                    await _log.WriteInfoAsync(nameof(OperationService), nameof(ProceedCashOutOperation), new
-                    {
-                        operationId,
-                        hotWallet
-                    }.ToJson(), $"Not enough funds on hotwallet {hotWallet.Address}");
+
                 }
             }
-            
+
+            await _log.WriteWarningAsync(nameof(OperationService), nameof(ProceedCashOutOperation), new
+            {
+                operationId,
+                amount
+            }.ToJson(), $"Not enough funds on hotwallets");
+
             throw new BusinessException("Not enoughFunds on Hot wallets", ErrorCode.NotEnoughFundsAvailable);
         }
 
