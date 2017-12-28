@@ -7,7 +7,7 @@ namespace Lykke.Service.LiteCoin.API.Core.CashIn
 {
     public interface ICashInOperation
     {
-        string OperationId { get; }
+        Guid OperationId { get; }
 
         DateTime DetectedAt { get; }
 
@@ -24,7 +24,7 @@ namespace Lykke.Service.LiteCoin.API.Core.CashIn
 
     public class CashInOperation : ICashInOperation
     {
-        public string OperationId { get; set; }
+        public Guid OperationId { get; set; }
         public DateTime DetectedAt { get; set; }
         public string DestinationAddress { get; set; }
         public decimal Amount { get; set; }
@@ -32,7 +32,7 @@ namespace Lykke.Service.LiteCoin.API.Core.CashIn
         public string SourceAddress { get; set; }
         public string TxHash { get; set; }
 
-        public static CashInOperation Create(string operationId, 
+        public static CashInOperation Create(Guid operationId, 
             string destinationAddress,
             string sourceAddress,
             string txHash,
@@ -56,7 +56,7 @@ namespace Lykke.Service.LiteCoin.API.Core.CashIn
     public interface ICashInOperationRepository
     {
         Task Insert(ICashInOperation operation);
-        Task<ICashInOperation> GetByOperationId(string operationId);
+        Task<ICashInOperation> GetByOperationId(Guid operationId);
         Task<ICashInOperation> GetByTxHash(string txHash);
         Task DeleteOldOperations(DateTime bound);
     }

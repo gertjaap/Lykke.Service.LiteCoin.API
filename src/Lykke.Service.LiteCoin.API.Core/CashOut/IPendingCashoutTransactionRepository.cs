@@ -7,18 +7,18 @@ namespace Lykke.Service.LiteCoin.API.Core.CashOut
     public interface ICashoutTransaction
     {
         string TxHash { get; }
-        string OperationId { get; }
+        Guid OperationId { get; }
         DateTime InsertedAt { get; }
     }
 
     public class CashOutTransaction: ICashoutTransaction
     {
         public string TxHash { get; set; }
-        public string OperationId { get; set; }
+        public Guid OperationId { get; set; }
         public DateTime InsertedAt { get; set; }
 
 
-        public static CashOutTransaction Create(string txHash, string operationId, DateTime? insertedAt = null)
+        public static CashOutTransaction Create(string txHash, Guid operationId, DateTime? insertedAt = null)
         {
             return new CashOutTransaction
             {

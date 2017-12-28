@@ -64,7 +64,7 @@ namespace Lykke.Service.LiteCoin.API.Controllers
             }
 
 
-            var operationId = Guid.NewGuid().ToString();
+            var operationId = Guid.NewGuid();
 
             var op = await _operationService.ProceedCashOutOperation(operationId, sourceWallet,
                 _addressValidator.GetBitcoinAddress(request.DestAddress), request.Amount);

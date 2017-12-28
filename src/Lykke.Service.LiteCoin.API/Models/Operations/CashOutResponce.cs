@@ -7,7 +7,7 @@ namespace Lykke.Service.LiteCoin.API.Models.Operations
 {
     public class CashOutResponce
     {
-        public string OperationId { get; set; } 
+        public Guid OperationId { get; set; } 
 
 
     }

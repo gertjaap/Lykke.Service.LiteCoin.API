@@ -10,7 +10,7 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Operations.CashOut
     public class PendingCashoutTransactionEntity : TableEntity, ICashoutTransaction
     {
         public string TxHash { get; set; }
-        public string OperationId { get; set; }
+        public Guid OperationId { get; set; }
         public DateTime InsertedAt { get; set; }
 
         public static string CreateRowKey(string txHash)

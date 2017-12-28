@@ -14,12 +14,12 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Operations.CashOut
             return "CON";
         }
 
-        public static string GenerateRowKey(string operationId)
+        public static string GenerateRowKey(Guid operationId)
         {
-            return operationId;
+            return operationId.ToString();
         }
         
-        public string OperationId { get; set;}
+        public Guid OperationId { get; set;}
 
         public DateTime StartedAt { get; set;}
 
@@ -75,7 +75,7 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Operations.CashOut
             return await _storage.GetDataAsync(PendingCashOutNotificationTableEntity.GeneratePartitionKey());
         }
 
-        public async Task RemoveBatch(IEnumerable<string> operationIds)
+        public async Task RemoveBatch(IEnumerable<Guid> operationIds)
         {
             foreach (var operationId in operationIds)
             {

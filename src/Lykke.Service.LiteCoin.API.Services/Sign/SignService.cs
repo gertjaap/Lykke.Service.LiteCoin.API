@@ -29,7 +29,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Sign
             _transactionBlobStorage = transactionBlobStorage;
         }
 
-        public async Task<Transaction> SignTransaction(string operationId, Transaction unsignedTransaction, params BitcoinAddress[] publicAddress)
+        public async Task<Transaction> SignTransaction(Guid operationId, Transaction unsignedTransaction, params BitcoinAddress[] publicAddress)
         {
             await _transactionBlobStorage.AddOrReplaceTransaction(operationId, TransactionBlobType.Initial, unsignedTransaction.ToHex());
 

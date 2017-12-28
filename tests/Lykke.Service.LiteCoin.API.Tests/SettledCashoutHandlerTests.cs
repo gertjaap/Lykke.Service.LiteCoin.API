@@ -18,7 +18,8 @@ namespace Lykke.Service.LiteCoin.API.Tests
         public async Task CanHandleCashoutOp()
         {
 
-            var op = CashOutOperation.Create("opid", "walletId", "add", 100, "asset", DateTime.UtcNow, "txHash");
+
+            var op = CashOutOperation.Create(Guid.NewGuid(), "walletId", "add", 100, "asset", DateTime.UtcNow, "txHash");
 
             var cashOutRepo = GetCashOutOperationRepository(op);
             var notificationTxRepo = GetNotificationTxRepo(op);
@@ -41,7 +42,7 @@ namespace Lykke.Service.LiteCoin.API.Tests
         {
             var result = new Mock<ICashOutOperationRepository>();
 
-            result.Setup(p => p.GetByOperationId(It.Is<string>(x => x == op.OperationId)))
+            result.Setup(p => p.GetByOperationId(It.Is<Guid>(x => x == op.OperationId)))
                 .ReturnsAsync(op).Verifiable();
 
             return result;

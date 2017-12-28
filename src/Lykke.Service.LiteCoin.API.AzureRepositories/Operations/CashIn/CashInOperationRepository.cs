@@ -12,7 +12,7 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Operations.CashIn
 {
     public class CashInOperationEntity : TableEntity, ICashInOperation
     {
-        public string OperationId { get; set; }
+        public Guid OperationId { get; set; }
         public DateTime DetectedAt { get; set; }
         public string DestinationAddress { get; set; }
         public decimal Amount { get; set; }
@@ -66,9 +66,9 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Operations.CashIn
                 return "ByOperationId";
             }
 
-            public static string GenerateRowKey(string operationId)
+            public static string GenerateRowKey(Guid operationId)
             {
-                return operationId;
+                return operationId.ToString();
             }
 
             public static CashInOperationEntity Create(ICashInOperation source)
@@ -87,7 +87,7 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Operations.CashIn
                 RowKey = rowKey,
                 SourceAddress = source.SourceAddress,
                 OperationId = source.OperationId,
-                AssetId = source.OperationId,
+                AssetId = source.AssetId,
                 Amount = source.Amount,
                 DetectedAt = source.DetectedAt,
                 DestinationAddress = source.DestinationAddress,
@@ -112,7 +112,7 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Operations.CashIn
             await _storage.InsertAsync(CashInOperationEntity.ByOperationId.Create(operation));
         }
 
-        public async Task<ICashInOperation> GetByOperationId(string operationId)
+        public async Task<ICashInOperation> GetByOperationId(Guid operationId)
         {
             return await _storage.GetDataAsync(CashInOperationEntity.ByOperationId.GeneratePartitionKey(),
                 CashInOperationEntity.ByOperationId.GenerateRowKey(operationId));

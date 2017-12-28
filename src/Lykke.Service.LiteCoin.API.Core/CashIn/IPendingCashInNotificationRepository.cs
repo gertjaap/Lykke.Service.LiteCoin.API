@@ -11,7 +11,7 @@ namespace Lykke.Service.LiteCoin.API.Core.CashIn
 
     public class PendingCashInNotification : IPendingCashInNotification
     {
-        public string OperationId { get; set; }
+        public Guid OperationId { get; set; }
 
         public DateTime DetectedAt { get; set; }
 
@@ -44,6 +44,6 @@ namespace Lykke.Service.LiteCoin.API.Core.CashIn
     {
         Task Insert(IPendingCashInNotification notification);
         Task<IEnumerable<IPendingCashInNotification>> GetAll();
-        Task RemoveBatch(IEnumerable<string> operationIds);
+        Task RemoveBatch(IEnumerable<Guid> operationIds);
     }
 }

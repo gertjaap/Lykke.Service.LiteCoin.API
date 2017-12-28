@@ -8,9 +8,8 @@ namespace Lykke.Service.LiteCoin.API.Core.CashIn
 
     public enum CashInEventType
     {
-       NotificationSend,
        MoneyTransferredToHotWallet,
-        MoneyTransferredToHoRetry
+       MoneyTransferredToHoRetry
     }
 
     public interface ICashInEvent
@@ -19,16 +18,16 @@ namespace Lykke.Service.LiteCoin.API.Core.CashIn
 
         DateTime DateTime { get; }
 
-        string OperationId { get; }
+        Guid OperationId { get; }
     }
 
     public class CashInEvent : ICashInEvent
     {
         public CashInEventType Type { get; set; }
         public DateTime DateTime { get; set; }
-        public string OperationId { get; set; }
+        public Guid OperationId { get; set; }
 
-        public static CashInEvent Create(string operationId, CashInEventType type, DateTime? dateTime = null)
+        public static CashInEvent Create(Guid operationId, CashInEventType type, DateTime? dateTime = null)
         {
             return new CashInEvent
             {
@@ -42,6 +41,6 @@ namespace Lykke.Service.LiteCoin.API.Core.CashIn
     public interface ICashInEventRepository
     {
         Task InsertEvent(ICashInEvent cashInEvent);
-        Task<bool> Exist(string operationId, CashInEventType type);
+        Task<bool> Exist(Guid operationId, CashInEventType type);
     }
 }

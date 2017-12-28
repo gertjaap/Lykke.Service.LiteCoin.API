@@ -15,11 +15,11 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Operations.CashOut
         public string Type { get; set; }
 
         public DateTime DateTime { get; set; }
-        public string OperationId { get; set; }
+        public Guid OperationId { get; set; }
 
-        public static string GeneratePartitionKey(string operationId)
+        public static string GeneratePartitionKey(Guid operationId)
         {
-            return operationId;
+            return operationId.ToString();
         }
 
         public static string GenerateRowKey(CashOutEventType type)
@@ -53,7 +53,7 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Operations.CashOut
             return _storage.InsertAsync(CashOutEventTableEntity.Create(cashOutEvent));
         }
 
-        public async Task<bool> Exist(string operationId, CashOutEventType type)
+        public async Task<bool> Exist(Guid operationId, CashOutEventType type)
         {
             return await _storage.GetDataAsync(CashOutEventTableEntity.GeneratePartitionKey(operationId),
                        CashOutEventTableEntity.GenerateRowKey(type)) != null;

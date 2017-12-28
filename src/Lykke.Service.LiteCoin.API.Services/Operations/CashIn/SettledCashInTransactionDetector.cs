@@ -74,7 +74,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Operations.CashIn
                 }
             
                 return CashInOperation.Create(
-                    operationId: Guid.NewGuid().ToString("N"), 
+                    operationId: Guid.NewGuid(), 
                     destinationAddress: wallet.Address.ToString(),
                     sourceAddress: sourceAddress,
                     txHash: txHash,

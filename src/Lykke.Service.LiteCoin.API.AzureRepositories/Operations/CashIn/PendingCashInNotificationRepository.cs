@@ -9,7 +9,7 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Operations.CashIn
 {
     public class PendingCashInNotificationTableEntity:TableEntity, IPendingCashInNotification
     {
-        public string OperationId { get; set; }
+        public Guid OperationId { get; set; }
         public DateTime DetectedAt { get; set; }
         public string DestinationAddress { get; set; }
         public decimal Amount { get; set; }
@@ -22,9 +22,9 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Operations.CashIn
             return "CIN";
         }
 
-        public static string GenerateRowKey(string operationId)
+        public static string GenerateRowKey(Guid operationId)
         {
-            return operationId;
+            return operationId.ToString();
         }
 
         public static PendingCashInNotificationTableEntity Create(IPendingCashInNotification source)
@@ -62,7 +62,7 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Operations.CashIn
             return await _storage.GetDataAsync(PendingCashInNotificationTableEntity.GeneratePartitionKey());
         }
 
-        public async Task RemoveBatch(IEnumerable<string> operationIds)
+        public async Task RemoveBatch(IEnumerable<Guid> operationIds)
         {
             foreach (var operationId in operationIds)
             {

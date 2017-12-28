@@ -5,7 +5,7 @@ namespace Lykke.Service.LiteCoin.API.Core.CashOut
 {
     public interface ICashOutOperation
     {
-        string OperationId { get; }
+        Guid OperationId { get; }
         DateTime StartedAt { get; }
         string ClientWalletId { get;  }
 
@@ -20,7 +20,7 @@ namespace Lykke.Service.LiteCoin.API.Core.CashOut
 
     public class CashOutOperation: ICashOutOperation
     {
-        public string OperationId { get; set; }
+        public Guid OperationId { get; set; }
         public DateTime StartedAt { get; set; }
         public DateTime? CompletedAt { get; set; }
         public string ClientWalletId { get; set; }
@@ -29,7 +29,7 @@ namespace Lykke.Service.LiteCoin.API.Core.CashOut
         public string DestinationAddress { get; set; }
         public string TxHash { get; set; }
         
-        public static CashOutOperation Create(string operationId, 
+        public static CashOutOperation Create(Guid operationId, 
             string walletId, 
             string address, 
             decimal amount,
@@ -56,7 +56,7 @@ namespace Lykke.Service.LiteCoin.API.Core.CashOut
     {
 
         Task Insert(ICashOutOperation operation);
-        Task<ICashOutOperation> GetByOperationId(string operationId);
+        Task<ICashOutOperation> GetByOperationId(Guid operationId);
         Task DeleteOldOperations(DateTime boun);
     }
 }

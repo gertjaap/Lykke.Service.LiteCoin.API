@@ -18,7 +18,7 @@ namespace Lykke.Service.LiteCoin.API.Core.CashOut
 
     public class PendingCashOutNotification: IPendingCashOutNotification
     {
-        public string OperationId { get; set; }
+        public Guid OperationId { get; set; }
         public DateTime StartedAt { get; set; }
         public string ClientWalletId { get; set; }
         public string AssetId { get; set; }
@@ -47,6 +47,6 @@ namespace Lykke.Service.LiteCoin.API.Core.CashOut
     {
         Task InsertOrReplace(IPendingCashOutNotification notification);
         Task<IEnumerable<IPendingCashOutNotification>> GetAll();
-        Task RemoveBatch(IEnumerable<string> operationIds);
+        Task RemoveBatch(IEnumerable<Guid> operationIds);
     }
 }

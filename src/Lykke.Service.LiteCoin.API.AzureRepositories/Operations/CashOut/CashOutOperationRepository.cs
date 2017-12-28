@@ -11,7 +11,7 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Operations.CashOut
 {
     public class CashOutOperationTableEntity : TableEntity, ICashOutOperation
     {
-        public string OperationId { get; set;}
+        public Guid OperationId { get; set;}
         public DateTime StartedAt { get; set;}
         public string ClientWalletId { get; set;}
         public string AssetId { get; set;}
@@ -64,9 +64,9 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Operations.CashOut
                 return "ByOperationId";
             }
 
-            public static string GenerateRowKey(string operationId)
+            public static string GenerateRowKey(Guid operationId)
             {
-                return operationId;
+                return operationId.ToString();
             }
 
             public static CashOutOperationTableEntity Create(ICashOutOperation source)
@@ -109,7 +109,7 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Operations.CashOut
         }
         
 
-        public async Task<ICashOutOperation> GetByOperationId(string operationId)
+        public async Task<ICashOutOperation> GetByOperationId(Guid operationId)
         {
             return await _storage.GetDataAsync(CashOutOperationTableEntity.ByOperationId.GeneratePartitionKey(),
                 CashOutOperationTableEntity.ByOperationId.GenerateRowKey(operationId));

@@ -20,7 +20,7 @@ namespace Lykke.Service.LiteCoin.API.Tests
             PrepareNetworks.EnsureLiteCoinPrepared();
 
 
-            var tx = CashOutTransaction.Create("txHash", "operationId");
+            var tx = CashOutTransaction.Create("txHash", Guid.NewGuid());
 
             var txConfirmationCount = 3;
 
@@ -45,7 +45,7 @@ namespace Lykke.Service.LiteCoin.API.Tests
             PrepareNetworks.EnsureLiteCoinPrepared();
 
 
-            var tx = CashOutTransaction.Create("txHash", "operationId");
+            var tx = CashOutTransaction.Create("txHash", Guid.NewGuid());
 
             var txConfirmationCount = 3;
 

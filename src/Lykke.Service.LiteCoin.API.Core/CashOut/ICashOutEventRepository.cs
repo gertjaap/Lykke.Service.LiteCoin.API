@@ -8,9 +8,7 @@ namespace Lykke.Service.LiteCoin.API.Core.CashOut
 
     public enum CashOutEventType
     {
-       NotificationOnStartSend,
-       DetectedOnBlockChain,
-       NotificationOnCompletedSend
+       DetectedOnBlockChain
     }
 
     public interface ICashOutEvent
@@ -19,16 +17,16 @@ namespace Lykke.Service.LiteCoin.API.Core.CashOut
 
         DateTime DateTime { get; }
 
-        string OperationId { get; }
+        Guid OperationId { get; }
     }
 
     public class CashOutEvent : ICashOutEvent
     {
         public CashOutEventType Type { get; set; }
         public DateTime DateTime { get; set; }
-        public string OperationId { get; set; }
+        public Guid OperationId { get; set; }
 
-        public static CashOutEvent Create(string operationId, CashOutEventType type, DateTime? dateTime = null)
+        public static CashOutEvent Create(Guid operationId, CashOutEventType type, DateTime? dateTime = null)
         {
             return new CashOutEvent
             {
@@ -42,6 +40,6 @@ namespace Lykke.Service.LiteCoin.API.Core.CashOut
     public interface ICashOutEventRepository
     {
         Task InsertEvent(ICashOutEvent cashOutEvent);
-        Task<bool> Exist(string operationId, CashOutEventType type);
+        Task<bool> Exist(Guid operationId, CashOutEventType type);
     }
 }

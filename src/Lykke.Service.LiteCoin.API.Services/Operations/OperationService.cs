@@ -8,8 +8,6 @@ using Lykke.Service.LiteCoin.API.Core.CashOut;
 using Lykke.Service.LiteCoin.API.Core.Constants;
 using Lykke.Service.LiteCoin.API.Core.Exceptions;
 using Lykke.Service.LiteCoin.API.Core.Operation;
-using Lykke.Service.LiteCoin.API.Core.Queue;
-using Lykke.Service.LiteCoin.API.Core.Queue.Contexts;
 using Lykke.Service.LiteCoin.API.Core.Sign;
 using Lykke.Service.LiteCoin.API.Core.Transactions;
 using Lykke.Service.LiteCoin.API.Core.Wallet;
@@ -47,7 +45,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Operations
             _cashOutNotificationRepository = cashOutNotificationRepository;
         }
 
-        public async Task<ICashOutOperation> ProceedCashOutOperation(string operationId, IWallet sourceWallet, BitcoinAddress destAddress, decimal amount)
+        public async Task<ICashOutOperation> ProceedCashOutOperation(Guid operationId, IWallet sourceWallet, BitcoinAddress destAddress, decimal amount)
         {
             var hotWallets = await _walletService.GetHotWallets();
             var assetId = Constants.AssetsContants.LiteCoin;
@@ -95,7 +93,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Operations
             throw new BusinessException("Not enough funds on hot wallets", ErrorCode.NotEnoughFundsAvailable);
         }
 
-        public async Task ProceedSendMoneyToHotWalletOperation(string operationId, IWallet sourceWallet, string thHash)
+        public async Task ProceedSendMoneyToHotWalletOperation(Guid operationId, IWallet sourceWallet, string thHash)
         {
             var hotWallet = (await _walletService.GetHotWallets()).First();
 
