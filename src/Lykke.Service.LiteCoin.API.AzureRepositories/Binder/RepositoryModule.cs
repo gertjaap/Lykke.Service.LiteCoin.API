@@ -2,12 +2,14 @@
 using AzureStorage.Blob;
 using AzureStorage.Tables;
 using Common.Log;
+using Lykke.Service.LiteCoin.API.AzureRepositories.Asset;
 using Lykke.Service.LiteCoin.API.AzureRepositories.Operations.CashIn;
 using Lykke.Service.LiteCoin.API.AzureRepositories.Operations.CashOut;
 using Lykke.Service.LiteCoin.API.AzureRepositories.Queue;
 using Lykke.Service.LiteCoin.API.AzureRepositories.TransactionOutput.BroadcastedOutputs;
 using Lykke.Service.LiteCoin.API.AzureRepositories.TransactionOutput.SpentOutputs;
 using Lykke.Service.LiteCoin.API.AzureRepositories.Transactions;
+using Lykke.Service.LiteCoin.API.Core.Asset;
 using Lykke.Service.LiteCoin.API.Core.CashIn;
 using Lykke.Service.LiteCoin.API.Core.CashOut;
 using Lykke.Service.LiteCoin.API.Core.Queue;
@@ -90,6 +92,10 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Binder
                     AzureTableStorage<PendingCashOutNotificationTableEntity>.Create(_settings.Nested(p => p.Db.DataConnString),
                         "PendingCashOutNotifications", _log)))
                 .As<IPendingCashOutNotificationRepository>();
+
+
+            builder.RegisterInstance(new AssetRepository())
+                .As<IAssetRepository>();
         }
 
         private void RegisterQueue(ContainerBuilder builder)

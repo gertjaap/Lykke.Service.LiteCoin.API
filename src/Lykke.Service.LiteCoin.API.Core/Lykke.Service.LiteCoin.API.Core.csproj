@@ -9,8 +9,8 @@
 
   <ItemGroup>
     <PackageReference Include="Lykke.AzureStorage" Version="3.2.0" />
-    <PackageReference Include="Lykke.Common" Version="3.1.0" />
-    <PackageReference Include="Lykke.SettingsReader" Version="1.0.44" />
+    <PackageReference Include="Lykke.Common" Version="3.2.0" />
+    <PackageReference Include="Lykke.SettingsReader" Version="1.0.45" />
     <PackageReference Include="NBitcoin" Version="4.0.0.50" />
     <PackageReference Include="NBitcoin.Litecoin" Version="1.0.0.7" />
   </ItemGroup>

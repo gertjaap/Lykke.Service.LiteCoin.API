@@ -30,6 +30,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Wallet
             return null;
         }
     }
+
     public class WalletService: IWalletService
     {
         private readonly HotWalletsSettings _hotWalletsSettings;
@@ -61,7 +62,6 @@ namespace Lykke.Service.LiteCoin.API.Services.Wallet
             return allWallets.Where(p => hotWallets.ContainsKey(p)).Select(p => Wallet.Create(_addressValidator.GetBitcoinAddress(p), IsClientWallet(p))).ToList();
         }
         
-
         public async Task<IWallet> CreateWallet()
         {
             var resp = await _serviceApiProvider.CreateWallet();

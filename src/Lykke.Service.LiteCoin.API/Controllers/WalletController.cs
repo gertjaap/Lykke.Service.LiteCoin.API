@@ -1,15 +1,13 @@
 ﻿using System.Net;
 using System.Threading.Tasks;
+using Lykke.Service.BlockchainApi.Contract.Responses;
 using Lykke.Service.LiteCoin.API.Core.Wallet;
 using Lykke.Service.LiteCoin.API.Filters;
-using Lykke.Service.LiteCoin.API.Models;
-using Lykke.Service.LiteCoin.API.Models.Wallet;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Lykke.Service.LiteCoin.API.Controllers
 {
-    [Route("api/wallet")]
     public class WalletController : Controller
     {
         private readonly IWalletService _walletService;
@@ -20,7 +18,7 @@ namespace Lykke.Service.LiteCoin.API.Controllers
         }
 
 
-        [HttpPost]
+        [HttpPost("api/wallets")]
         [SwaggerOperation("CreateWallet")]
         [ProducesResponseType(typeof(WalletCreationResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiException), 400)]
@@ -30,7 +28,7 @@ namespace Lykke.Service.LiteCoin.API.Controllers
 
             return Ok(new WalletCreationResponse
             {
-                PublicAddress = result.Address.ToString(),
+                Address = result.Address.ToString(),
             });
         }
     }

@@ -1,6 +1,9 @@
-﻿using Lykke.Service.LiteCoin.API.Core.Address;
-using Lykke.Service.LiteCoin.API.Models.Address;
+﻿using System.Net;
+using Lykke.Service.BlockchainApi.Contract.Responses;
+using Lykke.Service.LiteCoin.API.Core.Address;
+using Lykke.Service.LiteCoin.API.Filters;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Lykke.Service.LiteCoin.API.Controllers
 {
@@ -12,13 +15,15 @@ namespace Lykke.Service.LiteCoin.API.Controllers
         {
             _addressValidator = addressValidator;
         }
-
-        [HttpPost("api/address/validator")]
-        public AddressValidatorResponce Validate([FromBody]AddressValidatorRequest request)
+        [SwaggerOperation(nameof(Validate))]
+        [ProducesResponseType(typeof(AddressValidationResponse), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ApiException), 400)]
+        [HttpGet("api/addresses/{address}/is-valid")]
+        public AddressValidationResponse Validate(string address)
         {
-            return new AddressValidatorResponce
+            return new AddressValidationResponse
             {
-                IsValid = _addressValidator.IsValid(request.Address)
+                IsValid = _addressValidator.IsValid(address)
             };
         }
     }
