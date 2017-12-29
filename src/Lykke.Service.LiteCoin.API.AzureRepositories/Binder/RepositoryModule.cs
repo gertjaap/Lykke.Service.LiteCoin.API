@@ -82,16 +82,15 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Binder
                 .As<IDetectedAddressTransactionsRepository>();
 
 
+            builder.RegisterInstance(new PendingCashInEventRepository(
+                    AzureTableStorage<PendingCashInEventTableEntity>.Create(_settings.Nested(p => p.Db.DataConnString),
+                        "PendingCashInEvents", _log)))
+                .As<IPendingCashInEventRepository>();
 
-            builder.RegisterInstance(new PendingCashInNotificationRepository(
-                    AzureTableStorage<PendingCashInNotificationTableEntity>.Create(_settings.Nested(p => p.Db.DataConnString),
-                        "PendingCashInNotifications", _log)))
-                .As<IPendingCashInNotificationRepository>();
-
-            builder.RegisterInstance(new PendingCashOutNotificationRepository(
-                    AzureTableStorage<PendingCashOutNotificationTableEntity>.Create(_settings.Nested(p => p.Db.DataConnString),
-                        "PendingCashOutNotifications", _log)))
-                .As<IPendingCashOutNotificationRepository>();
+            builder.RegisterInstance(new PendingCashOutEventRepository(
+                    AzureTableStorage<PendingCashOutEventTableEntity>.Create(_settings.Nested(p => p.Db.DataConnString),
+                        "PendingCashOutEvents", _log)))
+                .As<IPendingCashOutEventRepository>();
 
 
             builder.RegisterInstance(new AssetRepository())

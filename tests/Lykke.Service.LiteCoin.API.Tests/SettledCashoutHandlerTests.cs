@@ -70,11 +70,11 @@ namespace Lykke.Service.LiteCoin.API.Tests
             return result;
         }
 
-        private Mock<IPendingCashOutNotificationRepository> GetNotificationTxRepo(ICashOutOperation op)
+        private Mock<IPendingCashOutEventRepository> GetNotificationTxRepo(ICashOutOperation op)
         {
-            var result = new Mock<IPendingCashOutNotificationRepository>();
+            var result = new Mock<IPendingCashOutEventRepository>();
 
-            result.Setup(p => p.InsertOrReplace(It.Is<IPendingCashOutNotification>(x => x.TxHash == op.TxHash && x.OperationId == op.OperationId)))
+            result.Setup(p => p.Insert(It.Is<IPendingCashOutEvent>(x => x.TxHash == op.TxHash && x.OperationId == op.OperationId)))
                 .Returns(Task.CompletedTask)
                 .Verifiable();
 

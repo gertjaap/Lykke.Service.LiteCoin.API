@@ -24,7 +24,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Operations
         private readonly IPendingCashoutTransactionRepository _pendingCashoutTransactionRepository;
         private readonly ILog _log;
         private readonly IBroadcastService _broadcastService;
-        private readonly IPendingCashOutNotificationRepository _cashOutNotificationRepository;
+        private readonly IPendingCashOutEventRepository _cashOutNotificationRepository;
 
         public OperationService(IWalletService walletService, 
             ITransactionBuilderService transactionBuilder, 
@@ -32,8 +32,8 @@ namespace Lykke.Service.LiteCoin.API.Services.Operations
             ICashOutOperationRepository cashOutOperationRepository,
             IPendingCashoutTransactionRepository pendingCashoutTransactionRepository,
             ILog log, 
-            IBroadcastService broadcastService, 
-            IPendingCashOutNotificationRepository cashOutNotificationRepository)
+            IBroadcastService broadcastService,
+            IPendingCashOutEventRepository cashOutNotificationRepository)
         {
             _walletService = walletService;
             _transactionBuilder = transactionBuilder;
@@ -73,9 +73,8 @@ namespace Lykke.Service.LiteCoin.API.Services.Operations
 
                 await _cashOutOperationRepository.Insert(operation);
 
-
-                await _cashOutNotificationRepository.InsertOrReplace(
-                    PendingCashOutNotification.Create(operation, CashOutStatusType.Started));
+                await _cashOutNotificationRepository.Insert(
+                    PendingCashOutEvent.Create(operation, PendingCashOutEventStatusType.Started));
                 
                 await _pendingCashoutTransactionRepository.InsertOrReplace(
                     CashOutTransaction.Create(signedtx.GetHash().ToString(), operationId));

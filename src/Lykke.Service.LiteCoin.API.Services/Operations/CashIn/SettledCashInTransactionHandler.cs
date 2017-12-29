@@ -11,15 +11,15 @@ namespace Lykke.Service.LiteCoin.API.Services.Operations.CashIn
     {
         private readonly IQueueRouter<SendCashInToHotWalletContext> _sendCashInToHotWalletQueue;
         private readonly ICashInOperationRepository _cashInOperationRepository;
-        private readonly IPendingCashInNotificationRepository _cashInNotificationRepository;
+        private readonly IPendingCashInEventRepository _cashInEventRepository;
 
         public SettledCashInTransactionHandler(ICashInOperationRepository cashInOperationRepository, 
             IQueueRouter<SendCashInToHotWalletContext> sendCashInToHotWalletQueue, 
-            IPendingCashInNotificationRepository cashInNotificationRepository)
+            IPendingCashInEventRepository cashInEventRepository)
         {
             _cashInOperationRepository = cashInOperationRepository;
             _sendCashInToHotWalletQueue = sendCashInToHotWalletQueue;
-            _cashInNotificationRepository = cashInNotificationRepository;
+            _cashInEventRepository = cashInEventRepository;
         }
 
         public async Task HandleSettledTransactions(IEnumerable<ICashInOperation> cashInOperations)
@@ -27,7 +27,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Operations.CashIn
             foreach (var cashInOperation in cashInOperations)
             {
                 await _cashInOperationRepository.Insert(cashInOperation);
-                await _cashInNotificationRepository.Insert(PendingCashInNotification.Create(cashInOperation));
+                await _cashInEventRepository.Insert(PendingCashInEvent.Create(cashInOperation, PendingCashInEventStatusType.DetectedOnBlockChain));
                 
                 await _sendCashInToHotWalletQueue.AddMessage(new SendCashInToHotWalletContext
                 {
