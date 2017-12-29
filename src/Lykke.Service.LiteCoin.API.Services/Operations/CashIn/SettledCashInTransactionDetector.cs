@@ -52,7 +52,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Operations.CashIn
             
             var coins = tx.Outputs.AsCoins().Where(p => p.ScriptPubKey.GetDestinationAddress(_network) == wallet.Address).ToList();
 
-            var amount = new Money(coins.Sum(p => p.Amount.Satoshi)).ToUnit(MoneyUnit.BTC);
+            var amount = new Money(coins.Sum(p => p.Amount.Satoshi)).Satoshi;
 
             if (amount != 0)
             {

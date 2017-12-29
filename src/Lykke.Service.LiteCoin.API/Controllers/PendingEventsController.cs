@@ -37,7 +37,7 @@ namespace Lykke.Service.LiteCoin.API.Controllers
             {
                 OperationId = p.OperationId.ToString(),
                 AssetId = p.AssetId,
-                Amount = p.Amount.ToString("F"),
+                Amount = p.Amount.ToString("D"),
                 Timestamp = p.DetectedAt
             });
         }
@@ -54,7 +54,7 @@ namespace Lykke.Service.LiteCoin.API.Controllers
             {
                 OperationId = p.OperationId.ToString(),
                 AssetId = p.AssetId,
-                Amount = p.Amount.ToString("F"),
+                Amount = p.Amount.ToString("D"),
                 Timestamp = p.StartedAt,
                 TransactionHash = p.TxHash,
                 ToAddress = p.DestinationAddress
@@ -75,7 +75,7 @@ namespace Lykke.Service.LiteCoin.API.Controllers
             {
                 OperationId = p.OperationId.ToString(),
                 AssetId = p.AssetId,
-                Amount = p.Amount.ToString("F"),
+                Amount = p.Amount.ToString("D"),
                 Timestamp = p.StartedAt,
                 TransactionHash = p.TxHash,
                 ToAddress = p.DestinationAddress
@@ -94,7 +94,7 @@ namespace Lykke.Service.LiteCoin.API.Controllers
             {
                 OperationId = p.OperationId.ToString(),
                 AssetId = p.AssetId,
-                Amount = p.Amount.ToString("F"),
+                Amount = p.Amount.ToString("D"),
                 Timestamp = p.StartedAt,
                 ToAddress = p.DestinationAddress
             });

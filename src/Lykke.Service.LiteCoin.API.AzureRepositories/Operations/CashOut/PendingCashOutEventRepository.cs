@@ -18,7 +18,7 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Operations.CashOut
 
         public string AssetId { get; set; }
 
-        public decimal Amount { get; set; }
+        public long Amount { get; set; }
 
         public string DestinationAddress { get; set; }
 

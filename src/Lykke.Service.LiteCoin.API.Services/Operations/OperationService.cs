@@ -45,7 +45,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Operations
             _cashOutNotificationRepository = cashOutNotificationRepository;
         }
 
-        public async Task<ICashOutOperation> ProceedCashOutOperation(Guid operationId, IWallet sourceWallet, BitcoinAddress destAddress, decimal amount)
+        public async Task<ICashOutOperation> ProceedCashOutOperation(Guid operationId, IWallet sourceWallet, BitcoinAddress destAddress, long amount)
         {
             var hotWallets = await _walletService.GetHotWallets();
             var assetId = Constants.AssetsContants.LiteCoin;

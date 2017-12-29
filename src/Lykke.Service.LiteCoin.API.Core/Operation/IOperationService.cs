@@ -11,7 +11,7 @@ namespace Lykke.Service.LiteCoin.API.Core.Operation
 
     public interface IOperationService
     {
-        Task<ICashOutOperation> ProceedCashOutOperation(Guid operationId, IWallet sourceWallet, BitcoinAddress destAddress, decimal amount);
+        Task<ICashOutOperation> ProceedCashOutOperation(Guid operationId, IWallet sourceWallet, BitcoinAddress destAddress, long amount);
         Task ProceedSendMoneyToHotWalletOperation(Guid operationId, IWallet sourceWallet, string thHash);
     }
 }

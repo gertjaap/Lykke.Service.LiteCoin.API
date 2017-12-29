@@ -13,7 +13,7 @@ namespace Lykke.Service.LiteCoin.API.Core.CashIn
 
         string DestinationAddress { get; }
 
-        decimal Amount { get; }
+        long Amount { get; }
 
         string AssetId { get; }
 
@@ -27,7 +27,7 @@ namespace Lykke.Service.LiteCoin.API.Core.CashIn
         public Guid OperationId { get; set; }
         public DateTime DetectedAt { get; set; }
         public string DestinationAddress { get; set; }
-        public decimal Amount { get; set; }
+        public long Amount { get; set; }
         public string AssetId { get; set; }
         public string SourceAddress { get; set; }
         public string TxHash { get; set; }
@@ -36,7 +36,7 @@ namespace Lykke.Service.LiteCoin.API.Core.CashIn
             string destinationAddress,
             string sourceAddress,
             string txHash,
-            decimal amount, 
+            long amount, 
             string assetId, 
             DateTime detectedAt)
         {

@@ -23,7 +23,7 @@ namespace Lykke.Service.LiteCoin.API.Core.CashOut
         public DateTime StartedAt { get; set; }
         public string ClientWalletId { get; set; }
         public string AssetId { get; set; }
-        public decimal Amount { get; set; }
+        public long Amount { get; set; }
         public string DestinationAddress { get; set; }
         public string TxHash { get; set; }
         public PendingCashOutEventStatusType Status { get; set; }

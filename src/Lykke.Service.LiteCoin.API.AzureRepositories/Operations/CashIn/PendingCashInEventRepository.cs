@@ -13,7 +13,7 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Operations.CashIn
         public Guid OperationId { get; set; }
         public DateTime DetectedAt { get; set; }
         public string DestinationAddress { get; set; }
-        public decimal Amount { get; set; }
+        public long Amount { get; set; }
         public string AssetId { get; set; }
         public string SourceAddress { get; set; }
         public string TxHash { get; set; }

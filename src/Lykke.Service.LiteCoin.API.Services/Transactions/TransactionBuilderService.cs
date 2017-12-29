@@ -31,11 +31,11 @@ namespace Lykke.Service.LiteCoin.API.Services.Transactions
         }
 
         public async Task<Transaction> GetTransferTransaction(BitcoinAddress source,
-            BitcoinAddress destination, decimal amount, bool sentDust = false)
+            BitcoinAddress destination, long amount, bool sentDust = false)
         {
             var builder = new TransactionBuilder();
 
-            await TransferOneDirection(builder, source, amount, destination, sentDust);
+            await TransferOneDirection(builder, source, (long)amount, destination, sentDust);
 
 
             var buildedTransaction = builder.BuildTransaction(false);
@@ -65,21 +65,21 @@ namespace Lykke.Service.LiteCoin.API.Services.Transactions
         }
 
         private async Task TransferOneDirection(TransactionBuilder builder, 
-            BitcoinAddress @from, decimal amount, BitcoinAddress to, bool addDust = true, bool sendDust = false)
+            BitcoinAddress @from, long amount, BitcoinAddress to, bool addDust = true, bool sendDust = false)
         {
             var fromStr = from.ToString();
             var coins = (await _transactionOutputsService.GetUnspentOutputs(fromStr)).ToList();
             var balance = coins.Select(o => o.Amount).DefaultIfEmpty()
-                .Sum(o => o?.ToDecimal(MoneyUnit.BTC) ?? 0);
-            if (sendDust && balance > amount &&
-                balance - amount < new TxOut(Money.Zero, from)
-                    .GetDustThreshold(builder.StandardTransactionPolicy.MinRelayTxFee).ToDecimal(MoneyUnit.BTC))
+                .Sum(o =>  o?.Satoshi ?? 0);
+            if (sendDust && balance > (long) amount &&
+                balance - (long)amount < new TxOut(Money.Zero, from)
+                    .GetDustThreshold(builder.StandardTransactionPolicy.MinRelayTxFee).Satoshi)
                 amount = balance;
-            await SendWithChange(builder,  coins, to, new Money(amount, MoneyUnit.BTC),
+            await SendWithChange(builder,  coins, to, new Money(amount),
                 from, addDust);
         }
 
-        public async Task<decimal> SendWithChange(TransactionBuilder builder, 
+        public async Task<long> SendWithChange(TransactionBuilder builder, 
             List<CoinWithSettlementInfo> coins, IDestination destination, Money amount, IDestination changeDestination,
             bool addDust = true)
         {
@@ -122,7 +122,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Transactions
 
 
 
-            return amount.ToDecimal(MoneyUnit.BTC);
+            return amount;
         }
 
         private static int NewMethod(Money amount, List<CoinWithSettlementInfo> orderedCoins, ref Money sendAmount)

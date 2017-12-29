@@ -22,7 +22,7 @@ namespace Lykke.Service.LiteCoin.API.Core.CashIn
 
         public string DestinationAddress { get; set; }
 
-        public decimal Amount { get; set; }
+        public long Amount { get; set; }
 
         public string AssetId { get; set; }
 

@@ -12,6 +12,6 @@ namespace Lykke.Service.LiteCoin.API.Models.Operations
 
         public string AssetId { get; set; }
 
-        public decimal Amount { get; set; }
+        public long Amount { get; set; }
     }
 }

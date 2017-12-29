@@ -23,7 +23,7 @@ namespace Lykke.Service.LiteCoin.API.Services.BlockChainProviders.InsightApi.Con
         public string TxHash { get; set; }
 
         [JsonProperty("amount")]
-        public decimal Amount { get; set; }
+        public long Amount { get; set; }
 
         [JsonProperty("height")]
         public int Height { get; set; }

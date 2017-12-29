@@ -11,7 +11,7 @@ namespace Lykke.Service.LiteCoin.API.Core.CashOut
 
         string AssetId { get; }
 
-        decimal Amount { get; }
+        long Amount { get; }
 
         string DestinationAddress { get; }
 
@@ -25,14 +25,14 @@ namespace Lykke.Service.LiteCoin.API.Core.CashOut
         public DateTime? CompletedAt { get; set; }
         public string ClientWalletId { get; set; }
         public string AssetId { get; set; }
-        public decimal Amount { get; set; }
+        public long Amount { get; set; }
         public string DestinationAddress { get; set; }
         public string TxHash { get; set; }
         
         public static CashOutOperation Create(Guid operationId, 
             string walletId, 
             string address, 
-            decimal amount,
+            long amount,
             string assetId,
             DateTime startedAt,
             string txHash )

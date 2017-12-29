@@ -10,10 +10,10 @@ namespace Lykke.Service.LiteCoin.API.Services.Fee
     public class FeeService:IFeeService
     {
         private readonly IFeeRateFacade _feeRateFacade;
-        private readonly decimal _minFeeValueSatoshi;
-        private readonly decimal _maxFeeValueSatoshi;
+        private readonly long _minFeeValueSatoshi;
+        private readonly long _maxFeeValueSatoshi;
 
-        public FeeService(IFeeRateFacade feeRateFacade, decimal minFeeValueSatoshi, decimal maxFeeValueSatoshi)
+        public FeeService(IFeeRateFacade feeRateFacade, long minFeeValueSatoshi, long maxFeeValueSatoshi)
         {
             _feeRateFacade = feeRateFacade;
             _minFeeValueSatoshi = minFeeValueSatoshi;
