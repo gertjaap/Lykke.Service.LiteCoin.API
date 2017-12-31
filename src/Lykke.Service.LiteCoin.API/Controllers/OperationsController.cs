@@ -68,10 +68,8 @@ namespace Lykke.Service.LiteCoin.API.Controllers
             {
                 throw new BusinessException($"Source wallet {address} is not client wallet", ErrorCode.BadInputParameter);
             }
-
-            var opId = Guid.NewGuid();
-
-            var op = await _operationService.ProceedCashOutOperation(opId, sourceWallet,
+            
+            var op = await _operationService.ProceedCashOutOperation(request.OperationId, sourceWallet,
                 _addressValidator.GetBitcoinAddress(request.To), amount);
 
 

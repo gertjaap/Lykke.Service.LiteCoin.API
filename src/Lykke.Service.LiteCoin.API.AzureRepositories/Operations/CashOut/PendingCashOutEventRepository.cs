@@ -14,7 +14,7 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Operations.CashOut
 
         public DateTime StartedAt { get; set; }
 
-        public string ClientWalletId { get; set; }
+        public string ClientAddress { get; set; }
 
         public string AssetId { get; set; }
 
@@ -63,7 +63,7 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Operations.CashOut
                 TxHash = source.TxHash,
                 DestinationAddress = source.DestinationAddress,
                 StartedAt = source.StartedAt,
-                ClientWalletId = source.ClientWalletId,
+                ClientAddress = source.ClientAddress,
                 Status = source.Status.ToString()
             };
         }
