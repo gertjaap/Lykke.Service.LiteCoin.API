@@ -4,9 +4,9 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using Lykke.Common.Api.Contract.Responses;
 using Lykke.Service.BlockchainApi.Contract.Responses;
 using Lykke.Service.LiteCoin.API.Core.Asset;
-using Lykke.Service.LiteCoin.API.Filters;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
@@ -23,7 +23,7 @@ namespace Lykke.Service.LiteCoin.API.Controllers
 
         [SwaggerOperation(nameof(GetAll))]
         [ProducesResponseType(typeof(AssetsListResponse), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(ApiException), 400)]
+        [ProducesResponseType(typeof(ErrorResponse), 400)]
         [HttpGet("api/assets")]
         public async Task<AssetsListResponse> GetAll()
         {
@@ -44,7 +44,7 @@ namespace Lykke.Service.LiteCoin.API.Controllers
         [SwaggerOperation(nameof(GetById))]
         [ProducesResponseType(typeof(AssetResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(AssetResponse), (int)HttpStatusCode.NotFound)]
-        [ProducesResponseType(typeof(ApiException), 400)]
+        [ProducesResponseType(typeof(ErrorResponse), 400)]
         [HttpGet("api/assets/{assetId}")]
         public async Task<IActionResult> GetById(string assetId)
         {

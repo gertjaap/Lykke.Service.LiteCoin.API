@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Lykke.Common.Api.Contract.Responses;
 using Lykke.Service.BlockchainApi.Contract.Requests;
 using Lykke.Service.LiteCoin.API.Core.Address;
 using Lykke.Service.LiteCoin.API.Core.Constants;
 using Lykke.Service.LiteCoin.API.Core.Exceptions;
 using Lykke.Service.LiteCoin.API.Core.Operation;
 using Lykke.Service.LiteCoin.API.Core.Wallet;
-using Lykke.Service.LiteCoin.API.Filters;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Lykke.Service.LiteCoin.API.Controllers
@@ -33,7 +33,7 @@ namespace Lykke.Service.LiteCoin.API.Controllers
         /// <returns>internal operation id</returns>
         [HttpPost("api/wallets/{address}/cashout")]
         [ProducesResponseType(200)]
-        [ProducesResponseType(typeof(ApiException), 400)]
+        [ProducesResponseType(typeof(ErrorResponse), 400)]
         public async Task<IActionResult> CashOut(string address, [FromBody] CashoutFromWalletRequest request)
         {
             if (!long.TryParse(request.Amount, out var amount))

@@ -4,10 +4,12 @@ using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using AzureStorage.Tables;
 using Common.Log;
+using Lykke.Common.Api.Contract.Responses;
 using Lykke.Common.ApiLibrary.Middleware;
 using Lykke.Common.ApiLibrary.Swagger;
 using Lykke.Logs;
 using Lykke.Service.LiteCoin.API.AzureRepositories.Binder;
+using Lykke.Service.LiteCoin.API.Core.Exceptions;
 using Lykke.Service.LiteCoin.API.Core.Services;
 using Lykke.Service.LiteCoin.API.Core.Settings;
 using Lykke.Service.LiteCoin.API.Filters;
@@ -44,10 +46,7 @@ namespace Lykke.Service.LiteCoin.API
         {
             try
             {
-                services.AddMvc(o =>
-                    {
-                        o.Filters.Add(new HandleAllExceptionsFilterFactory());
-                    })
+                services.AddMvc()
                     .AddJsonOptions(options =>
                     {
                         options.SerializerSettings.ContractResolver =
@@ -96,7 +95,16 @@ namespace Lykke.Service.LiteCoin.API
                     app.UseDeveloperExceptionPage();
                 }
 
-                app.UseLykkeMiddleware("LiteCoin.API", ex => new {Message = "Technical problem"});
+                app.UseLykkeMiddleware("LiteCoin.API", ex =>
+                {
+                    if (ex is BusinessException clientError)
+                    {
+
+                        return ErrorResponse.Create(clientError.Text);
+                    }
+
+                    return ErrorResponse.Create("Technical problem");
+                });
 
                 app.UseMvc();
                 app.UseSwagger();

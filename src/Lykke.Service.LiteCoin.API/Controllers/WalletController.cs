@@ -21,7 +21,7 @@ namespace Lykke.Service.LiteCoin.API.Controllers
         [HttpPost("api/wallets")]
         [SwaggerOperation("CreateWallet")]
         [ProducesResponseType(typeof(WalletCreationResponse), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(ApiException), 400)]
+        [ProducesResponseType(typeof(ErrorResponce), 400)]
         public async Task<IActionResult> CreateWallet()
         {
             var result = await _walletService.CreateWallet();

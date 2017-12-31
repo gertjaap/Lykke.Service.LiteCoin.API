@@ -1,17 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Lykke.Service.BlockchainApi.Contract.Requests;
 using Lykke.Service.BlockchainApi.Contract.Responses;
 using Lykke.Service.BlockchainApi.Contract.Responses.PendingEvents;
 using Lykke.Service.LiteCoin.API.Core.CashIn;
 using Lykke.Service.LiteCoin.API.Core.CashOut;
-using Lykke.Service.LiteCoin.API.Core.Exceptions;
-using Lykke.Service.LiteCoin.API.Filters;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using ErrorResponse = Lykke.Common.Api.Contract.Responses.ErrorResponse;
 
 namespace Lykke.Service.LiteCoin.API.Controllers
 {
@@ -29,7 +25,7 @@ namespace Lykke.Service.LiteCoin.API.Controllers
         [HttpGet("/api/pending-events/cashin")]
         [SwaggerOperation(nameof(GetPendingCashInEvents))]
         [ProducesResponseType(typeof(PendingEventsResponse<PendingCashinEventContract>), 200)]
-        [ProducesResponseType(typeof(ApiException), 400)]
+        [ProducesResponseType(typeof(ErrorResponse), 400)]
         public async Task<PendingEventsResponse<PendingCashinEventContract>> GetPendingCashInEvents([FromQuery] int maxEventsNumber = 100)
         {
             var entities = await _cashInEventRepository.GetAll(PendingCashInEventStatusType.DetectedOnBlockChain, maxEventsNumber);
@@ -50,7 +46,7 @@ namespace Lykke.Service.LiteCoin.API.Controllers
         [HttpGet("/api/pending-events/cashout-started")]
         [SwaggerOperation(nameof(GetPendingCashOutStartedEvents))]
         [ProducesResponseType(typeof(PendingEventsResponse<PendingCashoutStartedEventContract>), 200)]
-        [ProducesResponseType(typeof(ApiException), 400)]
+        [ProducesResponseType(typeof(ErrorResponse), 400)]
         public async Task<PendingEventsResponse<PendingCashoutStartedEventContract>> GetPendingCashOutStartedEvents([FromQuery] int maxEventsNumber = 100)
         {
             var entities = await _cashOutEventRepository.GetAll(PendingCashOutEventStatusType.Started, maxEventsNumber);
@@ -73,7 +69,7 @@ namespace Lykke.Service.LiteCoin.API.Controllers
         [HttpGet("/api/pending-events/cashout-completed")]
         [SwaggerOperation(nameof(GetPendingCashOutCompletedEvents))]
         [ProducesResponseType(typeof(PendingEventsResponse<PendingCashoutCompletedEventContract>), 200)]
-        [ProducesResponseType(typeof(ApiException), 400)]
+        [ProducesResponseType(typeof(ErrorResponse), 400)]
         public async Task<PendingEventsResponse<PendingCashoutCompletedEventContract>> GetPendingCashOutCompletedEvents([FromQuery] int maxEventsNumber = 100)
         {
             var entities = await _cashOutEventRepository.GetAll(PendingCashOutEventStatusType.Completed, maxEventsNumber);
@@ -96,7 +92,7 @@ namespace Lykke.Service.LiteCoin.API.Controllers
         [HttpGet("/api/pending-events/cashout-failed")]
         [SwaggerOperation(nameof(GetPendingCashOutFailedEvents))]
         [ProducesResponseType(typeof(PendingEventsResponse<PendingCashoutFailedEventContract>), 200)]
-        [ProducesResponseType(typeof(ApiException), 400)]
+        [ProducesResponseType(typeof(ErrorResponse), 400)]
         public async Task<PendingEventsResponse<PendingCashoutFailedEventContract>> GetPendingCashOutFailedEvents([FromQuery] int maxEventsNumber = 100)
         {
             var entities = await _cashOutEventRepository.GetAll(PendingCashOutEventStatusType.Failed, maxEventsNumber);
@@ -118,7 +114,7 @@ namespace Lykke.Service.LiteCoin.API.Controllers
         [HttpDelete("/api/pending-events/cashin")]
         [SwaggerOperation(nameof(DeletePendingCashInEvents))]
         [ProducesResponseType(200)]
-        [ProducesResponseType(typeof(ApiException), 400)]
+        [ProducesResponseType(typeof(ErrorResponse), 400)]
         public async Task<IActionResult> DeletePendingCashInEvents([FromBody]RemovePendingEventsRequest request)
         {
             await _cashInEventRepository.DeleteBatchIfExist(PendingCashInEventStatusType.DetectedOnBlockChain, request.OperationIds);
@@ -129,7 +125,7 @@ namespace Lykke.Service.LiteCoin.API.Controllers
         [HttpDelete("/api/pending-events/cashout-started")]
         [SwaggerOperation(nameof(DeletePendingCashOutStartedEvents))]
         [ProducesResponseType(200)]
-        [ProducesResponseType(typeof(ApiException), 400)]
+        [ProducesResponseType(typeof(ErrorResponse), 400)]
         public async Task<IActionResult> DeletePendingCashOutStartedEvents([FromBody]RemovePendingEventsRequest request)
         {
             await _cashOutEventRepository.DeleteBatchIfExist(PendingCashOutEventStatusType.Started, request.OperationIds);
@@ -140,7 +136,7 @@ namespace Lykke.Service.LiteCoin.API.Controllers
         [HttpDelete("/api/pending-events/cashout-completed")]
         [SwaggerOperation(nameof(DeletePendingCashOutCompletedEvents))]
         [ProducesResponseType(200)]
-        [ProducesResponseType(typeof(ApiException), 400)]
+        [ProducesResponseType(typeof(ErrorResponse), 400)]
         public async Task<IActionResult> DeletePendingCashOutCompletedEvents([FromBody]RemovePendingEventsRequest request)
         {
             await _cashOutEventRepository.DeleteBatchIfExist(PendingCashOutEventStatusType.Completed, request.OperationIds);
@@ -151,7 +147,7 @@ namespace Lykke.Service.LiteCoin.API.Controllers
         [HttpDelete("/api/pending-events/cashout-failed")]
         [SwaggerOperation(nameof(DeletePendingCashOutFailedEvents))]
         [ProducesResponseType(200)]
-        [ProducesResponseType(typeof(ApiException), 400)]
+        [ProducesResponseType(typeof(ErrorResponse), 400)]
         public async Task<IActionResult> DeletePendingCashOutFailedEvents([FromBody]RemovePendingEventsRequest request)
         {
             await _cashOutEventRepository.DeleteBatchIfExist(PendingCashOutEventStatusType.Failed, request.OperationIds);
