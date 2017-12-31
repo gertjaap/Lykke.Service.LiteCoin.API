@@ -1,8 +1,8 @@
 ﻿using System.Net;
 using System.Threading.Tasks;
+using Lykke.Common.Api.Contract.Responses;
 using Lykke.Service.BlockchainApi.Contract.Responses;
 using Lykke.Service.LiteCoin.API.Core.Wallet;
-using Lykke.Service.LiteCoin.API.Filters;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
@@ -21,7 +21,7 @@ namespace Lykke.Service.LiteCoin.API.Controllers
         [HttpPost("api/wallets")]
         [SwaggerOperation("CreateWallet")]
         [ProducesResponseType(typeof(WalletCreationResponse), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(ErrorResponce), 400)]
+        [ProducesResponseType(typeof(ErrorResponse), 400)]
         public async Task<IActionResult> CreateWallet()
         {
             var result = await _walletService.CreateWallet();
