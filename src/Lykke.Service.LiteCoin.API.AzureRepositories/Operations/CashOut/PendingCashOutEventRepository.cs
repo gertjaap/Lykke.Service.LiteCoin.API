@@ -86,7 +86,7 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Operations.CashOut
 
         public async Task<IEnumerable<IPendingCashOutEvent>> GetAll(PendingCashOutEventStatusType status, int count)
         {
-            return (await _storage.GetDataAsync(PendingCashOutEventTableEntity.ByStatus.GeneratePartitionKey(status))).Take(count); // todo implement Take logic in db
+            return await _storage.GetTopRecordsAsync(PendingCashOutEventTableEntity.ByStatus.GeneratePartitionKey(status), count);
         }
 
         public async Task DeleteBatchIfExist(PendingCashOutEventStatusType status, IEnumerable<Guid> operationIds)
