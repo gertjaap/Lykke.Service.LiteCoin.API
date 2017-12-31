@@ -54,7 +54,7 @@ namespace Lykke.Service.LiteCoin.API.Core.CashOut
 
     public interface ICashOutOperationRepository
     {
-
+        Task<bool> Exist(Guid operationId);
         Task Insert(ICashOutOperation operation);
         Task<ICashOutOperation> GetByOperationId(Guid operationId);
         Task DeleteOldOperations(DateTime boun);

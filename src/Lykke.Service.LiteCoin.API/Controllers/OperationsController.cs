@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Lykke.Common.Api.Contract.Responses;
 using Lykke.Service.BlockchainApi.Contract.Requests;
 using Lykke.Service.LiteCoin.API.Core.Address;
+using Lykke.Service.LiteCoin.API.Core.CashOut;
 using Lykke.Service.LiteCoin.API.Core.Constants;
 using Lykke.Service.LiteCoin.API.Core.Exceptions;
 using Lykke.Service.LiteCoin.API.Core.Operation;
@@ -57,6 +58,11 @@ namespace Lykke.Service.LiteCoin.API.Controllers
                 throw new BusinessException($"Invalid DestAddress {request.To}", ErrorCode.BadInputParameter);
             }
 
+            if (request.OperationId == Guid.Empty)
+            {
+                throw new BusinessException("Invalid operation id (GUID)", ErrorCode.BadInputParameter);
+            }
+
             var sourceWallet = await _walletService.GetByPublicAddress(address);
 
             if (sourceWallet == null)
@@ -69,7 +75,7 @@ namespace Lykke.Service.LiteCoin.API.Controllers
                 throw new BusinessException($"Source wallet {address} is not client wallet", ErrorCode.BadInputParameter);
             }
             
-            var op = await _operationService.ProceedCashOutOperation(request.OperationId, sourceWallet,
+            await _operationService.ProceedCashOutOperation(request.OperationId, sourceWallet,
                 _addressValidator.GetBitcoinAddress(request.To), amount);
 
 

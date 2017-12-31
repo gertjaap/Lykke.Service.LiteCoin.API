@@ -101,6 +101,11 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Operations.CashOut
             _storage = storage;
         }
 
+        public async Task<bool> Exist(Guid operationId)
+        {
+            return await GetByOperationId(operationId) != null;
+        }
+
         public async Task Insert(ICashOutOperation operation)
         {
             await _storage.InsertAsync(CashOutOperationTableEntity.ByOperationId.Create(operation));

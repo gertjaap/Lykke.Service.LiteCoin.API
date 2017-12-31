@@ -47,6 +47,11 @@ namespace Lykke.Service.LiteCoin.API.Services.Operations
 
         public async Task<ICashOutOperation> ProceedCashOutOperation(Guid operationId, IWallet sourceWallet, BitcoinAddress destAddress, long amount)
         {
+            if (await _cashOutOperationRepository.Exist(operationId))
+            {
+                throw new BusinessException($"Operation {operationId} already exist", ErrorCode.BadInputParameter);
+            }
+
             var hotWallets = await _walletService.GetHotWallets();
             var assetId = Constants.AssetsContants.LiteCoin;
             
