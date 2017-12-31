@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Linq;
 using System.Net;
+using Lykke.Common.Api.Contract.Responses;
 using Lykke.Service.LiteCoin.API.Core.Services;
-using Lykke.Service.LiteCoin.API.Models;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using IsAliveResponse = Lykke.Service.LiteCoin.API.Models.IsAliveResponse;
 
 namespace Lykke.Service.LiteCoin.API.Controllers
 {
