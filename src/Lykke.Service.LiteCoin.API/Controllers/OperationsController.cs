@@ -37,6 +37,10 @@ namespace Lykke.Service.LiteCoin.API.Controllers
         [ProducesResponseType(typeof(ErrorResponse), 400)]
         public async Task<IActionResult> CashOut(string address, [FromBody] CashoutFromWalletRequest request)
         {
+            if (request == null)
+            {
+                throw new BusinessException("Unable deserialize request", ErrorCode.BadInputParameter);
+            }
             if (!long.TryParse(request.Amount, out var amount))
             {
                 throw new BusinessException("Invalid amount string", ErrorCode.BadInputParameter);
@@ -49,7 +53,7 @@ namespace Lykke.Service.LiteCoin.API.Controllers
             if (request.AssetId != Constants.AssetsContants.LiteCoin)
             {
 
-                throw new BusinessException($"Invalid assetId: availiable asset ids - {Constants.AssetsContants.LiteCoin}", ErrorCode.BadInputParameter);
+                throw new BusinessException($"Invalid assetId: availiable asset ids", ErrorCode.BadInputParameter);
             }
 
             if (!_addressValidator.IsValid(request.To))
