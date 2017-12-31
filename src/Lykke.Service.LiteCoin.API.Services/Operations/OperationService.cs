@@ -96,7 +96,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Operations
         {
             var hotWallet = (await _walletService.GetHotWallets()).First();
 
-            var unsignedTx = await _transactionBuilder.GetSendMoneyToHotWalletTransaction(sourceWallet.Address, hotWallet.Address,
+            var unsignedTx = await _transactionBuilder.GetSendAllTransaction(sourceWallet.Address, hotWallet.Address,
                 thHash);
             var signedTx = await _signService.SignTransaction(operationId, unsignedTx, sourceWallet.Address);
 

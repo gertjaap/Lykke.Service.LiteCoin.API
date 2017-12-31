@@ -43,14 +43,15 @@ namespace Lykke.Service.LiteCoin.API.Services.Transactions
             return buildedTransaction;
         }
 
-        public async Task<Transaction> GetSendMoneyToHotWalletTransaction(BitcoinAddress fromAddress, BitcoinAddress destination, string fromTxHash)
+        public async Task<Transaction> GetSendAllTransaction(BitcoinAddress fromAddress, BitcoinAddress destination, string fromTxHash)
         {
             var builder = new TransactionBuilder();
-            var outputs = (await _transactionOutputsService.GetUnspentOutputs(fromAddress.ToString())).Where(p => p.Outpoint.Hash.ToString() == fromTxHash).ToArray();
+            var outputs = (await _transactionOutputsService.GetUnspentOutputs(fromAddress.ToString()))
+                .ToArray();
             var amount = outputs.Sum(o => o.Amount);
             var fee = await _feeService.GetMinFee();
 
-            if (fee.Satoshi > amount)
+            if (fee.Satoshi >= amount)
             {
                 throw new BusinessException(
                     $"The sum of total applicable outputs is less than the required fee: {fee.Satoshi} satoshis.",

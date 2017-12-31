@@ -75,8 +75,9 @@ namespace Lykke.Job.LiteCoin.Functions
             {
                 await _log.WriteWarningAsync(nameof(SendCashInToHotWalletFunctions), nameof(Send), context.ToJson(),
                     "Balance is less than fee");
-            }
 
+                return;
+            }
 
             await _cashInEventRepository.InsertEvent(CashInEvent.Create(operation.OperationId,
                 CashInEventType.MoneyTransferredToHotWallet));

@@ -6,7 +6,7 @@ namespace Lykke.Service.LiteCoin.API.Core.Transactions
     public interface ITransactionBuilderService
     {
         Task<Transaction> GetTransferTransaction(BitcoinAddress source, BitcoinAddress destination, long amount, bool sentDust = false);
-        Task<Transaction> GetSendMoneyToHotWalletTransaction(BitcoinAddress fromAddress, BitcoinAddress destination, string fromTxHash);
+        Task<Transaction> GetSendAllTransaction(BitcoinAddress fromAddress, BitcoinAddress destination, string fromTxHash);
 
     }
 }
