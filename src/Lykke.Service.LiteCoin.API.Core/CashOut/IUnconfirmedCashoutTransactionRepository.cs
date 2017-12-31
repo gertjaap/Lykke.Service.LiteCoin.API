@@ -4,14 +4,14 @@ using System.Threading.Tasks;
 
 namespace Lykke.Service.LiteCoin.API.Core.CashOut
 {
-    public interface ICashoutTransaction
+    public interface IUnconfirmedCashoutTransaction
     {
         string TxHash { get; }
         Guid OperationId { get; }
         DateTime InsertedAt { get; }
     }
 
-    public class CashOutTransaction: ICashoutTransaction
+    public class CashOutTransaction: IUnconfirmedCashoutTransaction
     {
         public string TxHash { get; set; }
         public Guid OperationId { get; set; }
@@ -28,10 +28,10 @@ namespace Lykke.Service.LiteCoin.API.Core.CashOut
             };
         }
     }
-    public interface IPendingCashoutTransactionRepository
+    public interface IUnconfirmedCashoutTransactionRepository
     {
-        Task<IEnumerable<ICashoutTransaction>> GetAll();
-        Task InsertOrReplace(ICashoutTransaction tx);
+        Task<IEnumerable<IUnconfirmedCashoutTransaction>> GetAll();
+        Task InsertOrReplace(IUnconfirmedCashoutTransaction tx);
         Task Remove(string txHash);
     }
 }

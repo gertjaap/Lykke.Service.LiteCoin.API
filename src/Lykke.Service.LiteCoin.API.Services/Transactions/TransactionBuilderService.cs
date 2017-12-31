@@ -46,8 +46,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Transactions
         public async Task<Transaction> GetSendAllTransaction(BitcoinAddress fromAddress, BitcoinAddress destination, string fromTxHash)
         {
             var builder = new TransactionBuilder();
-            var outputs = (await _transactionOutputsService.GetUnspentOutputs(fromAddress.ToString()))
-                .ToArray();
+            var outputs = (await _transactionOutputsService.GetUnspentOutputs(fromAddress.ToString())).ToArray();
             var amount = outputs.Sum(o => o.Amount);
             var fee = await _feeService.GetMinFee();
 

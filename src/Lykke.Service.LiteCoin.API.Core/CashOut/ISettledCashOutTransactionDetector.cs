@@ -8,6 +8,6 @@ namespace Lykke.Service.LiteCoin.API.Core.CashOut
 
     public interface ISettledCashOutTransactionDetector
     {
-        Task<IEnumerable<ICashoutTransaction>> CheckSettlement(IEnumerable<ICashoutTransaction> trackedTransactions, int minConfirmationsCount);
+        Task<IEnumerable<IUnconfirmedCashoutTransaction>> CheckSettlement(IEnumerable<IUnconfirmedCashoutTransaction> trackedTransactions, int minConfirmationsCount);
     }
 }

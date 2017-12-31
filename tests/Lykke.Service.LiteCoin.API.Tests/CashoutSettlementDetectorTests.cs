@@ -59,7 +59,7 @@ namespace Lykke.Service.LiteCoin.API.Tests
             
         }
 
-        private Mock<IBlockChainProvider> GetBlockChainProvider(ICashoutTransaction tx, int confirmationCount)
+        private Mock<IBlockChainProvider> GetBlockChainProvider(IUnconfirmedCashoutTransaction tx, int confirmationCount)
         {
             var result = new Mock<IBlockChainProvider>();
 

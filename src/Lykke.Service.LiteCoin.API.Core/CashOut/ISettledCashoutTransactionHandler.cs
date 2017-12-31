@@ -7,6 +7,6 @@ namespace Lykke.Service.LiteCoin.API.Core.CashOut
 {
     public interface ISettledCashoutTransactionHandler
     {
-        Task HandleSettledTransactions(IEnumerable<ICashoutTransaction> settledTransactions);
+        Task HandleSettledTransactions(IEnumerable<IUnconfirmedCashoutTransaction> settledTransactions);
     }
 }

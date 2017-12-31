@@ -7,7 +7,7 @@ using Microsoft.WindowsAzure.Storage.Table;
 
 namespace Lykke.Service.LiteCoin.API.AzureRepositories.Operations.CashOut
 {
-    public class PendingCashoutTransactionEntity : TableEntity, ICashoutTransaction
+    public class UnconfirmedCashoutTransactionEntity : TableEntity, IUnconfirmedCashoutTransaction
     {
         public string TxHash { get; set; }
         public Guid OperationId { get; set; }
@@ -23,9 +23,9 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Operations.CashOut
             return "TCTH";
         }
 
-        public static PendingCashoutTransactionEntity Create(ICashoutTransaction source)
+        public static UnconfirmedCashoutTransactionEntity Create(IUnconfirmedCashoutTransaction source)
         {
-            return new PendingCashoutTransactionEntity
+            return new UnconfirmedCashoutTransactionEntity
             {
                 OperationId = source.OperationId,
                 InsertedAt = source.InsertedAt,
@@ -35,28 +35,28 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Operations.CashOut
             };
         }
     }
-    public class PendingCashoutTransactionRepository: IPendingCashoutTransactionRepository
+    public class UnconfirmedCashoutTransactionRepository: IUnconfirmedCashoutTransactionRepository
     {
-        private readonly INoSQLTableStorage<PendingCashoutTransactionEntity> _storage;
+        private readonly INoSQLTableStorage<UnconfirmedCashoutTransactionEntity> _storage;
 
-        public PendingCashoutTransactionRepository(INoSQLTableStorage<PendingCashoutTransactionEntity> storage)
+        public UnconfirmedCashoutTransactionRepository(INoSQLTableStorage<UnconfirmedCashoutTransactionEntity> storage)
         {
             _storage = storage;
         }
 
-        public async Task<IEnumerable<ICashoutTransaction>> GetAll()
+        public async Task<IEnumerable<IUnconfirmedCashoutTransaction>> GetAll()
         {
-            return await _storage.GetDataAsync(PendingCashoutTransactionEntity.CreatePartitionKey());
+            return await _storage.GetDataAsync(UnconfirmedCashoutTransactionEntity.CreatePartitionKey());
         }
 
-        public Task InsertOrReplace(ICashoutTransaction tx)
+        public Task InsertOrReplace(IUnconfirmedCashoutTransaction tx)
         {
-            return _storage.InsertOrReplaceAsync(PendingCashoutTransactionEntity.Create(tx));
+            return _storage.InsertOrReplaceAsync(UnconfirmedCashoutTransactionEntity.Create(tx));
         }
 
         public Task Remove(string txHash)
         {
-            return _storage.DeleteAsync(PendingCashoutTransactionEntity.CreatePartitionKey(), PendingCashoutTransactionEntity.CreateRowKey(txHash));
+            return _storage.DeleteAsync(UnconfirmedCashoutTransactionEntity.CreatePartitionKey(), UnconfirmedCashoutTransactionEntity.CreateRowKey(txHash));
         }
     }
 }

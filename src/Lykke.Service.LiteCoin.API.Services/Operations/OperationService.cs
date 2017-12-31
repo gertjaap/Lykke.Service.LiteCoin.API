@@ -21,7 +21,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Operations
         private readonly ITransactionBuilderService _transactionBuilder;
         private readonly ISignService _signService;
         private readonly ICashOutOperationRepository _cashOutOperationRepository;
-        private readonly IPendingCashoutTransactionRepository _pendingCashoutTransactionRepository;
+        private readonly IUnconfirmedCashoutTransactionRepository _unconfirmedCashoutTransactionRepository;
         private readonly ILog _log;
         private readonly IBroadcastService _broadcastService;
         private readonly IPendingCashOutEventRepository _cashOutNotificationRepository;
@@ -30,7 +30,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Operations
             ITransactionBuilderService transactionBuilder, 
             ISignService signService,
             ICashOutOperationRepository cashOutOperationRepository,
-            IPendingCashoutTransactionRepository pendingCashoutTransactionRepository,
+            IUnconfirmedCashoutTransactionRepository unconfirmedCashoutTransactionRepository,
             ILog log, 
             IBroadcastService broadcastService,
             IPendingCashOutEventRepository cashOutNotificationRepository)
@@ -39,7 +39,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Operations
             _transactionBuilder = transactionBuilder;
             _signService = signService;
             _cashOutOperationRepository = cashOutOperationRepository;
-            _pendingCashoutTransactionRepository = pendingCashoutTransactionRepository;
+            _unconfirmedCashoutTransactionRepository = unconfirmedCashoutTransactionRepository;
             _log = log;
             _broadcastService = broadcastService;
             _cashOutNotificationRepository = cashOutNotificationRepository;
@@ -76,7 +76,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Operations
                 await _cashOutNotificationRepository.Insert(
                     PendingCashOutEvent.Create(operation, PendingCashOutEventStatusType.Started));
                 
-                await _pendingCashoutTransactionRepository.InsertOrReplace(
+                await _unconfirmedCashoutTransactionRepository.InsertOrReplace(
                     CashOutTransaction.Create(signedtx.GetHash().ToString(), operationId));
 
 

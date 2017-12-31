@@ -21,9 +21,9 @@ namespace Lykke.Service.LiteCoin.API.Services.Operations.CashOut
         }
 
 
-        public async Task<IEnumerable<ICashoutTransaction>> CheckSettlement(IEnumerable<ICashoutTransaction> trackedTransactions, int minConfirmationsCount)
+        public async Task<IEnumerable<IUnconfirmedCashoutTransaction>> CheckSettlement(IEnumerable<IUnconfirmedCashoutTransaction> trackedTransactions, int minConfirmationsCount)
         {
-            var settledTransactions = new List<ICashoutTransaction>();
+            var settledTransactions = new List<IUnconfirmedCashoutTransaction>();
 
             foreach (var tx in trackedTransactions)
             {

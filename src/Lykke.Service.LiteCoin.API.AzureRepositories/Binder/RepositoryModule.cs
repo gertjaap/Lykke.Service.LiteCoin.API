@@ -40,10 +40,10 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Binder
 
         private void RegisterRepo(ContainerBuilder builder)
         {
-            builder.RegisterInstance(new PendingCashoutTransactionRepository(
-                AzureTableStorage<PendingCashoutTransactionEntity>.Create(_settings.Nested(p => p.Db.DataConnString),
-                    "PengingCashoutTransactions", _log)))
-                    .As<IPendingCashoutTransactionRepository>();
+            builder.RegisterInstance(new UnconfirmedCashoutTransactionRepository(
+                AzureTableStorage<UnconfirmedCashoutTransactionEntity>.Create(_settings.Nested(p => p.Db.DataConnString),
+                    "UnconfirmedCashoutTransactions", _log)))
+                    .As<IUnconfirmedCashoutTransactionRepository>();
 
             builder.RegisterInstance(new CashOutOperationRepository(
                 AzureTableStorage<CashOutOperationTableEntity>.Create(_settings.Nested(p => p.Db.DataConnString),

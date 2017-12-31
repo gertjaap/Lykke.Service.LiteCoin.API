@@ -11,22 +11,22 @@ namespace Lykke.Service.LiteCoin.API.Services.Operations.CashOut
         private readonly OperationsConfirmationsSettings _confirmationsSettings;
         private readonly ISettledCashoutTransactionHandler _settledCashoutTransactionHandler;
         private readonly ISettledCashOutTransactionDetector _cashOutTransactionDetector;
-        private readonly IPendingCashoutTransactionRepository _pendingCashoutTransactionRepository;
+        private readonly IUnconfirmedCashoutTransactionRepository _unconfirmedCashoutTransactionRepository;
 
         public CashOutsOperationDetectorFacade(OperationsConfirmationsSettings confirmationsSettings, 
             ISettledCashoutTransactionHandler settledCashoutTransactionHandler, 
             ISettledCashOutTransactionDetector cashOutTransactionDetector, 
-            IPendingCashoutTransactionRepository pendingCashoutTransactionRepository)
+            IUnconfirmedCashoutTransactionRepository unconfirmedCashoutTransactionRepository)
         {
             _confirmationsSettings = confirmationsSettings;
             _settledCashoutTransactionHandler = settledCashoutTransactionHandler;
             _cashOutTransactionDetector = cashOutTransactionDetector;
-            _pendingCashoutTransactionRepository = pendingCashoutTransactionRepository;
+            _unconfirmedCashoutTransactionRepository = unconfirmedCashoutTransactionRepository;
         }
         
         public async Task DetectCashOutOps()
         {
-            var pendingTxs = await _pendingCashoutTransactionRepository.GetAll();
+            var pendingTxs = await _unconfirmedCashoutTransactionRepository.GetAll();
 
             var settledCashouts = await _cashOutTransactionDetector.CheckSettlement(pendingTxs, _confirmationsSettings.MinCashOutConfirmations);
 

@@ -59,9 +59,9 @@ namespace Lykke.Service.LiteCoin.API.Tests
             return result;
         }
 
-        private Mock<IPendingCashoutTransactionRepository> GetTrackedCashoutTxRepo(ICashOutOperation op)
+        private Mock<IUnconfirmedCashoutTransactionRepository> GetTrackedCashoutTxRepo(ICashOutOperation op)
         {
-            var result = new Mock<IPendingCashoutTransactionRepository>();
+            var result = new Mock<IUnconfirmedCashoutTransactionRepository>();
             
             result.Setup(p=>p.Remove(It.Is<string>(x=>x==op.TxHash)))
                 .Returns(Task.CompletedTask)
