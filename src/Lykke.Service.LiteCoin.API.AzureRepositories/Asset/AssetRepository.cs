@@ -23,10 +23,10 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Asset
 
             new Asset
             {
-                Address = "",
-                AssetId = Constants.AssetsContants.LiteCoin,
-                Accuracy = 8,
-                Name = "LiteCoin"
+                Address = Constants.AssetsContants.LiteCoin.Address,
+                AssetId = Constants.AssetsContants.LiteCoin.AssetId,
+                Accuracy = Constants.AssetsContants.LiteCoin.Accuracy,
+                Name = Constants.AssetsContants.LiteCoin.Name
             }
         };
 

@@ -5,7 +5,7 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Lykke.Common.Api.Contract.Responses;
-using Lykke.Service.BlockchainApi.Contract.Responses;
+using Lykke.Service.BlockchainApi.Contract.Assets;
 using Lykke.Service.LiteCoin.API.Core.Asset;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.SwaggerGen;
@@ -22,23 +22,20 @@ namespace Lykke.Service.LiteCoin.API.Controllers
         }
 
         [SwaggerOperation(nameof(GetAll))]
-        [ProducesResponseType(typeof(AssetsListResponse), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(AssetResponse[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), 400)]
         [HttpGet("api/assets")]
-        public async Task<AssetsListResponse> GetAll()
+        public async Task<AssetResponse[]> GetAll()
         {
             var assets = await _assetRepository.GetAll();
 
-            return new AssetsListResponse
+            return assets.Select(p => new AssetResponse
             {
-                Assets = assets.Select(p => new AssetResponse
-                {
-                    Address = p.Address,
-                    AssetId = p.AssetId,
-                    Accuracy = p.Accuracy,
-                    Name = p.Name
-                }).ToList().AsReadOnly()
-            };
+                Address = p.Address,
+                AssetId = p.AssetId,
+                Accuracy = p.Accuracy,
+                Name = p.Name
+            }).ToArray();
         }
 
         [SwaggerOperation(nameof(GetById))]

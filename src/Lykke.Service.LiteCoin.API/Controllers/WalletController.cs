@@ -1,10 +1,10 @@
 ﻿using System.Net;
 using System.Threading.Tasks;
-using Lykke.Common.Api.Contract.Responses;
-using Lykke.Service.BlockchainApi.Contract.Responses;
+using Lykke.Service.BlockchainSignService.Client.AutorestClient.Models;
 using Lykke.Service.LiteCoin.API.Core.Wallet;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using ErrorResponse = Lykke.Common.Api.Contract.Responses.ErrorResponse;
 
 namespace Lykke.Service.LiteCoin.API.Controllers
 {
@@ -28,7 +28,7 @@ namespace Lykke.Service.LiteCoin.API.Controllers
 
             return Ok(new WalletCreationResponse
             {
-                Address = result.Address.ToString(),
+                PublicAddress = result.Address.ToString()
             });
         }
     }

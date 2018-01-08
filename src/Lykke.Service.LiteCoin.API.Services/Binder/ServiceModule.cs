@@ -115,6 +115,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Binder
             }).SingleInstance();
 
             builder.RegisterType<WalletService>().As<IWalletService>();
+            builder.RegisterType<WalletBalanceService>().As<IWalletBalanceService>();
         }
 
         private void RegisterDetectorServices(ContainerBuilder builder)

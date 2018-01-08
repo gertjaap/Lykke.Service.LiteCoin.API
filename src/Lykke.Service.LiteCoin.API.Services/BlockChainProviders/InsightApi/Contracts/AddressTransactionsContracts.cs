@@ -6,5 +6,8 @@ namespace Lykke.Service.LiteCoin.API.Services.BlockChainProviders.InsightApi.Con
     {
         [JsonProperty("transactions")]
         public string[] Transactions { get; set; }
+
+        [JsonProperty("balanceSat")]
+        public long BalanceSatoshi { get; set; }
     }
 }

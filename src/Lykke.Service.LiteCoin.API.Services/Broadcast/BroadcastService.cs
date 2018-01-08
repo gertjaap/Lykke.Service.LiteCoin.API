@@ -6,6 +6,7 @@ using Lykke.Service.LiteCoin.API.Core.BlockChainReaders;
 using Lykke.Service.LiteCoin.API.Core.Broadcast;
 using Lykke.Service.LiteCoin.API.Core.Exceptions;
 using Lykke.Service.LiteCoin.API.Core.TransactionOutputs;
+using Lykke.Service.LiteCoin.API.Core.Transactions;
 using NBitcoin;
 
 namespace Lykke.Service.LiteCoin.API.Services.Broadcast
@@ -15,13 +16,15 @@ namespace Lykke.Service.LiteCoin.API.Services.Broadcast
         private readonly IBlockChainProvider _blockChainProvider;
         private readonly ITransactionOutputsService _transactionOutputsService;
         private readonly ILog _log;
+        private readonly IUnconfirmedTransactionRepository _unconfirmedTransactionRepository;
 
         public BroadcastService(IBlockChainProvider blockChainProvider, 
-            ITransactionOutputsService transactionOutputsService, ILog log)
+            ITransactionOutputsService transactionOutputsService, ILog log, IUnconfirmedTransactionRepository unconfirmedTransactionRepository)
         {
             _blockChainProvider = blockChainProvider;
             _transactionOutputsService = transactionOutputsService;
             _log = log;
+            _unconfirmedTransactionRepository = unconfirmedTransactionRepository;
         }
 
         public async Task BroadCastTransaction(Transaction tx)
@@ -38,6 +41,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Broadcast
             }
 
             await _transactionOutputsService.SaveOuputs(tx);
+            
         }
     }
 }

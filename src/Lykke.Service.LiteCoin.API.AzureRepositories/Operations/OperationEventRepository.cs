@@ -1,0 +1,63 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Threading.Tasks;
+using AzureStorage;
+using Lykke.Service.LiteCoin.API.Core.CashOut;
+using Lykke.Service.LiteCoin.API.Core.Operation;
+using Microsoft.WindowsAzure.Storage.Table;
+
+namespace Lykke.Service.LiteCoin.API.AzureRepositories.Operations.CashOut
+{
+    public class OperationEventTableEntity : TableEntity, IOperationEvent
+    {
+        OperationEventType IOperationEvent.Type => Enum.Parse<OperationEventType>(Type);
+
+        public string Type { get; set; }
+
+        public DateTime DateTime { get; set; }
+        public Guid OperationId { get; set; }
+
+        public static string GeneratePartitionKey(Guid operationId)
+        {
+            return operationId.ToString();
+        }
+
+        public static string GenerateRowKey(OperationEventType type)
+        {
+            return type.ToString();
+        }
+
+        public static OperationEventTableEntity Create(IOperationEvent source)
+        {
+            return new OperationEventTableEntity
+            {
+                DateTime = source.DateTime,
+                OperationId = source.OperationId,
+                PartitionKey = GeneratePartitionKey(source.OperationId),
+                RowKey = GenerateRowKey(source.Type)
+            };
+        }
+    }
+
+    public class OperationEventRepository: IOperationEventRepository
+    {
+        private readonly INoSQLTableStorage<OperationEventTableEntity> _storage;
+
+        public OperationEventRepository(INoSQLTableStorage<OperationEventTableEntity> storage)
+        {
+            _storage = storage;
+        }
+
+        public Task InsertEvent(IOperationEvent operationEvent)
+        {
+            return _storage.InsertAsync(OperationEventTableEntity.Create(operationEvent));
+        }
+
+        public async Task<bool> Exist(Guid operationId, OperationEventType type)
+        {
+            return await _storage.GetDataAsync(OperationEventTableEntity.GeneratePartitionKey(operationId),
+                       OperationEventTableEntity.GenerateRowKey(type)) != null;
+        }
+    }
+}

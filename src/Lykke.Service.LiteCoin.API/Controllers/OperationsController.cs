@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Lykke.Common.Api.Contract.Responses;
-using Lykke.Service.BlockchainApi.Contract.Requests;
 using Lykke.Service.LiteCoin.API.Core.Address;
 using Lykke.Service.LiteCoin.API.Core.CashOut;
 using Lykke.Service.LiteCoin.API.Core.Constants;

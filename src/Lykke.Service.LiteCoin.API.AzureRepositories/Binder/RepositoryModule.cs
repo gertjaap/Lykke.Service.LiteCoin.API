@@ -3,20 +3,21 @@ using AzureStorage.Blob;
 using AzureStorage.Tables;
 using Common.Log;
 using Lykke.Service.LiteCoin.API.AzureRepositories.Asset;
-using Lykke.Service.LiteCoin.API.AzureRepositories.Operations.CashIn;
-using Lykke.Service.LiteCoin.API.AzureRepositories.Operations.CashOut;
+using Lykke.Service.LiteCoin.API.AzureRepositories.Operations;
 using Lykke.Service.LiteCoin.API.AzureRepositories.Queue;
 using Lykke.Service.LiteCoin.API.AzureRepositories.TransactionOutput.BroadcastedOutputs;
 using Lykke.Service.LiteCoin.API.AzureRepositories.TransactionOutput.SpentOutputs;
 using Lykke.Service.LiteCoin.API.AzureRepositories.Transactions;
+using Lykke.Service.LiteCoin.API.AzureRepositories.Wallet;
 using Lykke.Service.LiteCoin.API.Core.Asset;
-using Lykke.Service.LiteCoin.API.Core.CashIn;
-using Lykke.Service.LiteCoin.API.Core.CashOut;
+using Lykke.Service.LiteCoin.API.Core.Operation;
+using Lykke.Service.LiteCoin.API.Core.PendingEvent;
 using Lykke.Service.LiteCoin.API.Core.Queue;
 using Lykke.Service.LiteCoin.API.Core.Settings.ServiceSettings;
 using Lykke.Service.LiteCoin.API.Core.TransactionOutputs.BroadcastedOutputs;
 using Lykke.Service.LiteCoin.API.Core.TransactionOutputs.SpentOutputs;
 using Lykke.Service.LiteCoin.API.Core.Transactions;
+using Lykke.Service.LiteCoin.API.Core.Wallet;
 using Lykke.SettingsReader;
 
 namespace Lykke.Service.LiteCoin.API.AzureRepositories.Binder
@@ -40,32 +41,6 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Binder
 
         private void RegisterRepo(ContainerBuilder builder)
         {
-            builder.RegisterInstance(new UnconfirmedCashoutTransactionRepository(
-                AzureTableStorage<UnconfirmedCashoutTransactionEntity>.Create(_settings.Nested(p => p.Db.DataConnString),
-                    "UnconfirmedCashoutTransactions", _log)))
-                    .As<IUnconfirmedCashoutTransactionRepository>();
-
-            builder.RegisterInstance(new CashOutOperationRepository(
-                AzureTableStorage<CashOutOperationTableEntity>.Create(_settings.Nested(p => p.Db.DataConnString),
-                    "CashOutOperations", _log)))
-                    .As<ICashOutOperationRepository>();
-
-            builder.RegisterInstance(new CashOutEventRepository(
-                    AzureTableStorage<CashOutEventTableEntity>.Create(_settings.Nested(p => p.Db.DataConnString),
-                        "CashOutEvents", _log)))
-                .As<ICashOutEventRepository>();
-
-
-            builder.RegisterInstance(new CashInOperationRepository(
-                    AzureTableStorage<CashInOperationEntity>.Create(_settings.Nested(p => p.Db.DataConnString),
-                        "CashInOperations", _log)))
-                .As<ICashInOperationRepository>();
-
-            builder.RegisterInstance(new CashInEventRepository(
-                    AzureTableStorage<CashInEventTableEntity>.Create(_settings.Nested(p => p.Db.DataConnString),
-                        "CashInEvents", _log)))
-                .As<ICashInEventRepository>();
-
             builder.RegisterInstance(new BroadcastedOutputRepository(
                     AzureTableStorage<BroadcastedOutputTableEntity>.Create(_settings.Nested(p => p.Db.DataConnString),
                         "BroadcastedOutputs", _log)))
@@ -76,25 +51,33 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Binder
                         "SpentOutputs", _log)))
                 .As<ISpentOutputRepository>();
 
-            builder.RegisterInstance(new DetectedAddressTransactionsRepository(
-                    AzureTableStorage<DetectedAddressTransactionEntity>.Create(_settings.Nested(p => p.Db.DataConnString),
-                        "DetectedAddressTransactions", _log)))
-                .As<IDetectedAddressTransactionsRepository>();
-
-
-            builder.RegisterInstance(new PendingCashInEventRepository(
-                    AzureTableStorage<PendingCashInEventTableEntity>.Create(_settings.Nested(p => p.Db.DataConnString),
-                        "PendingCashInEvents", _log)))
-                .As<IPendingCashInEventRepository>();
-
-            builder.RegisterInstance(new PendingCashOutEventRepository(
-                    AzureTableStorage<PendingCashOutEventTableEntity>.Create(_settings.Nested(p => p.Db.DataConnString),
-                        "PendingCashOutEvents", _log)))
-                .As<IPendingCashOutEventRepository>();
-
-
             builder.RegisterInstance(new AssetRepository())
                 .As<IAssetRepository>();
+
+            builder.RegisterInstance(new OperationMetaRepository(
+                AzureTableStorage<OperationMetaEntity>.Create(_settings.Nested(p => p.Db.DataConnString),
+                    "OperationMeta", _log)))
+                .As<IOperationMetaRepository>();
+
+            builder.RegisterInstance(new UnconfirmedTransactionRepository(
+                AzureTableStorage<UnconfirmedTransactionEntity>.Create(_settings.Nested(p => p.Db.DataConnString),
+                    "UnconfirmedTransactions", _log)))
+                .As<IUnconfirmedTransactionRepository>();
+
+            builder.RegisterInstance(new ObservableOperationRepository(
+                AzureTableStorage<ObservableOperationEntity>.Create(_settings.Nested(p => p.Db.DataConnString),
+                    "ObservableOperations", _log)))
+                .As<IObservableOperationRepository>();
+
+            builder.RegisterInstance(new ObservableWalletRepository(
+                AzureTableStorage<ObservableWalletEntity>.Create(_settings.Nested(p => p.Db.DataConnString),
+                    "ObservableWallets", _log)))
+                .As<IObservableWalletRepository>();
+
+            builder.RegisterInstance(new WalletBalanceRepository(
+                    AzureTableStorage<WalletBalanceEntity>.Create(_settings.Nested(p => p.Db.DataConnString),
+                        "WalletBalances", _log)))
+                .As<IWalletBalanceRepository>();
         }
 
         private void RegisterQueue(ContainerBuilder builder)

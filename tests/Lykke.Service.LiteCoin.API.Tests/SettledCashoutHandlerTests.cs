@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Common.Log;
 using Lykke.Service.LiteCoin.API.Core.CashOut;
+using Lykke.Service.LiteCoin.API.Core.Operation;
 using Lykke.Service.LiteCoin.API.Core.Queue;
 using Lykke.Service.LiteCoin.API.Core.Queue.Contexts;
 using Lykke.Service.LiteCoin.API.Services.Operations.CashOut;
@@ -48,11 +49,11 @@ namespace Lykke.Service.LiteCoin.API.Tests
             return result;
         }
 
-        private Mock<ICashOutEventRepository> GetCashOutEventRepository(ICashOutOperation op)
+        private Mock<IOperationEventRepository> GetCashOutEventRepository(ICashOutOperation op)
         {
-            var result = new Mock<ICashOutEventRepository>();
+            var result = new Mock<IOperationEventRepository>();
             
-            result.Setup(p => p.InsertEvent(It.Is<ICashOutEvent>(x => x.OperationId == op.OperationId && x.Type == CashOutEventType.DetectedOnBlockChain)))
+            result.Setup(p => p.InsertEvent(It.Is<IOperationEvent>(x => x.OperationId == op.OperationId && x.Type == OperationEventType.DetectedOnBlockChain)))
                 .Returns(Task.CompletedTask)
                 .Verifiable();
 
