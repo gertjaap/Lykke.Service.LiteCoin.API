@@ -1,18 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using AzureStorage;
 using Lykke.Service.LiteCoin.API.AzureRepositories.Helpers;
-using Lykke.Service.LiteCoin.API.Core.Operation;
-using Lykke.Service.LiteCoin.API.Core.PendingEvent;
+using Lykke.Service.LiteCoin.API.Core.ObservableOperation;
 using Microsoft.WindowsAzure.Storage.Table;
 
 namespace Lykke.Service.LiteCoin.API.AzureRepositories.Transactions
 {
-    public class ObservableOperationEntity : TableEntity, IObservableTransactionData
+    public class ObservableOperationEntity : TableEntity, IObservableOperation
     {
-        BroadcastStatus IObservableTransactionData.Status => Enum.Parse<BroadcastStatus>(Status);
+        BroadcastStatus IObservableOperation.Status => Enum.Parse<BroadcastStatus>(Status);
 
         public string Status { get; set; }
 
@@ -22,9 +20,10 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Transactions
         public string AssetId { get; set; }
         public long AmountSatoshi { get; set; }
         public DateTime Updated { get; set; }
+        public string TxHash { get; set; }
 
         public static ObservableOperationEntity Map(string partitionKey, string rowKey,
-            IObservableTransactionData source)
+            IObservableOperation source)
         {
             return new ObservableOperationEntity
             {
@@ -36,7 +35,8 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Transactions
                 ToAddress = source.ToAddress,
                 AmountSatoshi = source.AmountSatoshi,
                 Status = source.Status.ToString(),
-                Updated = source.Updated
+                Updated = source.Updated,
+                TxHash = source.TxHash
             };
         }
 
@@ -52,7 +52,7 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Transactions
                 return operationId.ToString();
             }
 
-            public static ObservableOperationEntity Create(IObservableTransactionData source)
+            public static ObservableOperationEntity Create(IObservableOperation source)
             {
                 return Map(GeneratePartitionKey(), GenerateRowKey(source.OperationId), source);
             }
@@ -70,7 +70,7 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Transactions
                 return operationId.ToString();
             }
 
-            public static ObservableOperationEntity Create(IObservableTransactionData source)
+            public static ObservableOperationEntity Create(IObservableOperation source)
             {
                 return Map(GeneratePartitionKey(source.Status), GenerateRowKey(source.OperationId), source);
             }
@@ -86,30 +86,22 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Transactions
             _storage = storage;
         }
 
-        public async Task<IEnumerable<IObservableTransactionData>> Get(BroadcastStatus status, int skip, int take)
+        public async Task<IEnumerable<IObservableOperation>> Get(BroadcastStatus status, int skip, int take)
         {
             return await _storage.GetPagedResult(ObservableOperationEntity.ByStatus.GeneratePartitionKey(status), skip, take);
         }
 
-        public async Task Insert(IObservableTransactionData tx)
+        public async Task InsertOrReplace(IObservableOperation tx)
         {
-            await _storage.InsertAsync(ObservableOperationEntity.ByOperationId.Create(tx));
-            await _storage.InsertAsync(ObservableOperationEntity.ByStatus.Create(tx));
-        }
-
-        public async Task ChangeStatus(Guid operationId, BroadcastStatus status)
-        {
-            var dbEntity = await GetById(operationId);
+            var dbEntity = await GetById(tx.OperationId);
 
             if (dbEntity != null)
             {
                 await DeleteIfExist(dbEntity);
-
-                dbEntity.Status = status.ToString();
-                dbEntity.Updated = DateTime.UtcNow;
-
-                await Insert(dbEntity);
             }
+
+            await _storage.InsertAsync(ObservableOperationEntity.ByOperationId.Create(tx));
+            await _storage.InsertAsync(ObservableOperationEntity.ByStatus.Create(tx));
         }
 
         public async Task DeleteIfExist(params Guid[] operationIds)
@@ -122,7 +114,7 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Transactions
             }
         }
 
-        public async Task DeleteIfExist(IObservableTransactionData source)
+        public async Task DeleteIfExist(IObservableOperation source)
         {
             if (source != null)
             {

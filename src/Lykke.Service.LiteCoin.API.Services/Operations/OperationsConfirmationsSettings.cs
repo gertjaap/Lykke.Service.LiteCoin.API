@@ -6,8 +6,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Operations
 {
     public class OperationsConfirmationsSettings
     {
-        public int MinCashOutConfirmations { get; set; }
-        public int MinCashInConfirmations { get; set; }
-        public int MinCashInRetryConfirmations { get; set; }
+
+        public int MinConfirmationsToDetectOperation { get; set; }
     }
 }

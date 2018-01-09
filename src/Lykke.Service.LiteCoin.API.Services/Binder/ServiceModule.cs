@@ -7,6 +7,7 @@ using Lykke.Service.LiteCoin.API.Core.Broadcast;
 using Lykke.Service.LiteCoin.API.Core.CashIn;
 using Lykke.Service.LiteCoin.API.Core.CashOut;
 using Lykke.Service.LiteCoin.API.Core.Fee;
+using Lykke.Service.LiteCoin.API.Core.ObservableOperation;
 using Lykke.Service.LiteCoin.API.Core.Operation;
 using Lykke.Service.LiteCoin.API.Core.Settings.ServiceSettings;
 using Lykke.Service.LiteCoin.API.Core.Sign;
@@ -19,6 +20,7 @@ using Lykke.Service.LiteCoin.API.Services.Address;
 using Lykke.Service.LiteCoin.API.Services.BlockChainProviders.InsightApi;
 using Lykke.Service.LiteCoin.API.Services.Broadcast;
 using Lykke.Service.LiteCoin.API.Services.Fee;
+using Lykke.Service.LiteCoin.API.Services.ObservableOperation;
 using Lykke.Service.LiteCoin.API.Services.Operations;
 using Lykke.Service.LiteCoin.API.Services.Operations.CashIn;
 using Lykke.Service.LiteCoin.API.Services.Operations.CashOut;
@@ -55,11 +57,12 @@ namespace Lykke.Service.LiteCoin.API.Services.Binder
             RegisterTransactionOutputsServices(builder);
             RegisterTransactionBuilderServices(builder);
             RegisterBroadcastServices(builder);
+            RegisterObservableServices(builder);
         }
 
         private void RegisterNetwork(ContainerBuilder builder)
         {
-            NBitcoin.Litecoin.Networks.Register();
+            NBitcoin.Litecoin.Networks.EnsureRegistered();
 
             builder.RegisterInstance(Network.GetNetwork(_settings.CurrentValue.Network)).As<Network>();
         }
@@ -115,16 +118,13 @@ namespace Lykke.Service.LiteCoin.API.Services.Binder
             }).SingleInstance();
 
             builder.RegisterType<WalletService>().As<IWalletService>();
-            builder.RegisterType<WalletBalanceService>().As<IWalletBalanceService>();
         }
 
         private void RegisterDetectorServices(ContainerBuilder builder)
         {
             builder.RegisterInstance(new OperationsConfirmationsSettings
             {
-                MinCashInConfirmations = _settings.CurrentValue.MinCashInConfirmationsCount,
-                MinCashOutConfirmations = _settings.CurrentValue.MinCashOutConfirmationsCount,
-                MinCashInRetryConfirmations = _settings.CurrentValue.MinCashInRetryConfirmationsCount
+                MinConfirmationsToDetectOperation = _settings.CurrentValue.MinConfirmationsToDetectOperation
             });
             
             RegisterCashInDetectorServices(builder);
@@ -177,6 +177,12 @@ namespace Lykke.Service.LiteCoin.API.Services.Binder
         private void RegisterBroadcastServices(ContainerBuilder builder)
         {
             builder.RegisterType<BroadcastService>().As<IBroadcastService>();
+        }
+
+        private void RegisterObservableServices(ContainerBuilder builder)
+        {
+            builder.RegisterType<ObservableOperationService>().As<IObservableOperationService>();
+            builder.RegisterType<WalletBalanceService>().As<IWalletBalanceService>();
         }
     }
 }

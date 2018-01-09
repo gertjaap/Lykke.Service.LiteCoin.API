@@ -22,13 +22,7 @@ namespace Lykke.Service.LiteCoin.API.Core.Settings.ServiceSettings
         public long MaxFeeValue { get; set; } = 10000000;
         
         [Optional]
-        public int MinCashInConfirmationsCount { get; set; } = 3;
-
-        [Optional]
-        public int MinCashOutConfirmationsCount { get; set; } = 3;
-
-        [Optional]
-        public int MinCashInRetryConfirmationsCount { get; set; } = 100;
+        public int MinConfirmationsToDetectOperation { get; set; } = 3;
 
         [Optional]
         public int BroadcastedOutputsExpirationDays { get; set; } = 7;

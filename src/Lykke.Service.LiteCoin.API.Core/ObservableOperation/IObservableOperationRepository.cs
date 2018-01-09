@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Lykke.Service.LiteCoin.API.Core.Operation;
 
-namespace Lykke.Service.LiteCoin.API.Core.PendingEvent
+namespace Lykke.Service.LiteCoin.API.Core.ObservableOperation
 {
     public enum BroadcastStatus
     {
@@ -13,7 +12,7 @@ namespace Lykke.Service.LiteCoin.API.Core.PendingEvent
         Failed
     }
 
-    public interface IObservableTransactionData 
+    public interface IObservableOperation 
     {
         BroadcastStatus Status { get; }
         Guid OperationId { get;  }
@@ -22,9 +21,10 @@ namespace Lykke.Service.LiteCoin.API.Core.PendingEvent
         string AssetId { get;  }
         long AmountSatoshi { get;  }
         DateTime Updated { get;  }
+        string TxHash { get; }
     }
 
-    public class ObervableTransactionData : IObservableTransactionData
+    public class ObervableOperation : IObservableOperation
     {
         public Guid OperationId { get; set; }
         public string FromAddress { get; set; }
@@ -34,10 +34,11 @@ namespace Lykke.Service.LiteCoin.API.Core.PendingEvent
         public bool IncludeFee { get; set; }
         public DateTime Updated { get; set; }
         public BroadcastStatus Status { get; set; }
+        public string TxHash { get; set; }
 
-        public static ObervableTransactionData Create(IOperationMeta operation, BroadcastStatus status, DateTime? updated = null)
+        public static ObervableOperation Create(IOperationMeta operation, BroadcastStatus status, string txHash, DateTime? updated = null)
         {
-            return new ObervableTransactionData
+            return new ObervableOperation
             {
                 OperationId = operation.OperationId,
                 AmountSatoshi = operation.AmountSatoshi,
@@ -46,6 +47,7 @@ namespace Lykke.Service.LiteCoin.API.Core.PendingEvent
                 IncludeFee = operation.IncludeFee,
                 ToAddress = operation.ToAddress,
                 Status = status,
+                TxHash = txHash,
                 Updated = updated ?? DateTime.UtcNow
             };
         }
@@ -53,9 +55,8 @@ namespace Lykke.Service.LiteCoin.API.Core.PendingEvent
  
     public interface IObservableOperationRepository
     {
-        Task<IEnumerable<IObservableTransactionData>> Get(BroadcastStatus status, int skip, int take);
-        Task Insert(IObservableTransactionData tx);
-        Task ChangeStatus(Guid operationId, BroadcastStatus status);
+        Task<IEnumerable<IObservableOperation>> Get(BroadcastStatus status, int skip, int take);
+        Task InsertOrReplace(IObservableOperation tx);
         Task DeleteIfExist(params Guid[] operationIds);
     }
 }

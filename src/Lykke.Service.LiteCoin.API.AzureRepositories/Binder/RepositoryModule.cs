@@ -10,8 +10,8 @@ using Lykke.Service.LiteCoin.API.AzureRepositories.TransactionOutput.SpentOutput
 using Lykke.Service.LiteCoin.API.AzureRepositories.Transactions;
 using Lykke.Service.LiteCoin.API.AzureRepositories.Wallet;
 using Lykke.Service.LiteCoin.API.Core.Asset;
+using Lykke.Service.LiteCoin.API.Core.ObservableOperation;
 using Lykke.Service.LiteCoin.API.Core.Operation;
-using Lykke.Service.LiteCoin.API.Core.PendingEvent;
 using Lykke.Service.LiteCoin.API.Core.Queue;
 using Lykke.Service.LiteCoin.API.Core.Settings.ServiceSettings;
 using Lykke.Service.LiteCoin.API.Core.TransactionOutputs.BroadcastedOutputs;
