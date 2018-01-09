@@ -1,14 +1,10 @@
-﻿using System;
-using System.Net;
+﻿using System.Net;
 using System.Threading.Tasks;
 using Lykke.Service.BlockchainApi.Contract.Transactions;
-using Lykke.Service.BlockchainSignService.Client.AutorestClient.Models;
 using Lykke.Service.LiteCoin.API.Core.Broadcast;
 using Lykke.Service.LiteCoin.API.Core.Exceptions;
 using Microsoft.AspNetCore.Mvc;
-using NBitcoin;
 using Swashbuckle.AspNetCore.SwaggerGen;
-using ErrorResponse = Lykke.Common.Api.Contract.Responses.ErrorResponse;
 
 namespace Lykke.Service.LiteCoin.API.Controllers
 {

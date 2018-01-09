@@ -4,8 +4,6 @@ using Lykke.Service.BlockchainSignService.Client;
 using Lykke.Service.LiteCoin.API.Core.Address;
 using Lykke.Service.LiteCoin.API.Core.BlockChainReaders;
 using Lykke.Service.LiteCoin.API.Core.Broadcast;
-using Lykke.Service.LiteCoin.API.Core.CashIn;
-using Lykke.Service.LiteCoin.API.Core.CashOut;
 using Lykke.Service.LiteCoin.API.Core.Fee;
 using Lykke.Service.LiteCoin.API.Core.ObservableOperation;
 using Lykke.Service.LiteCoin.API.Core.Operation;
@@ -22,8 +20,6 @@ using Lykke.Service.LiteCoin.API.Services.Broadcast;
 using Lykke.Service.LiteCoin.API.Services.Fee;
 using Lykke.Service.LiteCoin.API.Services.ObservableOperation;
 using Lykke.Service.LiteCoin.API.Services.Operations;
-using Lykke.Service.LiteCoin.API.Services.Operations.CashIn;
-using Lykke.Service.LiteCoin.API.Services.Operations.CashOut;
 using Lykke.Service.LiteCoin.API.Services.Sign;
 using Lykke.Service.LiteCoin.API.Services.SourceWallet;
 using Lykke.Service.LiteCoin.API.Services.TransactionOutputs;
@@ -127,34 +123,8 @@ namespace Lykke.Service.LiteCoin.API.Services.Binder
                 MinConfirmationsToDetectOperation = _settings.CurrentValue.MinConfirmationsToDetectOperation
             });
             
-            RegisterCashInDetectorServices(builder);
-            RegisterCashOutsDetectorServices(builder);
         }
-
-        private void RegisterCashInDetectorServices(ContainerBuilder builder)
-        {
-            builder.RegisterType<CashInOperationDetectorFacade>()
-                .As<ICashInOperationDetectorFacade>();
-
-            builder.RegisterType<SettledCashInTransactionDetector>()
-                .As<ISettledCashInTransactionDetector>();
-
-            builder.RegisterType<SettledCashInTransactionHandler>()
-                .As<ISettledCashInTransactionHandler>();
-        }
-
-        private void RegisterCashOutsDetectorServices(ContainerBuilder builder)
-        {
-            builder.RegisterType<SettledCashOutTransactionDetector>()
-                .As<ISettledCashOutTransactionDetector>();
-
-            builder.RegisterType<SettledCashoutTransactionHandler>()
-                .As<ISettledCashoutTransactionHandler>();
-
-            builder.RegisterType<CashOutsOperationDetectorFacade>()
-                .As<ICashOutsOperationDetectorFacade>();
-        }
-
+        
         private void RegisterTransactionOutputsServices(ContainerBuilder builder)
         {
             builder.RegisterInstance(new TransactionOutputsExpirationSettings
@@ -164,7 +134,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Binder
             });
 
             builder.RegisterType<TransactionOutputsService>().As<ITransactionOutputsService>();
-            builder.RegisterType<SpentOutputService>().As<ISpentOutputService>();
+            builder.RegisterType<SpentOutputService>().As<ISpentOutputService>().SingleInstance();
             builder.RegisterType<BroadcastedOutputsService>().As<IBroadcastedOutputsService>();
         }
 

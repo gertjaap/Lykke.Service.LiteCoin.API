@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Net;
 using Lykke.Common.Api.Contract.Responses;
 using Lykke.Service.LiteCoin.API.Core.Services;

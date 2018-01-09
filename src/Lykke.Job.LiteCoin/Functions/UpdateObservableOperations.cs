@@ -18,16 +18,18 @@ namespace Lykke.Job.LiteCoin.Functions
         private readonly IUnconfirmedTransactionRepository _unconfirmedTransactionRepository;
         private readonly IBlockChainProvider _blockChainProvider;
         private readonly IObservableOperationRepository _observableOperationRepository;
-        private OperationsConfirmationsSettings _confirmationsSettings;
+        private readonly OperationsConfirmationsSettings _confirmationsSettings;
         private readonly ILog _log;
         private readonly IOperationMetaRepository _operationMetaRepository;
+        private readonly IOperationEventRepository _operationEventRepository;
         
         public UpdateObservableOperations(IUnconfirmedTransactionRepository unconfirmedTransactionRepository, 
             IBlockChainProvider blockChainProvider,
             IObservableOperationRepository observableOperationRepository, 
             OperationsConfirmationsSettings confirmationsSettings,
             ILog log,
-            IOperationMetaRepository operationMetaRepository)
+            IOperationMetaRepository operationMetaRepository, 
+            IOperationEventRepository operationEventRepository)
         {
             _unconfirmedTransactionRepository = unconfirmedTransactionRepository;
             _blockChainProvider = blockChainProvider;
@@ -35,6 +37,7 @@ namespace Lykke.Job.LiteCoin.Functions
             _confirmationsSettings = confirmationsSettings;
             _log = log;
             _operationMetaRepository = operationMetaRepository;
+            _operationEventRepository = operationEventRepository;
         }
 
         [TimerTrigger("00:10:00")]
@@ -65,6 +68,8 @@ namespace Lykke.Job.LiteCoin.Functions
                 if (isCompleted)
                 {
                     await _unconfirmedTransactionRepository.DeleteIfExist(unconfirmedTransaction.OperationId);
+                    await _operationEventRepository.InsertIfNotExist(OperationEvent.Create(unconfirmedTransaction.OperationId,
+                        OperationEventType.DetectedOnBlockChain));
                 }
             }
         }
