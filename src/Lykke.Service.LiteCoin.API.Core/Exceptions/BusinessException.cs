@@ -22,14 +22,14 @@ namespace Lykke.Service.LiteCoin.API.Core.Exceptions
         TransactionConcurrentInputsProblem = 2,
         BadInputParameter = 3,
         NotEnoughFundsAvailable = 4,
-        CashOutOperationNotFound = 5,
-        CashInOperationNotFound = 6,
+        OperationNotFound = 5,
         WalletNotFound = 7,
         BroadcastError = 8,
         SignError = 9,
         BalanceIsLessThanFee = 10,
         EntityAlreadyExist = 11,
-        EntityNotExist = 12
+        EntityNotExist = 12,
+        TransactionAlreadyBroadcasted = 13
 
     }
 }

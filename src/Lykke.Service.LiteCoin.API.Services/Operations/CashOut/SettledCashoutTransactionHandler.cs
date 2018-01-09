@@ -52,7 +52,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Operations.CashOut
             await _cashOutNotificationRepository.Insert(PendingCashOutEvent.Create(operation, PendingCashOutEventStatusType.Completed));
             await _unconfirmedCashoutTransactionRepository.Remove(tx.TxHash);
 
-            await _eventRepository.InsertEvent(OperationEvent.Create(operation.OperationId,
+            await _eventRepository.InsertIfNotExist(OperationEvent.Create(operation.OperationId,
                 OperationEventType.DetectedOnBlockChain));
         }
     }

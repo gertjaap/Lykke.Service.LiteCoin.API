@@ -45,7 +45,7 @@ namespace Lykke.Service.LiteCoin.API.Controllers
             catch (BusinessException e) when(e.Code == ErrorCode.EntityAlreadyExist)
             {
 
-                return StatusCode((int) HttpStatusCode.Conflict);
+                return StatusCode(409);
             }
 
             return Ok();

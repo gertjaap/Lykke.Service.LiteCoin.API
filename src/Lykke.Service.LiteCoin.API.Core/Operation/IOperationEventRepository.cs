@@ -39,7 +39,7 @@ namespace Lykke.Service.LiteCoin.API.Core.Operation
 
     public interface IOperationEventRepository
     {
-        Task InsertEvent(IOperationEvent operationEvent);
+        Task InsertIfNotExist(IOperationEvent operationEvent);
         Task<bool> Exist(Guid operationId, OperationEventType type);
     }
 }

@@ -53,7 +53,7 @@ namespace Lykke.Service.LiteCoin.API.Tests
         {
             var result = new Mock<IOperationEventRepository>();
             
-            result.Setup(p => p.InsertEvent(It.Is<IOperationEvent>(x => x.OperationId == op.OperationId && x.Type == OperationEventType.DetectedOnBlockChain)))
+            result.Setup(p => p.InsertIfNotExist(It.Is<IOperationEvent>(x => x.OperationId == op.OperationId && x.Type == OperationEventType.DetectedOnBlockChain)))
                 .Returns(Task.CompletedTask)
                 .Verifiable();
 

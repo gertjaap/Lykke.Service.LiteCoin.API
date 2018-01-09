@@ -49,7 +49,7 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Operations.CashOut
             _storage = storage;
         }
 
-        public Task InsertEvent(IOperationEvent operationEvent)
+        public Task InsertIfNotExist(IOperationEvent operationEvent)
         {
             return _storage.InsertAsync(OperationEventTableEntity.Create(operationEvent));
         }
