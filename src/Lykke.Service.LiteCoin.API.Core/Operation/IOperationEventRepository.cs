@@ -6,7 +6,6 @@ namespace Lykke.Service.LiteCoin.API.Core.Operation
 
     public enum OperationEventType
     {
-        Builded,
         Broadcasted,
         DetectedOnBlockChain
     }

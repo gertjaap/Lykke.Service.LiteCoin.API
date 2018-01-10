@@ -4,8 +4,8 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using Lykke.Common.Api.Contract.Responses;
 using Lykke.Service.BlockchainApi.Contract.Balances;
-using Lykke.Service.BlockchainSignService.Client.AutorestClient.Models;
 using Lykke.Service.LiteCoin.API.Core.Address;
 using Lykke.Service.LiteCoin.API.Core.Exceptions;
 using Lykke.Service.LiteCoin.API.Core.Wallet;
@@ -35,7 +35,7 @@ namespace Lykke.Service.LiteCoin.API.Controllers
         {
             if (!_addressValidator.IsValid(address))
             {
-                return BadRequest(new ErrorResponse("Invalid address"));
+                return BadRequest(ErrorResponse.Create("Invalid address"));
             }
 
             try
@@ -60,7 +60,7 @@ namespace Lykke.Service.LiteCoin.API.Controllers
         {
             if (!_addressValidator.IsValid(address))
             {
-                return BadRequest(new ErrorResponse("Invalid address"));
+                return BadRequest(ErrorResponse.Create("Invalid address"));
             }
 
             try

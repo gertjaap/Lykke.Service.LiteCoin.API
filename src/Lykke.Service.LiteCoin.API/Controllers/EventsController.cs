@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Lykke.Common.Api.Contract.Responses;
 using Lykke.Service.BlockchainApi.Contract.Transactions;
-using Lykke.Service.BlockchainSignService.Client.AutorestClient.Models;
 using Lykke.Service.LiteCoin.API.Core.ObservableOperation;
 using Lykke.Service.LiteCoin.API.Helpers;
 using Microsoft.AspNetCore.Mvc;
@@ -23,10 +23,10 @@ namespace Lykke.Service.LiteCoin.API.Controllers
 
 
         [HttpGet("api/transactions/completed")]
-        [SwaggerOperation(nameof(GetCompletedTransaction))]
+        [SwaggerOperation(nameof(GetCompletedTransactions))]
         [ProducesResponseType(typeof(CompletedTransactionContract[]),(int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), 400)]
-        public async Task<IEnumerable<CompletedTransactionContract>> GetCompletedTransaction([FromQuery]int skip, [FromQuery]int take)
+        public async Task<IEnumerable<CompletedTransactionContract>> GetCompletedTransactions([FromQuery]int skip, [FromQuery]int take)
         {
             return (await _observableOperationService.GetCompletedOperations(skip, take)).Select(p =>
                 new CompletedTransactionContract
@@ -37,17 +37,18 @@ namespace Lykke.Service.LiteCoin.API.Controllers
                     Hash = p.TxHash,
                     FromAddress = p.FromAddress,
                     ToAddress = p.ToAddress,
-                    Timestamp = p.Updated
+                    Timestamp = p.Updated,
+                    Fee = MoneyConversionHelper.SatoshiToContract(p.FeeSatoshi)
                 });
         }
 
 
 
-        [HttpGet("api/transactions/in-progress")]
-        [SwaggerOperation(nameof(GetFailedTransaction))]
+        [HttpGet("api/transactions/failed")]
+        [SwaggerOperation(nameof(GetFailedTransactions))]
         [ProducesResponseType(typeof(FailedTransactionContract[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), 400)]
-        public async Task<IEnumerable<FailedTransactionContract>> GetFailedTransaction([FromQuery]int skip, [FromQuery]int take)
+        public async Task<IEnumerable<FailedTransactionContract>> GetFailedTransactions([FromQuery]int skip, [FromQuery]int take)
         {
             return (await _observableOperationService.GetFailedOperations(skip, take)).Select(p =>
                 new FailedTransactionContract
@@ -57,25 +58,27 @@ namespace Lykke.Service.LiteCoin.API.Controllers
                     AssetId = p.AssetId,
                     FromAddress = p.FromAddress,
                     ToAddress = p.ToAddress,
-                    Timestamp = p.Updated
+                    Timestamp = p.Updated,
+                    Fee = MoneyConversionHelper.SatoshiToContract(p.FeeSatoshi)
                 });
         }
         
         [HttpGet("api/transactions/in-progress")]
-        [SwaggerOperation(nameof(GetFailedTransaction))]
-        [ProducesResponseType(typeof(FailedTransactionContract[]), (int)HttpStatusCode.OK)]
+        [SwaggerOperation(nameof(GetInProgressTransactions))]
+        [ProducesResponseType(typeof(InProgressTransactionContract[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), 400)]
-        public async Task<IEnumerable<FailedTransactionContract>> RemoveF([FromQuery]int skip, [FromQuery]int take)
+        public async Task<IEnumerable<InProgressTransactionContract>> GetInProgressTransactions([FromQuery]int skip, [FromQuery]int take)
         {
             return (await _observableOperationService.GetFailedOperations(skip, take)).Select(p =>
-                new FailedTransactionContract
+                new InProgressTransactionContract
                 {
                     Amount = MoneyConversionHelper.SatoshiToContract(p.AmountSatoshi),
                     OperationId = p.OperationId,
                     AssetId = p.AssetId,
                     FromAddress = p.FromAddress,
                     ToAddress = p.ToAddress,
-                    Timestamp = p.Updated
+                    Timestamp = p.Updated,
+                    Fee = MoneyConversionHelper.SatoshiToContract(p.FeeSatoshi)
                 });
         }
 

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Lykke.Service.LiteCoin.API.Core.Address;
+﻿using Lykke.Service.LiteCoin.API.Core.Address;
 using NBitcoin;
 
 namespace Lykke.Service.LiteCoin.API.Services.Address

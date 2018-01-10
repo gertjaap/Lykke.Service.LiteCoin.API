@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using AzureStorage;
-using Lykke.Service.LiteCoin.API.Core.CashOut;
 using Lykke.Service.LiteCoin.API.Core.Operation;
 using Microsoft.WindowsAzure.Storage.Table;
 
-namespace Lykke.Service.LiteCoin.API.AzureRepositories.Operations.CashOut
+namespace Lykke.Service.LiteCoin.API.AzureRepositories.Operations
 {
     public class OperationEventTableEntity : TableEntity, IOperationEvent
     {

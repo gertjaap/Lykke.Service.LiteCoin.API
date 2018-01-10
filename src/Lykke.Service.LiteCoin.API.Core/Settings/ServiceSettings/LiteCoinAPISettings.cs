@@ -2,12 +2,11 @@
 
 namespace Lykke.Service.LiteCoin.API.Core.Settings.ServiceSettings
 {
-    public class LiteCoinAPISettings
+    public class LiteCoinApiSettings
     {
         public DbSettings Db { get; set; }
         public string Network { get; set; }
         public string InsightAPIUrl { get; set; }
-        public string SignFacadeUrl { get; set; }
 
         public string EventsWebHook { get; set; }
 

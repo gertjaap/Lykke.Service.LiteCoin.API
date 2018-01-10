@@ -3,9 +3,15 @@ using NBitcoin;
 
 namespace Lykke.Service.LiteCoin.API.Core.Transactions
 {
+    public interface IBuildedTransaction
+    {
+        Transaction TransactionData { get; }
+        Money Fee { get; }
+        Money Amount { get; }
+    }
     public interface ITransactionBuilderService
     {
-        Task<Transaction> GetTransferTransaction(BitcoinAddress source, BitcoinAddress destination, Money amount, bool includeFee);
+        Task<IBuildedTransaction> GetTransferTransaction(BitcoinAddress source, BitcoinAddress destination, Money amount, bool includeFee);
 
     }
 }

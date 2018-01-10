@@ -5,7 +5,7 @@ namespace Lykke.Service.LiteCoin.API.Core.Settings
 {
     public class AppSettings
     {
-        public LiteCoinAPISettings LiteCoinAPI { get; set; }
+        public LiteCoinApiSettings LiteCoinAPI { get; set; }
         public SlackNotificationsSettings SlackNotifications { get; set; }
     }
 }

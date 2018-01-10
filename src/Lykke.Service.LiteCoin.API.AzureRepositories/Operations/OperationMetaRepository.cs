@@ -15,6 +15,7 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Operations
         public string ToAddress { get; set; }
         public string AssetId { get; set; }
         public long AmountSatoshi { get; set; }
+        public long FeeSatoshi { get; set; }
         public bool IncludeFee { get; set; }
         public DateTime Inserted { get; set; }
 
@@ -30,7 +31,8 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Operations
                 OperationId = source.OperationId,
                 IncludeFee = source.IncludeFee,
                 AmountSatoshi = source.AmountSatoshi,
-                Inserted = source.Inserted
+                Inserted = source.Inserted,
+                FeeSatoshi = source.FeeSatoshi
             };
         }
 

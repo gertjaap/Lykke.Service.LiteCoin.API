@@ -10,7 +10,6 @@ using Lykke.Service.LiteCoin.API.Core.BlockChainReaders;
 using Lykke.Service.LiteCoin.API.Services.BlockChainProviders.Helpers;
 using Lykke.Service.LiteCoin.API.Services.BlockChainProviders.InsightApi.Contracts;
 using Lykke.Service.LiteCoin.API.Services.Helpers;
-using MoreLinq;
 using NBitcoin;
 
 namespace Lykke.Service.LiteCoin.API.Services.BlockChainProviders.InsightApi

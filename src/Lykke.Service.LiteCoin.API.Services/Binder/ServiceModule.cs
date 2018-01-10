@@ -1,6 +1,5 @@
 ﻿using Autofac;
 using Common.Log;
-using Lykke.Service.BlockchainSignService.Client;
 using Lykke.Service.LiteCoin.API.Core.Address;
 using Lykke.Service.LiteCoin.API.Core.BlockChainReaders;
 using Lykke.Service.LiteCoin.API.Core.Broadcast;
@@ -8,7 +7,6 @@ using Lykke.Service.LiteCoin.API.Core.Fee;
 using Lykke.Service.LiteCoin.API.Core.ObservableOperation;
 using Lykke.Service.LiteCoin.API.Core.Operation;
 using Lykke.Service.LiteCoin.API.Core.Settings.ServiceSettings;
-using Lykke.Service.LiteCoin.API.Core.Sign;
 using Lykke.Service.LiteCoin.API.Core.TransactionOutputs;
 using Lykke.Service.LiteCoin.API.Core.TransactionOutputs.BroadcastedOutputs;
 using Lykke.Service.LiteCoin.API.Core.TransactionOutputs.SpentOutputs;
@@ -20,8 +18,6 @@ using Lykke.Service.LiteCoin.API.Services.Broadcast;
 using Lykke.Service.LiteCoin.API.Services.Fee;
 using Lykke.Service.LiteCoin.API.Services.ObservableOperation;
 using Lykke.Service.LiteCoin.API.Services.Operations;
-using Lykke.Service.LiteCoin.API.Services.Sign;
-using Lykke.Service.LiteCoin.API.Services.SourceWallet;
 using Lykke.Service.LiteCoin.API.Services.TransactionOutputs;
 using Lykke.Service.LiteCoin.API.Services.TransactionOutputs.BroadcastedOutputs;
 using Lykke.Service.LiteCoin.API.Services.TransactionOutputs.SpentOutputs;
@@ -35,8 +31,8 @@ namespace Lykke.Service.LiteCoin.API.Services.Binder
     public  class ServiceModule:Module
     {
         private readonly ILog _log;
-        private readonly IReloadingManager<LiteCoinAPISettings> _settings;
-        public ServiceModule(IReloadingManager<LiteCoinAPISettings> settings, ILog log)
+        private readonly IReloadingManager<LiteCoinApiSettings> _settings;
+        public ServiceModule(IReloadingManager<LiteCoinApiSettings> settings, ILog log)
         {
             _log = log;
             _settings = settings;
@@ -48,7 +44,6 @@ namespace Lykke.Service.LiteCoin.API.Services.Binder
             RegisterFeeServices(builder);
             RegisterAddressValidatorServices(builder);
             RegisterInsightApiBlockChainReaders(builder);
-            RegisterSignFacadeServices(builder);
             RegisterDetectorServices(builder);
             RegisterTransactionOutputsServices(builder);
             RegisterTransactionBuilderServices(builder);
@@ -92,29 +87,6 @@ namespace Lykke.Service.LiteCoin.API.Services.Binder
             builder.RegisterType<InsightApiBlockChainProvider>().As<IBlockChainProvider>();
         }
         
-        private void RegisterSignFacadeServices(ContainerBuilder builder)
-        {
-            builder.RegisterInstance(new SignSettings
-            {
-                Url = _settings.CurrentValue.SignFacadeUrl
-            }).SingleInstance();
-
-            builder.RegisterInstance(new BlockchainSignServiceClient(_settings.CurrentValue.SignFacadeUrl, _log)).AsSelf();
-            builder.RegisterType<SignService>().As<ISignService>().SingleInstance();
-            builder.RegisterType<BlockchainSignServiceApiProvider>().As<IBlockchainSignServiceApiProvider>().SingleInstance();
-
-            RegisterWalletServices(builder);
-        }
-
-        private void RegisterWalletServices(ContainerBuilder builder)
-        {
-            builder.RegisterInstance(new HotWalletsSettings
-            {
-                SourceWalletPublicAddresses = _settings.CurrentValue.SourceWallets
-            }).SingleInstance();
-
-            builder.RegisterType<WalletService>().As<IWalletService>();
-        }
 
         private void RegisterDetectorServices(ContainerBuilder builder)
         {

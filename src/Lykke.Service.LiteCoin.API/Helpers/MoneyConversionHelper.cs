@@ -13,9 +13,9 @@ namespace Lykke.Service.LiteCoin.API.Helpers
 
         public static long SatoshiFromContract(string input)
         {
-            var satoshi = Conversions.CoinsFromContract(input, Constants.AssetsContants.LiteCoin.Accuracy);
+            var btc = Conversions.CoinsFromContract(input, Constants.AssetsContants.LiteCoin.Accuracy);
 
-            return new Money(satoshi, MoneyUnit.Satoshi).Satoshi;
+            return new Money(btc, MoneyUnit.BTC).Satoshi;
         }
     }
 }

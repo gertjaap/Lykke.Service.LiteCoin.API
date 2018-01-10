@@ -9,6 +9,23 @@ using NBitcoin;
 
 namespace Lykke.Service.LiteCoin.API.Services.Transactions
 {
+    public class BuildedTransaction: IBuildedTransaction
+    {
+        public Transaction TransactionData { get; set; }
+        public Money Fee { get; set; }
+        public Money Amount { get; set; }
+
+        public static BuildedTransaction Create(Transaction transaction, Money fee, Money amount)
+        {
+            return new BuildedTransaction
+            {
+                Amount = amount,
+                Fee = fee,
+                TransactionData = transaction
+            };
+        }
+    }
+
     public class TransactionBuilderService : ITransactionBuilderService
     {
         private readonly ITransactionOutputsService _transactionOutputsService;
@@ -21,20 +38,16 @@ namespace Lykke.Service.LiteCoin.API.Services.Transactions
             _feeService = feeService;
         }
 
-        public async Task<Transaction> GetTransferTransaction(BitcoinAddress source,
+        public async Task<IBuildedTransaction> GetTransferTransaction(BitcoinAddress source,
             BitcoinAddress destination, Money amount, bool includeFee)
         {
             var builder = new TransactionBuilder();
 
-            await TransferOneDirection(builder, source, amount.Satoshi, destination, includeFee);
-
-
-            var buildedTransaction = builder.BuildTransaction(false);
-
-            return buildedTransaction;
+            return await TransferOneDirection(builder, source, amount.Satoshi, destination, includeFee);
+            
         }
 
-        private async Task TransferOneDirection(TransactionBuilder builder, 
+        private async Task<IBuildedTransaction> TransferOneDirection(TransactionBuilder builder, 
             BitcoinAddress @from, long amount, BitcoinAddress to, bool includeFee)
         {
             var fromStr = from.ToString();
@@ -45,11 +58,12 @@ namespace Lykke.Service.LiteCoin.API.Services.Transactions
                 balance - amount < new TxOut(Money.Zero, from)
                     .GetDustThreshold(builder.StandardTransactionPolicy.MinRelayTxFee).Satoshi)
                 amount = balance;
-            await SendWithChange(builder,  coins, to, new Money(amount),
+
+            return await SendWithChange(builder,  coins, to, new Money(amount),
                 from, includeFee);
         }
 
-        public async Task<long> SendWithChange(TransactionBuilder builder, 
+        public async Task<IBuildedTransaction> SendWithChange(TransactionBuilder builder, 
             List<CoinWithSettlementInfo> coins, IDestination destination, Money amount, IDestination changeDestination, bool includeFee)
         {
             if (amount.Satoshi <= 0)
@@ -113,7 +127,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Transactions
             builder.BuildTransaction(false);
             
 
-            return amount;
+            return BuildedTransaction.Create(builder.BuildTransaction(false), fee, amount);
         }
 
         private static int GetCoinsCount(Money amount, List<CoinWithSettlementInfo> orderedCoins, ref Money sendAmount)

@@ -19,6 +19,7 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Transactions
         public string ToAddress { get; set; }
         public string AssetId { get; set; }
         public long AmountSatoshi { get; set; }
+        public long FeeSatoshi { get; set; }
         public DateTime Updated { get; set; }
         public string TxHash { get; set; }
 
@@ -36,7 +37,8 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Transactions
                 AmountSatoshi = source.AmountSatoshi,
                 Status = source.Status.ToString(),
                 Updated = source.Updated,
-                TxHash = source.TxHash
+                TxHash = source.TxHash,
+                FeeSatoshi = source.FeeSatoshi
             };
         }
 

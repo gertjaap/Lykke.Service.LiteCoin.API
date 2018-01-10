@@ -2,7 +2,7 @@
 using Lykke.Service.LiteCoin.API.Core.Domain.Health;
 using Lykke.Service.LiteCoin.API.Core.Services;
 
-namespace Lykke.Service.LiteCoin.API.Services
+namespace Lykke.Service.LiteCoin.API.Services.Health
 {
     // NOTE: See https://lykkex.atlassian.net/wiki/spaces/LKEWALLET/pages/35755585/Add+your+app+to+Monitoring
     public class HealthService : IHealthService

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Lykke.Service.LiteCoin.API.Core.Constants
+﻿namespace Lykke.Service.LiteCoin.API.Core.Constants
 {
     public static class Constants
     {

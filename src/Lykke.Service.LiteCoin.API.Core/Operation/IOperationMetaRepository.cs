@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Lykke.Service.LiteCoin.API.Core.Operation
@@ -16,6 +14,7 @@ namespace Lykke.Service.LiteCoin.API.Core.Operation
         string AssetId { get; }
 
         long AmountSatoshi { get; }
+        long FeeSatoshi { get; }
 
         bool IncludeFee { get; }
         DateTime Inserted { get; }
@@ -28,11 +27,12 @@ namespace Lykke.Service.LiteCoin.API.Core.Operation
         public string ToAddress { get; set; }
         public string AssetId { get; set; }
         public long AmountSatoshi { get; set; }
+        public long FeeSatoshi { get; set; }
         public bool IncludeFee { get; set; }
         public DateTime Inserted { get; set; }
 
         public static OperationMeta Create(Guid operationId, string fromAddress, string toAddress, string assetId,
-            long amountSatoshi, bool includeFee, DateTime? inserted = null)
+            long amountSatoshi, long feeSatoshi, bool includeFee, DateTime? inserted = null)
         {
             return new OperationMeta
             {
@@ -42,7 +42,8 @@ namespace Lykke.Service.LiteCoin.API.Core.Operation
                 IncludeFee = includeFee,
                 OperationId = operationId,
                 ToAddress = toAddress,
-                Inserted = inserted ?? DateTime.UtcNow
+                Inserted = inserted ?? DateTime.UtcNow,
+                FeeSatoshi = feeSatoshi
             };
         }
     }

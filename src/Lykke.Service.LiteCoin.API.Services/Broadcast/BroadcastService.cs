@@ -6,7 +6,6 @@ using Lykke.Service.LiteCoin.API.Core.BlockChainReaders;
 using Lykke.Service.LiteCoin.API.Core.Broadcast;
 using Lykke.Service.LiteCoin.API.Core.Exceptions;
 using Lykke.Service.LiteCoin.API.Core.Operation;
-using Lykke.Service.LiteCoin.API.Core.TransactionOutputs;
 using Lykke.Service.LiteCoin.API.Core.TransactionOutputs.BroadcastedOutputs;
 using Lykke.Service.LiteCoin.API.Core.Transactions;
 using NBitcoin;

@@ -19,7 +19,8 @@ namespace Lykke.Service.LiteCoin.API.Core.ObservableOperation
         string FromAddress { get; }
         string ToAddress { get;  }
         string AssetId { get;  }
-        long AmountSatoshi { get;  }
+        long AmountSatoshi { get; }
+        long FeeSatoshi { get; }
         DateTime Updated { get;  }
         string TxHash { get; }
     }
@@ -31,6 +32,7 @@ namespace Lykke.Service.LiteCoin.API.Core.ObservableOperation
         public string ToAddress { get; set; }
         public string AssetId { get; set; }
         public long AmountSatoshi { get; set; }
+        public long FeeSatoshi { get; set; }
         public bool IncludeFee { get; set; }
         public DateTime Updated { get; set; }
         public BroadcastStatus Status { get; set; }
@@ -48,7 +50,8 @@ namespace Lykke.Service.LiteCoin.API.Core.ObservableOperation
                 ToAddress = operation.ToAddress,
                 Status = status,
                 TxHash = txHash,
-                Updated = updated ?? DateTime.UtcNow
+                Updated = updated ?? DateTime.UtcNow,
+                FeeSatoshi = operation.FeeSatoshi
             };
         }
     }

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Lykke.Service.LiteCoin.API.Core.Wallet;
 using NBitcoin;
 
 namespace Lykke.Service.LiteCoin.API.Core.Operation
@@ -11,7 +10,7 @@ namespace Lykke.Service.LiteCoin.API.Core.Operation
             BitcoinAddress fromAddress,
             BitcoinAddress toAddress,
             string assetId,
-            Money amount, 
+            Money amountToSend, 
             bool includeFee);
     }
 }

@@ -5,6 +5,7 @@ using Lykke.JobTriggers.Extenstions;
 using Lykke.Service.LiteCoin.API.Core.Services;
 using Lykke.Service.LiteCoin.API.Core.Settings.ServiceSettings;
 using Lykke.Service.LiteCoin.API.Services;
+using Lykke.Service.LiteCoin.API.Services.Health;
 using Lykke.Service.LiteCoin.API.Services.LifeiteManagers;
 using Lykke.SettingsReader;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,12 +14,12 @@ namespace Lykke.Job.LiteCoin.Modules
 {
     public class LiteCoinJobModule : Module
     {
-        private readonly IReloadingManager<LiteCoinAPISettings> _settings;
+        private readonly IReloadingManager<LiteCoinApiSettings> _settings;
         private readonly ILog _log;
         // NOTE: you can remove it if you don't need to use IServiceCollection extensions to register service specific dependencies
         private readonly IServiceCollection _services;
 
-        public LiteCoinJobModule(IReloadingManager<LiteCoinAPISettings> settings, ILog log)
+        public LiteCoinJobModule(IReloadingManager<LiteCoinApiSettings> settings, ILog log)
         {
             _settings = settings;
             _log = log;
