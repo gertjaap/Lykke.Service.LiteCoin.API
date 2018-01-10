@@ -40,7 +40,7 @@ namespace Lykke.Job.LiteCoin.Functions
             _operationEventRepository = operationEventRepository;
         }
 
-        [TimerTrigger("00:10:00")]
+        [TimerTrigger("00:02:00")]
         public async Task DetectUnconfirmedTransactions()
         {
             var unconfirmedTxs = await _unconfirmedTransactionRepository.GetAll();
