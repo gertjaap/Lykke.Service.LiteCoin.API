@@ -10,15 +10,8 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Helpers
     {
         public static async Task<IEnumerable<T>> GetPagedResult<T>(this INoSQLTableStorage<T> storage, string partition, int skip, int take) where T:ITableEntity, new()
         {
-            var query = new TableQuery<T>()
-                .Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, partition))
-                .Take(take);
-
-            var page = new AzureStorage.Tables.Paging.PagingInfo { ElementCount = skip };
-            
-            var result  = await storage.ExecuteQueryWithPaginationAsync(query, page);
-
-            return result.ToList();
+            var all = await storage.GetDataAsync(partition);
+            return all.Skip(skip).Take(take);
         } 
     }
 }

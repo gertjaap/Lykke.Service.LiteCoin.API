@@ -2,7 +2,7 @@
 {
     public static class Constants
     {
-        public static class AssetsContants
+        public static class Assets
         {
             public static class LiteCoin
             {

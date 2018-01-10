@@ -47,7 +47,7 @@ namespace Lykke.Service.LiteCoin.API.Controllers
                 throw new BusinessException($"Amount can't be less or equal to zero: {amountSatoshi}", ErrorCode.BadInputParameter);
             }
 
-            if (request.AssetId != Constants.AssetsContants.LiteCoin.AssetId)
+            if (request.AssetId != Constants.Assets.LiteCoin.AssetId)
             {
 
                 throw new BusinessException("Invalid assetId", ErrorCode.BadInputParameter);

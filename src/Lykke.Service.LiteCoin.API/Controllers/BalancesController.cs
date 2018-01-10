@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Lykke.Common.Api.Contract.Responses;
 using Lykke.Service.BlockchainApi.Contract.Balances;
 using Lykke.Service.LiteCoin.API.Core.Address;
+using Lykke.Service.LiteCoin.API.Core.Constants;
 using Lykke.Service.LiteCoin.API.Core.Exceptions;
 using Lykke.Service.LiteCoin.API.Core.Wallet;
 using Lykke.Service.LiteCoin.API.Helpers;
@@ -86,7 +87,8 @@ namespace Lykke.Service.LiteCoin.API.Controllers
             return Ok(balances.Select(p=>new WalletBalanceContract
             {
                 Address = p.Address,
-                Balance = MoneyConversionHelper.SatoshiToContract(p.BalanceSatoshi)
+                Balance = MoneyConversionHelper.SatoshiToContract(p.BalanceSatoshi),
+                AssetId = Constants.Assets.LiteCoin.AssetId
             }));
         }
     }
