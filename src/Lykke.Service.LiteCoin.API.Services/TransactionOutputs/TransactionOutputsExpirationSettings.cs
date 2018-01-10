@@ -3,9 +3,9 @@
     public class TransactionOutputsExpirationSettings
     {
 
-        public int BroadcastedOutputsExpirationDays { get; set; } 
+        public int BroadcastedOutputsExpirationMinutes { get; set; } 
 
 
-        public int SpentOutputsExpirationDays { get; set; } 
+        public int SpentOutputsExpirationMinutes { get; set; } 
     }
 }

@@ -101,8 +101,8 @@ namespace Lykke.Service.LiteCoin.API.Services.Binder
         {
             builder.RegisterInstance(new TransactionOutputsExpirationSettings
             {
-                BroadcastedOutputsExpirationDays = _settings.CurrentValue.BroadcastedOutputsExpirationDays,
-                SpentOutputsExpirationDays = _settings.CurrentValue.SpentOutputsExpirationDays
+                BroadcastedOutputsExpirationMinutes = _settings.CurrentValue.BroadcastedOutputsExpirationMinutes,
+                SpentOutputsExpirationMinutes = _settings.CurrentValue.SpentOutputsExpirationMinutes
             });
 
             builder.RegisterType<TransactionOutputsService>().As<ITransactionOutputsService>();

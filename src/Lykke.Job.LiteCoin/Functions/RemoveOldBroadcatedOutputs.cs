@@ -21,7 +21,7 @@ namespace Lykke.Job.LiteCoin.Functions
         [TimerTrigger("01:00:00")]
         public async Task Clean()
         {
-            var bound = DateTime.UtcNow.AddDays(-_settings.BroadcastedOutputsExpirationDays);
+            var bound = DateTime.UtcNow.AddDays(-_settings.BroadcastedOutputsExpirationMinutes);
 
             await _broadcastedOutputRepository.DeleteOldOutputs(bound);
         }
