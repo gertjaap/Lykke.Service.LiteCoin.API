@@ -28,7 +28,9 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Wallet
         {
             return new ObservableWalletEntity
             {
-                Address = source.Address
+                Address = source.Address,
+                PartitionKey = GeneratePartitionKey(),
+                RowKey = GenerateRowKey(source.Address)
             };
         }
     }
