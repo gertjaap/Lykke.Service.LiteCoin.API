@@ -69,7 +69,7 @@ namespace Lykke.Service.LiteCoin.API.Controllers
         [ProducesResponseType(typeof(ErrorResponse), 400)]
         public async Task<IEnumerable<InProgressTransactionContract>> GetInProgressTransactions([FromQuery]int skip, [FromQuery]int take)
         {
-            return (await _observableOperationService.GetFailedOperations(skip, take)).Select(p =>
+            return (await _observableOperationService.GetInProgressOperations(skip, take)).Select(p =>
                 new InProgressTransactionContract
                 {
                     Amount = MoneyConversionHelper.SatoshiToContract(p.AmountSatoshi),
