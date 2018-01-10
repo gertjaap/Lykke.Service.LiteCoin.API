@@ -5,6 +5,7 @@ using Flurl.Http;
 using Lykke.Service.LiteCoin.API.Core.BlockChainReaders;
 using Lykke.Service.LiteCoin.API.Core.Broadcast;
 using Lykke.Service.LiteCoin.API.Core.Exceptions;
+using Lykke.Service.LiteCoin.API.Core.ObservableOperation;
 using Lykke.Service.LiteCoin.API.Core.Operation;
 using Lykke.Service.LiteCoin.API.Core.TransactionOutputs.BroadcastedOutputs;
 using Lykke.Service.LiteCoin.API.Core.Transactions;
@@ -20,13 +21,15 @@ namespace Lykke.Service.LiteCoin.API.Services.Broadcast
         private readonly IBroadcastedOutputsService _broadcastedOutputsService;
         private readonly IOperationMetaRepository _operationMetaRepository;
         private readonly IOperationEventRepository _operationEventRepository;
+        private readonly IObservableOperationRepository _observableOperationRepository;
 
         public BroadcastService(IBlockChainProvider blockChainProvider,
             ILog log, 
             IUnconfirmedTransactionRepository unconfirmedTransactionRepository,
             IBroadcastedOutputsService broadcastedOutputsService, 
             IOperationMetaRepository operationMetaRepository,
-            IOperationEventRepository operationEventRepository)
+            IOperationEventRepository operationEventRepository,
+            IObservableOperationRepository observableOperationRepository)
         {
             _blockChainProvider = blockChainProvider;
             _log = log;
@@ -34,11 +37,13 @@ namespace Lykke.Service.LiteCoin.API.Services.Broadcast
             _broadcastedOutputsService = broadcastedOutputsService;
             _operationMetaRepository = operationMetaRepository;
             _operationEventRepository = operationEventRepository;
+            _observableOperationRepository = observableOperationRepository;
         }
 
         public async Task BroadCastTransaction(Guid operationId, Transaction tx)
         {
-            if (!await _operationMetaRepository.Exist(operationId))
+            var operation = await _operationMetaRepository.Get(operationId);
+            if (operation == null)
             {
                 throw new BusinessException("Operation not found", ErrorCode.OperationNotFound);
             }
@@ -48,22 +53,17 @@ namespace Lykke.Service.LiteCoin.API.Services.Broadcast
 
                 throw new BusinessException("Operation not found", ErrorCode.TransactionAlreadyBroadcasted);
             }
-            try
-            {
-                await _blockChainProvider.BroadCastTransaction(tx);
-            }
-            catch (FlurlHttpException e)
-            {
-                await _log.WriteErrorAsync(nameof(BroadcastService), nameof(BroadCastTransaction),
-                    tx.GetHash().ToString(), e);
-                throw new BusinessException($"Broadcast error - {e.Call.ErrorResponseBody}", ErrorCode.BroadcastError);
-            }
 
+            await _blockChainProvider.BroadCastTransaction(tx);
             await _broadcastedOutputsService.SaveNewOutputs(tx);
             await _operationEventRepository.InsertIfNotExist(OperationEvent.Create(operationId, OperationEventType.Broadcasted));
+
+
+            await _observableOperationRepository.InsertOrReplace(ObervableOperation.Create(operation,
+                BroadcastStatus.InProgress, tx.GetHash().ToString()));
+
             await _unconfirmedTransactionRepository.InsertOrReplace(
                 UnconfirmedTransaction.Create(operationId, tx.GetHash().ToString()));
-
         }
 
         public async Task BroadCastTransaction(Guid operationId, string txHex)

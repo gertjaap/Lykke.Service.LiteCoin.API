@@ -24,12 +24,12 @@ namespace Lykke.Service.LiteCoin.API.Core.Exceptions
         NotEnoughFundsAvailable = 4,
         OperationNotFound = 5,
         WalletNotFound = 7,
-        BroadcastError = 8,
         SignError = 9,
         BalanceIsLessThanFee = 10,
         EntityAlreadyExist = 11,
         EntityNotExist = 12,
-        TransactionAlreadyBroadcasted = 13
+        TransactionAlreadyBroadcasted = 13,
+        BlockChainApiError = 14
 
     }
 }

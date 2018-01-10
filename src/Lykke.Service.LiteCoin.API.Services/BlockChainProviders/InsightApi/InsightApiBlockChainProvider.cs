@@ -7,6 +7,7 @@ using Common.Log;
 using Flurl;
 using Flurl.Http;
 using Lykke.Service.LiteCoin.API.Core.BlockChainReaders;
+using Lykke.Service.LiteCoin.API.Core.Exceptions;
 using Lykke.Service.LiteCoin.API.Services.BlockChainProviders.Helpers;
 using Lykke.Service.LiteCoin.API.Services.BlockChainProviders.InsightApi.Contracts;
 using Lykke.Service.LiteCoin.API.Services.Helpers;
@@ -167,8 +168,16 @@ namespace Lykke.Service.LiteCoin.API.Services.BlockChainProviders.InsightApi
                 return false;
             }
 
-            
-            return await Retry.Try(() => url.GetJsonAsync<T>(), NeedToRetryException, tryCount, _log);
+
+            try
+            {
+
+                return await Retry.Try(() => url.GetJsonAsync<T>(), NeedToRetryException, tryCount, _log);
+            }
+            catch (FlurlHttpException)
+            {
+                throw new BusinessException("Error while proceeding operation within Blockchain Insight Api", ErrorCode.BlockChainApiError);
+            }
         }
     }
 }
