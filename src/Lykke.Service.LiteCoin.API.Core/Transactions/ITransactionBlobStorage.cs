@@ -6,7 +6,7 @@ namespace Lykke.Service.LiteCoin.API.Core.Transactions
     public enum TransactionBlobType
     {
         Initial = 0,
-        Signed = 1
+        BeforeBroadcast = 1
     }
 
     public interface ITransactionBlobStorage

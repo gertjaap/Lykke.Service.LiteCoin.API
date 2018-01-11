@@ -22,6 +22,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Broadcast
         private readonly IOperationMetaRepository _operationMetaRepository;
         private readonly IOperationEventRepository _operationEventRepository;
         private readonly IObservableOperationRepository _observableOperationRepository;
+        private readonly ITransactionBlobStorage _transactionBlobStorage;
 
         public BroadcastService(IBlockChainProvider blockChainProvider,
             ILog log, 
@@ -29,7 +30,8 @@ namespace Lykke.Service.LiteCoin.API.Services.Broadcast
             IBroadcastedOutputsService broadcastedOutputsService, 
             IOperationMetaRepository operationMetaRepository,
             IOperationEventRepository operationEventRepository,
-            IObservableOperationRepository observableOperationRepository)
+            IObservableOperationRepository observableOperationRepository, 
+            ITransactionBlobStorage transactionBlobStorage)
         {
             _blockChainProvider = blockChainProvider;
             _log = log;
@@ -38,6 +40,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Broadcast
             _operationMetaRepository = operationMetaRepository;
             _operationEventRepository = operationEventRepository;
             _observableOperationRepository = observableOperationRepository;
+            _transactionBlobStorage = transactionBlobStorage;
         }
 
         public async Task BroadCastTransaction(Guid operationId, Transaction tx)
@@ -53,6 +56,8 @@ namespace Lykke.Service.LiteCoin.API.Services.Broadcast
 
                 throw new BusinessException("Operation not found", ErrorCode.TransactionAlreadyBroadcasted);
             }
+
+            await _transactionBlobStorage.AddOrReplaceTransaction(operationId,TransactionBlobType.BeforeBroadcast, tx.ToHex());
 
             await _blockChainProvider.BroadCastTransaction(tx);
             await _broadcastedOutputsService.SaveNewOutputs(tx);
