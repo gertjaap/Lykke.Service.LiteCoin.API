@@ -18,19 +18,19 @@ namespace Lykke.Service.LiteCoin.API.Services.ObservableOperation
             _unconfirmedTransactionRepository = unconfirmedTransactionRepository;
         }
 
-        public Task<IEnumerable<IObservableOperation>> GetInProgressOperations(int skip, int take)
+        public Task<IEnumerable<IObservableOperation>> GetInProgressOperations()
         {
-            return _observableOperationRepository.Get(BroadcastStatus.InProgress, skip, take);
+            return _observableOperationRepository.Get(BroadcastStatus.InProgress);
         }
 
-        public Task<IEnumerable<IObservableOperation>> GetCompletedOperations(int skip, int take)
+        public Task<IEnumerable<IObservableOperation>> GetCompletedOperations()
         {
-            return _observableOperationRepository.Get(BroadcastStatus.Completed, skip, take);
+            return _observableOperationRepository.Get(BroadcastStatus.Completed);
         }
 
-        public Task<IEnumerable<IObservableOperation>> GetFailedOperations(int skip, int take)
+        public Task<IEnumerable<IObservableOperation>> GetFailedOperations()
         {
-            return _observableOperationRepository.Get(BroadcastStatus.Failed, skip, take);
+            return _observableOperationRepository.Get(BroadcastStatus.Failed);
         }
 
         public async Task DeleteOperations(IEnumerable<Guid> opIds)

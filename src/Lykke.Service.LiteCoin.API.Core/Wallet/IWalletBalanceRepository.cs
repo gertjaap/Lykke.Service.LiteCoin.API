@@ -37,6 +37,6 @@ namespace Lykke.Service.LiteCoin.API.Core.Wallet
 
         Task DeleteIfExist(string address);
 
-        Task<IEnumerable<IWalletBalance>> Get(int skip, int take);
+        Task<IEnumerable<IWalletBalance>> GetAll();
     }
 }

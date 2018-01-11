@@ -5,6 +5,7 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Lykke.Common.Api.Contract.Responses;
+using Lykke.Service.BlockchainApi.Contract;
 using Lykke.Service.BlockchainApi.Contract.Balances;
 using Lykke.Service.LiteCoin.API.Core.Address;
 using Lykke.Service.LiteCoin.API.Core.Constants;
@@ -79,17 +80,18 @@ namespace Lykke.Service.LiteCoin.API.Controllers
         
         [HttpGet("api/balances/")]
         [SwaggerOperation(nameof(GetBalances))]
-        [ProducesResponseType(typeof(WalletBalanceContract[]), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(PaginationResponse<WalletBalanceContract>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), 400)]
-        public async Task<IActionResult> GetBalances([FromQuery] int skip, [FromQuery] int take)
+        public async Task<PaginationResponse<WalletBalanceContract>> GetBalances([FromQuery]int take, [FromQuery] string continuation)
         {
-            var balances = await _balanceService.GetPagedBalances(skip, take);
-            return Ok(balances.Select(p=>new WalletBalanceContract
+            var padedResult = await _balanceService.GetBalances(take, continuation);
+
+            return PaginationResponse.From(padedResult.Continuation, padedResult.Items.Select(p => new WalletBalanceContract
             {
                 Address = p.Address,
                 Balance = MoneyConversionHelper.SatoshiToContract(p.BalanceSatoshi),
                 AssetId = Constants.Assets.LiteCoin.AssetId
-            }));
+            }).ToList().AsReadOnly());
         }
     }
 }

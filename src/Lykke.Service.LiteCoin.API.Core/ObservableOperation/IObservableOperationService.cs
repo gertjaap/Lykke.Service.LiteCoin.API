@@ -6,9 +6,9 @@ namespace Lykke.Service.LiteCoin.API.Core.ObservableOperation
 {
     public interface IObservableOperationService
     {
-        Task<IEnumerable<IObservableOperation>> GetInProgressOperations(int skip, int take);
-        Task<IEnumerable<IObservableOperation>> GetCompletedOperations(int skip, int take);
-        Task<IEnumerable<IObservableOperation>> GetFailedOperations(int skip, int take);
+        Task<IEnumerable<IObservableOperation>> GetInProgressOperations();
+        Task<IEnumerable<IObservableOperation>> GetCompletedOperations();
+        Task<IEnumerable<IObservableOperation>> GetFailedOperations();
         Task DeleteOperations(IEnumerable<Guid> opIds);
     }
 }

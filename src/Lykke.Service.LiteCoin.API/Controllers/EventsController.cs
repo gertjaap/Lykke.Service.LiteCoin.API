@@ -26,9 +26,9 @@ namespace Lykke.Service.LiteCoin.API.Controllers
         [SwaggerOperation(nameof(GetCompletedTransactions))]
         [ProducesResponseType(typeof(CompletedTransactionContract[]),(int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), 400)]
-        public async Task<IEnumerable<CompletedTransactionContract>> GetCompletedTransactions([FromQuery]int skip, [FromQuery]int take)
+        public async Task<IEnumerable<CompletedTransactionContract>> GetCompletedTransactions()
         {
-            return (await _observableOperationService.GetCompletedOperations(skip, take)).Select(p =>
+            return (await _observableOperationService.GetCompletedOperations()).Select(p =>
                 new CompletedTransactionContract
                 {
                     Amount = MoneyConversionHelper.SatoshiToContract(p.AmountSatoshi),
@@ -48,9 +48,9 @@ namespace Lykke.Service.LiteCoin.API.Controllers
         [SwaggerOperation(nameof(GetFailedTransactions))]
         [ProducesResponseType(typeof(FailedTransactionContract[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), 400)]
-        public async Task<IEnumerable<FailedTransactionContract>> GetFailedTransactions([FromQuery]int skip, [FromQuery]int take)
+        public async Task<IEnumerable<FailedTransactionContract>> GetFailedTransactions()
         {
-            return (await _observableOperationService.GetFailedOperations(skip, take)).Select(p =>
+            return (await _observableOperationService.GetFailedOperations()).Select(p =>
                 new FailedTransactionContract
                 {
                     Amount = MoneyConversionHelper.SatoshiToContract(p.AmountSatoshi),
@@ -67,9 +67,9 @@ namespace Lykke.Service.LiteCoin.API.Controllers
         [SwaggerOperation(nameof(GetInProgressTransactions))]
         [ProducesResponseType(typeof(InProgressTransactionContract[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), 400)]
-        public async Task<IEnumerable<InProgressTransactionContract>> GetInProgressTransactions([FromQuery]int skip, [FromQuery]int take)
+        public async Task<IEnumerable<InProgressTransactionContract>> GetInProgressTransactions()
         {
-            return (await _observableOperationService.GetInProgressOperations(skip, take)).Select(p =>
+            return (await _observableOperationService.GetInProgressOperations()).Select(p =>
                 new InProgressTransactionContract
                 {
                     Amount = MoneyConversionHelper.SatoshiToContract(p.AmountSatoshi),
@@ -84,7 +84,7 @@ namespace Lykke.Service.LiteCoin.API.Controllers
 
 
 
-        [HttpGet("api/transactions/observation")]
+        [HttpDelete("api/transactions/observation")]
         [SwaggerOperation(nameof(DeleteTransactions))]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), 400)]

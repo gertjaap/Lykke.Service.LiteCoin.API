@@ -58,9 +58,9 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Wallet
                 WalletBalanceEntity.GenerateRowKey(address));
         }
 
-        public async Task<IEnumerable<IWalletBalance>> Get(int skip, int take)
+        public async Task<IEnumerable<IWalletBalance>> GetAll()
         {
-            return await _storage.GetPagedResult(WalletBalanceEntity.GeneratePartitionKey(), skip, take);
+            return await _storage.GetDataAsync(WalletBalanceEntity.GeneratePartitionKey());
         }
     }
 }

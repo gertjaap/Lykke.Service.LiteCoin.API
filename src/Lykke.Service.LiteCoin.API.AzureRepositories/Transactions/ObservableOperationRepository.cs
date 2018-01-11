@@ -88,9 +88,9 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Transactions
             _storage = storage;
         }
 
-        public async Task<IEnumerable<IObservableOperation>> Get(BroadcastStatus status, int skip, int take)
+        public async Task<IEnumerable<IObservableOperation>> Get(BroadcastStatus status)
         {
-            return await _storage.GetPagedResult(ObservableOperationEntity.ByStatus.GeneratePartitionKey(status), skip, take);
+            return await _storage.GetDataAsync(ObservableOperationEntity.ByStatus.GeneratePartitionKey(status));
         }
 
         public async Task InsertOrReplace(IObservableOperation tx)

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Lykke.Service.LiteCoin.API.Core.Pagination;
 using Lykke.Service.LiteCoin.API.Core.Wallet;
 
 namespace Lykke.Service.LiteCoin.API.Services.Wallet
@@ -26,9 +27,11 @@ namespace Lykke.Service.LiteCoin.API.Services.Wallet
             await _balanceRepository.DeleteIfExist(address);
         }
 
-        public Task<IEnumerable<IWalletBalance>> GetPagedBalances(int skip, int take)
+        public async Task<IPadedResult<IWalletBalance>> GetBalances(int take, string continuation)
         {
-            return _balanceRepository.Get(skip, take);
+            //TODO add db pagination
+
+            return PagedResult<WalletBalance>.Create(await _balanceRepository.GetAll(), continuation: null);
         }
     }
 }

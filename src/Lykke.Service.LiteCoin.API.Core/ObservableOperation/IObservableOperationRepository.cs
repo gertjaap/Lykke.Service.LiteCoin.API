@@ -58,7 +58,7 @@ namespace Lykke.Service.LiteCoin.API.Core.ObservableOperation
  
     public interface IObservableOperationRepository
     {
-        Task<IEnumerable<IObservableOperation>> Get(BroadcastStatus status, int skip, int take);
+        Task<IEnumerable<IObservableOperation>> Get(BroadcastStatus status);
         Task InsertOrReplace(IObservableOperation tx);
         Task DeleteIfExist(params Guid[] operationIds);
     }
