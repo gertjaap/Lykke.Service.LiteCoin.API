@@ -30,7 +30,15 @@ namespace Lykke.Job.LiteCoin.Functions
             foreach (var observableWallet in wallets)
             {
                 var balance = await _blockChainProvider.GetBalanceSatoshi(observableWallet.Address);
-                await _balanceRepository.InsertOrReplace(WalletBalance.Create(observableWallet.Address, balance));
+
+                if (balance != 0)
+                {
+                    await _balanceRepository.InsertOrReplace(WalletBalance.Create(observableWallet.Address, balance));
+                }
+                else
+                {
+                    await _balanceRepository.DeleteIfExist(observableWallet.Address);
+                }
             }
         }
     }
