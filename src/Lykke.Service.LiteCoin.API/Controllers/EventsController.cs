@@ -78,7 +78,8 @@ namespace Lykke.Service.LiteCoin.API.Controllers
                     FromAddress = p.FromAddress,
                     ToAddress = p.ToAddress,
                     Timestamp = p.Updated,
-                    Fee = MoneyConversionHelper.SatoshiToContract(p.FeeSatoshi)
+                    Fee = MoneyConversionHelper.SatoshiToContract(p.FeeSatoshi),
+                    Hash = p.TxHash,
                 });
         }
 
