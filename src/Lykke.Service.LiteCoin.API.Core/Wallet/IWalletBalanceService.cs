@@ -9,6 +9,6 @@ namespace Lykke.Service.LiteCoin.API.Core.Wallet
     {
         Task Subscribe(string address);
         Task Unsubscribe(string address);
-        Task<IPadedResult<IWalletBalance>> GetBalances(int take, string continuation);
+        Task<IPaginationResult<IWalletBalance>> GetBalances(int take, string continuation);
     }
 }

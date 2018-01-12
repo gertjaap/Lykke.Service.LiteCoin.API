@@ -5,6 +5,7 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Lykke.Common.Api.Contract.Responses;
+using Lykke.Service.BlockchainApi.Contract;
 using Lykke.Service.BlockchainApi.Contract.Assets;
 using Lykke.Service.LiteCoin.API.Core.Asset;
 using Microsoft.AspNetCore.Mvc;
@@ -21,21 +22,21 @@ namespace Lykke.Service.LiteCoin.API.Controllers
             _assetRepository = assetRepository;
         }
 
-        [SwaggerOperation(nameof(GetAll))]
-        [ProducesResponseType(typeof(AssetResponse[]), (int)HttpStatusCode.OK)]
+        [SwaggerOperation(nameof(GetPaged))]
+        [ProducesResponseType(typeof(PaginationResponse<AssetResponse>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), 400)]
         [HttpGet("api/assets")]
-        public async Task<AssetResponse[]> GetAll()
+        public async Task<PaginationResponse<AssetResponse>> GetPaged([FromQuery]int take, [FromQuery]string continuation)
         {
-            var assets = await _assetRepository.GetAll();
+            var paginationResult = await _assetRepository.GetPaged(take, continuation);
 
-            return assets.Select(p => new AssetResponse
+            return PaginationResponse.From(paginationResult.Continuation, paginationResult.Items.Select(p => new AssetResponse
             {
                 Address = p.Address,
                 AssetId = p.AssetId,
                 Accuracy = p.Accuracy,
                 Name = p.Name
-            }).ToArray();
+            }).ToList().AsReadOnly());
         }
 
         [SwaggerOperation(nameof(GetById))]

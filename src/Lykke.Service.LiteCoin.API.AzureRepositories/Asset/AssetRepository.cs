@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Lykke.AzureStorage.Tables.Paging;
 using Lykke.Service.LiteCoin.API.Core.Asset;
 using Lykke.Service.LiteCoin.API.Core.Constants;
+using Lykke.Service.LiteCoin.API.Core.Pagination;
 
 namespace Lykke.Service.LiteCoin.API.AzureRepositories.Asset
 {
@@ -30,10 +32,9 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Asset
             }
         };
 
-        public Task<IEnumerable<IAsset>> GetAll()
+        public Task<IPaginationResult<IAsset>> GetPaged(int take, string continuation)
         {
-            return Task.FromResult(_mockList);
-            throw new NotImplementedException();
+            return Task.FromResult(PaginationResult<IAsset>.Create(_mockList, null));
         }
 
         public Task<IAsset> GetById(string assetId)

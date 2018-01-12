@@ -27,11 +27,11 @@ namespace Lykke.Service.LiteCoin.API.Services.Wallet
             await _balanceRepository.DeleteIfExist(address);
         }
 
-        public async Task<IPadedResult<IWalletBalance>> GetBalances(int take, string continuation)
+        public async Task<IPaginationResult<IWalletBalance>> GetBalances(int take, string continuation)
         {
             //TODO add db pagination
 
-            return PagedResult<WalletBalance>.Create(await _balanceRepository.GetAll(), continuation: null);
+            return PaginationResult<WalletBalance>.Create(await _balanceRepository.GetAll(), continuation: null);
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Lykke.Service.LiteCoin.API.Core.Pagination;
 
 namespace Lykke.Service.LiteCoin.API.Core.Asset
 {
@@ -13,7 +14,7 @@ namespace Lykke.Service.LiteCoin.API.Core.Asset
 
     public interface IAssetRepository
     {
-        Task<IEnumerable<IAsset>> GetAll();
+        Task<IPaginationResult<IAsset>> GetPaged(int take, string continuation);
         Task<IAsset> GetById(string assetId);
     }
 }
