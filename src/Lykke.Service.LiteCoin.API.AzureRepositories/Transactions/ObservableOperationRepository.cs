@@ -59,24 +59,6 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Transactions
                 return Map(GeneratePartitionKey(), GenerateRowKey(source.OperationId), source);
             }
         }
-
-        public static class ByStatus
-        {
-            public static string GeneratePartitionKey(BroadcastStatus status)
-            {
-                return status.ToString();
-            }
-
-            public static string GenerateRowKey(Guid operationId)
-            {
-                return operationId.ToString();
-            }
-
-            public static ObservableOperationEntity Create(IObservableOperation source)
-            {
-                return Map(GeneratePartitionKey(source.Status), GenerateRowKey(source.OperationId), source);
-            }
-        }
     }
 
     public class ObservableOperationRepository: IObservableOperationRepository
@@ -87,51 +69,26 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Transactions
         {
             _storage = storage;
         }
-
-        public async Task<IEnumerable<IObservableOperation>> Get(BroadcastStatus status)
-        {
-            return await _storage.GetDataAsync(ObservableOperationEntity.ByStatus.GeneratePartitionKey(status));
-        }
+        
 
         public async Task InsertOrReplace(IObservableOperation tx)
         {
-            var dbEntity = await GetById(tx.OperationId);
-
-            if (dbEntity != null)
-            {
-                await DeleteIfExist(dbEntity);
-            }
-
             await _storage.InsertAsync(ObservableOperationEntity.ByOperationId.Create(tx));
-            await _storage.InsertAsync(ObservableOperationEntity.ByStatus.Create(tx));
         }
 
         public async Task DeleteIfExist(params Guid[] operationIds)
         {
             foreach (var operationId in operationIds)
             {
-                var entity = await GetById(operationId);
-
-                await DeleteIfExist(entity);
-            }
-        }
-
-        public async Task DeleteIfExist(IObservableOperation source)
-        {
-            if (source != null)
-            {
                 await _storage.DeleteIfExistAsync(ObservableOperationEntity.ByOperationId.GeneratePartitionKey(),
-                    ObservableOperationEntity.ByOperationId.GenerateRowKey(source.OperationId));
-
-                await _storage.DeleteIfExistAsync(ObservableOperationEntity.ByStatus.GeneratePartitionKey(source.Status),
-                    ObservableOperationEntity.ByStatus.GenerateRowKey(source.OperationId));
+                    ObservableOperationEntity.ByOperationId.GenerateRowKey(operationId));
             }
         }
 
-        private async Task<ObservableOperationEntity> GetById(Guid operationId)
+        public async Task<IObservableOperation> GetById(Guid opId)
         {
             return await _storage.GetDataAsync(ObservableOperationEntity.ByOperationId.GeneratePartitionKey(),
-                UnconfirmedTransactionEntity.GenerateRowKey(operationId));
+                UnconfirmedTransactionEntity.GenerateRowKey(opId));
         }
     }
 }

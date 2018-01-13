@@ -12,7 +12,7 @@
     <PackageReference Include="Lykke.Common" Version="4.1.0" />
     <PackageReference Include="Lykke.SettingsReader" Version="1.1.4" />
     <PackageReference Include="NBitcoin" Version="4.0.0.51" />
-    <PackageReference Include="NBitcoin.Litecoin" Version="1.0.0.8" />
+    <PackageReference Include="NBitcoin.Litecoin" Version="1.0.0.9" />
   </ItemGroup>
 
   <ItemGroup>

@@ -17,28 +17,16 @@ namespace Lykke.Service.LiteCoin.API.Services.ObservableOperation
             _observableOperationRepository = observableOperationRepository;
             _unconfirmedTransactionRepository = unconfirmedTransactionRepository;
         }
-
-        public Task<IEnumerable<IObservableOperation>> GetInProgressOperations()
+        
+        public async Task DeleteOperations(params Guid[] opIds)
         {
-            return _observableOperationRepository.Get(BroadcastStatus.InProgress);
+            await _observableOperationRepository.DeleteIfExist(opIds);
+            await _unconfirmedTransactionRepository.DeleteIfExist(opIds);
         }
 
-        public Task<IEnumerable<IObservableOperation>> GetCompletedOperations()
+        public Task<IObservableOperation> GetById(Guid opId)
         {
-            return _observableOperationRepository.Get(BroadcastStatus.Completed);
-        }
-
-        public Task<IEnumerable<IObservableOperation>> GetFailedOperations()
-        {
-            return _observableOperationRepository.Get(BroadcastStatus.Failed);
-        }
-
-        public async Task DeleteOperations(IEnumerable<Guid> opIds)
-        {
-            var enumerable = opIds as Guid[] ?? opIds.ToArray();
-
-            await _observableOperationRepository.DeleteIfExist(enumerable.ToArray());
-            await _unconfirmedTransactionRepository.DeleteIfExist(enumerable.ToArray());
+            return _observableOperationRepository.GetById(opId);
         }
     }
 }

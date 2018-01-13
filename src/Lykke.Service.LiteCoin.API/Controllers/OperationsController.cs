@@ -7,6 +7,7 @@ using Lykke.Service.LiteCoin.API.Core.Address;
 using Lykke.Service.LiteCoin.API.Core.Broadcast;
 using Lykke.Service.LiteCoin.API.Core.Constants;
 using Lykke.Service.LiteCoin.API.Core.Exceptions;
+using Lykke.Service.LiteCoin.API.Core.ObservableOperation;
 using Lykke.Service.LiteCoin.API.Core.Operation;
 using Lykke.Service.LiteCoin.API.Helpers;
 using Microsoft.AspNetCore.Mvc;
@@ -20,14 +21,18 @@ namespace Lykke.Service.LiteCoin.API.Controllers
         private readonly IOperationService _operationService;
         private readonly IAddressValidator _addressValidator;
         private readonly IBroadcastService _broadcastService;
+        private readonly IObservableOperationService _observableOperationService;
+
 
         public OperationsController(IOperationService operationService, 
             IAddressValidator addressValidator, 
-            IBroadcastService broadcastService)
+            IBroadcastService broadcastService, 
+            IObservableOperationService observableOperationService)
         {
             _operationService = operationService;
             _addressValidator = addressValidator;
             _broadcastService = broadcastService;
+            _observableOperationService = observableOperationService;
         }
 
         [HttpPost("api/transactions")]
@@ -102,5 +107,57 @@ namespace Lykke.Service.LiteCoin.API.Controllers
 
             return Ok();
         }
+
+        [HttpGet("api/transactions/broadcast/{operationId}")]
+        [SwaggerOperation(nameof(GetObservableOperation))]
+        [ProducesResponseType(typeof(BroadcastedTransactionResponse),(int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType(typeof(ErrorResponse), 400)]
+        public async Task<IActionResult> GetObservableOperation(Guid operationId)
+        {
+            var result = await _observableOperationService.GetById(operationId);
+
+            if (result == null)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.NoContent);
+            }
+
+            BroadcastedTransactionState MapState(BroadcastStatus status)
+            {
+                switch (status)
+                {
+                    case BroadcastStatus.Completed:
+                        return BroadcastedTransactionState.Completed;
+                    case BroadcastStatus.Failed:
+                        return BroadcastedTransactionState.Failed;
+                    case BroadcastStatus.InProgress:
+                        return BroadcastedTransactionState.Failed;
+                    default:
+                        throw new InvalidCastException($"Unknown mapping from {status} ");
+                }
+            }
+
+            return Ok(new BroadcastedTransactionResponse
+            {
+                Amount = MoneyConversionHelper.SatoshiToContract(result.AmountSatoshi),
+                Fee = MoneyConversionHelper.SatoshiToContract(result.FeeSatoshi),
+                OperationId = result.OperationId,
+                Hash = result.TxHash,
+                Timestamp = result.Updated,
+                State = MapState(result.Status)
+            });
+        }
+
+        [HttpDelete("api/transactions/broadcast/{operationId}")]
+        [SwaggerOperation(nameof(RemoveObservableOperation))]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ErrorResponse), 400)]
+        public async Task<IActionResult> RemoveObservableOperation(Guid operationId)
+        {
+            await _observableOperationService.DeleteOperations(operationId);
+
+            return Ok();
+        }
+
     }
 }
