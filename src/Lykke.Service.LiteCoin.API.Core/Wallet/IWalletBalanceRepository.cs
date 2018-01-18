@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Lykke.Service.LiteCoin.API.Core.Pagination;
 
 namespace Lykke.Service.LiteCoin.API.Core.Wallet
 {
@@ -36,7 +37,6 @@ namespace Lykke.Service.LiteCoin.API.Core.Wallet
         Task InsertOrReplace(IWalletBalance balance);
 
         Task DeleteIfExist(string address);
-
-        Task<IEnumerable<IWalletBalance>> GetAll();
+        Task<IPaginationResult<IWalletBalance>> GetBalances(int take, string continuation);
     }
 }

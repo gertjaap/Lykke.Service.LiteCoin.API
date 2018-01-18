@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using AzureStorage;
 using Lykke.Service.LiteCoin.API.AzureRepositories.Helpers;
+using Lykke.Service.LiteCoin.API.Core.Pagination;
 using Lykke.Service.LiteCoin.API.Core.Wallet;
 using Microsoft.WindowsAzure.Storage.Table;
 using NBitcoin;
@@ -58,9 +60,12 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Wallet
                 WalletBalanceEntity.GenerateRowKey(address));
         }
 
-        public async Task<IEnumerable<IWalletBalance>> GetAll()
+        public async Task<IPaginationResult<IWalletBalance>> GetBalances(int take, string continuation)
         {
-            return await _storage.GetDataAsync(WalletBalanceEntity.GeneratePartitionKey());
+            var t = await _storage.GetDataAsync(WalletBalanceEntity.GeneratePartitionKey());
+            var result = await _storage.GetDataWithContinuationTokenAsync(WalletBalanceEntity.GeneratePartitionKey(), take, continuation);
+
+            return PaginationResult<IWalletBalance>.Create(result.Entities.Cast<IWalletBalance>(), result.ContinuationToken);
         }
     }
 }
