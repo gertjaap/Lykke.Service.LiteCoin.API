@@ -131,7 +131,7 @@ namespace Lykke.Service.LiteCoin.API.Controllers
                     case BroadcastStatus.Failed:
                         return BroadcastedTransactionState.Failed;
                     case BroadcastStatus.InProgress:
-                        return BroadcastedTransactionState.Failed;
+                        return BroadcastedTransactionState.InProgress;
                     default:
                         throw new InvalidCastException($"Unknown mapping from {status} ");
                 }
