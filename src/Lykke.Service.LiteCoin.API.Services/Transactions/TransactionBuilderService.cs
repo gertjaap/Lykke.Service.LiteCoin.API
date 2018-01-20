@@ -76,34 +76,17 @@ namespace Lykke.Service.LiteCoin.API.Services.Transactions
 
             builder.AddCoins(orderedCoins.Take(cnt));
 
-            Money fee;
+            var fee = await _feeService.CalcFeeForTransaction(builder);
 
-            if (includeFee)
+            if (fee >= amount)
             {
-                fee = await _feeService.GetMinFee();
-
-                if (fee >= amount)
-                {
-                    throw new BusinessException(
-                        $"The sum of total applicable outputs is less than the required fee: {fee} satoshis.",
-                        ErrorCode.BalanceIsLessThanFee);
-                }
-
-                amount = amount - fee;
-            }
-            else
-            {
-                fee = await _feeService.CalcFeeForTransaction(builder);
-
-                if (fee >= amount)
-                {
-                    throw new BusinessException(
-                        $"The sum of total applicable outputs is less than the required fee: {fee} satoshis.",
-                        ErrorCode.BalanceIsLessThanFee);
-                }
+                throw new BusinessException(
+                    $"The sum of total applicable outputs is less than the required fee: {fee} satoshis.",
+                    ErrorCode.BalanceIsLessThanFee);
             }
 
-            if (sendAmount < amount + fee)
+
+            if (!includeFee && sendAmount < amount + fee)
             {
                 var orderedFeeCoins = orderedCoins.Skip(cnt)
                     .OrderBy(o => o.Amount)
@@ -115,6 +98,13 @@ namespace Lykke.Service.LiteCoin.API.Services.Transactions
             }
 
             builder.Send(destination, amount);
+
+            if (includeFee)
+            {
+                builder.SubtractFees();
+                amount = amount - fee;
+            }
+
             builder.SetChange(changeDestination);
 
             builder.SendFees(fee);

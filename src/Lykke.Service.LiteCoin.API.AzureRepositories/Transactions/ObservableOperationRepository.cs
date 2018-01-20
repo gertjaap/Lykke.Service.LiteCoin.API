@@ -73,7 +73,7 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Transactions
 
         public async Task InsertOrReplace(IObservableOperation tx)
         {
-            await _storage.InsertAsync(ObservableOperationEntity.ByOperationId.Create(tx));
+            await _storage.InsertOrReplaceAsync(ObservableOperationEntity.ByOperationId.Create(tx));
         }
 
         public async Task DeleteIfExist(params Guid[] operationIds)

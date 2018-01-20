@@ -40,22 +40,10 @@ namespace Lykke.Service.LiteCoin.API.Services.Fee
         {
             var  fromFeeRate = (await GetFeeRate()).GetFee(size);
 
-            if (fromFeeRate.Satoshi > _maxFeeValueSatoshi)
-            {
-                return new Money(_maxFeeValueSatoshi, MoneyUnit.Satoshi);
-            }
+            var min = new Money(_minFeeValueSatoshi, MoneyUnit.Satoshi);
+            var max = new Money(_maxFeeValueSatoshi, MoneyUnit.Satoshi);
 
-            if (fromFeeRate.Satoshi < _minFeeValueSatoshi)
-            {
-                return new Money(_minFeeValueSatoshi, MoneyUnit.Satoshi);
-            }
-
-            return fromFeeRate;
-        }
-
-        public  Task<Money> GetMinFee()
-        {
-            return Task.FromResult(new Money(_minFeeValueSatoshi, MoneyUnit.Satoshi));
+            return Money.Max(Money.Min(fromFeeRate, max), min);
         }
     }
 }
