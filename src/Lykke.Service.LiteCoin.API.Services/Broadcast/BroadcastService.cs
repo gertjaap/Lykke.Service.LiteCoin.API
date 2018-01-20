@@ -8,6 +8,7 @@ using Lykke.Service.LiteCoin.API.Core.Exceptions;
 using Lykke.Service.LiteCoin.API.Core.ObservableOperation;
 using Lykke.Service.LiteCoin.API.Core.Operation;
 using Lykke.Service.LiteCoin.API.Core.TransactionOutputs.BroadcastedOutputs;
+using Lykke.Service.LiteCoin.API.Core.TransactionOutputs.SpentOutputs;
 using Lykke.Service.LiteCoin.API.Core.Transactions;
 using NBitcoin;
 
@@ -23,6 +24,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Broadcast
         private readonly IOperationEventRepository _operationEventRepository;
         private readonly IObservableOperationRepository _observableOperationRepository;
         private readonly ITransactionBlobStorage _transactionBlobStorage;
+        private readonly ISpentOutputService _spentOutputService;
 
         public BroadcastService(IBlockChainProvider blockChainProvider,
             ILog log, 
@@ -31,7 +33,8 @@ namespace Lykke.Service.LiteCoin.API.Services.Broadcast
             IOperationMetaRepository operationMetaRepository,
             IOperationEventRepository operationEventRepository,
             IObservableOperationRepository observableOperationRepository, 
-            ITransactionBlobStorage transactionBlobStorage)
+            ITransactionBlobStorage transactionBlobStorage, 
+            ISpentOutputService spentOutputService)
         {
             _blockChainProvider = blockChainProvider;
             _log = log;
@@ -41,6 +44,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Broadcast
             _operationEventRepository = operationEventRepository;
             _observableOperationRepository = observableOperationRepository;
             _transactionBlobStorage = transactionBlobStorage;
+            _spentOutputService = spentOutputService;
         }
 
         public async Task BroadCastTransaction(Guid operationId, Transaction tx)
@@ -60,7 +64,10 @@ namespace Lykke.Service.LiteCoin.API.Services.Broadcast
             await _transactionBlobStorage.AddOrReplaceTransaction(operationId,TransactionBlobType.BeforeBroadcast, tx.ToHex());
 
             await _blockChainProvider.BroadCastTransaction(tx);
+
             await _broadcastedOutputsService.SaveNewOutputs(tx);
+            await _spentOutputService.SaveSpentOutputs(tx);
+            
             await _operationEventRepository.InsertIfNotExist(OperationEvent.Create(operationId, OperationEventType.Broadcasted));
 
 

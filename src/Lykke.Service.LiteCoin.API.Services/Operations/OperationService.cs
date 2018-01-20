@@ -12,7 +12,6 @@ namespace Lykke.Service.LiteCoin.API.Services.Operations
     {
         private readonly ITransactionBuilderService _transactionBuilder;
         private readonly IOperationMetaRepository _operationMetaRepository;
-        private readonly ISpentOutputService _spentOutputService;
         private readonly ITransactionBlobStorage _transactionBlobStorage;
 
         public OperationService(ITransactionBuilderService transactionBuilder,
@@ -22,7 +21,6 @@ namespace Lykke.Service.LiteCoin.API.Services.Operations
         {
             _transactionBuilder = transactionBuilder;
             _operationMetaRepository = operationMetaRepository;
-            _spentOutputService = spentOutputService;
             _transactionBlobStorage = transactionBlobStorage;
         }
 
@@ -43,9 +41,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Operations
             var operation = OperationMeta.Create(operationId, fromAddress.ToString(), toAddress.ToString(), assetId,
                 buildedTransaction.Amount.Satoshi, buildedTransaction.Fee.Satoshi, includeFee);
             await _operationMetaRepository.Insert(operation);
-
-            await _spentOutputService.SaveSpentOutputs(buildedTransaction.TransactionData);
-
+            
             await _transactionBlobStorage.AddOrReplaceTransaction(operationId, TransactionBlobType.Initial,
                 buildedTransaction.TransactionData.ToHex());
 
