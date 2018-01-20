@@ -88,6 +88,8 @@ namespace Lykke.Service.LiteCoin.API.Services.Transactions
                         $"The sum of total applicable outputs is less than the required fee: {fee} satoshis.",
                         ErrorCode.BalanceIsLessThanFee);
                 }
+
+                amount = amount - fee;
             }
             else
             {
@@ -99,8 +101,6 @@ namespace Lykke.Service.LiteCoin.API.Services.Transactions
                         $"The sum of total applicable outputs is less than the required fee: {fee} satoshis.",
                         ErrorCode.BalanceIsLessThanFee);
                 }
-
-                amount = amount - fee;
             }
 
             if (sendAmount < amount + fee)
@@ -109,13 +109,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Transactions
                     .OrderBy(o => o.Amount)
                     .ToList();
 
-                var feeCoinsCnt = 0;
-
-                while (sendAmount < amount + fee && feeCoinsCnt < orderedFeeCoins.Count)
-                {
-                    sendAmount += orderedFeeCoins[cnt].TxOut.Value;
-                    feeCoinsCnt++;
-                }
+                var feeCoinsCnt = GetCoinsCount(amount + fee, orderedFeeCoins, ref sendAmount);
 
                 builder.AddCoins(orderedFeeCoins.Take(feeCoinsCnt));
             }
