@@ -65,9 +65,6 @@ namespace Lykke.Job.LiteCoin.Functions
                 var status = isCompleted
                     ? BroadcastStatus.Completed
                     : BroadcastStatus.InProgress;
-                
-                await _observableOperationRepository.InsertOrReplace(ObervableOperation.Create(operationMeta, status,
-                    unconfirmedTransaction.TxHash));
 
                 if (isCompleted)
                 {
@@ -79,6 +76,9 @@ namespace Lykke.Job.LiteCoin.Functions
                     await _operationEventRepository.InsertIfNotExist(OperationEvent.Create(unconfirmedTransaction.OperationId,
                         OperationEventType.DetectedOnBlockChain));
                 }
+
+                await _observableOperationRepository.InsertOrReplace(ObervableOperation.Create(operationMeta, status,
+                    unconfirmedTransaction.TxHash));
             }
         }
     }

@@ -77,7 +77,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Broadcast
             {
                 await _log.WriteErrorAsync(nameof(BroadcastService), nameof(BroadCastTransaction),
                     txHex, e);
-                throw new BusinessException("Invalid transaction hex", ErrorCode.BadInputParameter);
+                throw new BusinessException("Invalid transaction transactionContext", ErrorCode.BadInputParameter);
             }
 
             await BroadCastTransaction(operationId, tx);

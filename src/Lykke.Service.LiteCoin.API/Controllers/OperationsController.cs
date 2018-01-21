@@ -94,7 +94,7 @@ namespace Lykke.Service.LiteCoin.API.Controllers
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType(400)]
         [ProducesResponseType(409)]
-        public async Task<IActionResult> BroadcastTransaction(BroadcastTransactionRequest request)
+        public async Task<IActionResult> BroadcastTransaction([FromBody] BroadcastTransactionRequest request)
         {
             try
             {
