@@ -9,6 +9,7 @@ using Lykke.Service.LiteCoin.API.Core.BlockChainReaders;
 using Lykke.Service.LiteCoin.API.Core.ObservableOperation;
 using Lykke.Service.LiteCoin.API.Core.Operation;
 using Lykke.Service.LiteCoin.API.Core.Transactions;
+using Lykke.Service.LiteCoin.API.Core.Wallet;
 using Lykke.Service.LiteCoin.API.Services.Operations;
 
 namespace Lykke.Job.LiteCoin.Functions
@@ -22,6 +23,7 @@ namespace Lykke.Job.LiteCoin.Functions
         private readonly ILog _log;
         private readonly IOperationMetaRepository _operationMetaRepository;
         private readonly IOperationEventRepository _operationEventRepository;
+        private readonly IWalletBalanceService _walletBalanceService;
         
         public UpdateObservableOperations(IUnconfirmedTransactionRepository unconfirmedTransactionRepository, 
             IBlockChainProvider blockChainProvider,
@@ -29,7 +31,8 @@ namespace Lykke.Job.LiteCoin.Functions
             OperationsConfirmationsSettings confirmationsSettings,
             ILog log,
             IOperationMetaRepository operationMetaRepository, 
-            IOperationEventRepository operationEventRepository)
+            IOperationEventRepository operationEventRepository,
+            IWalletBalanceService walletBalanceService)
         {
             _unconfirmedTransactionRepository = unconfirmedTransactionRepository;
             _blockChainProvider = blockChainProvider;
@@ -38,6 +41,7 @@ namespace Lykke.Job.LiteCoin.Functions
             _log = log;
             _operationMetaRepository = operationMetaRepository;
             _operationEventRepository = operationEventRepository;
+            _walletBalanceService = walletBalanceService;
         }
 
         [TimerTrigger("00:02:00")]
@@ -67,6 +71,10 @@ namespace Lykke.Job.LiteCoin.Functions
 
                 if (isCompleted)
                 {
+                    //Force update balances
+                    await _walletBalanceService.UpdateBalance(operationMeta.FromAddress);
+                    await _walletBalanceService.UpdateBalance(operationMeta.ToAddress);
+
                     await _unconfirmedTransactionRepository.DeleteIfExist(unconfirmedTransaction.OperationId);
                     await _operationEventRepository.InsertIfNotExist(OperationEvent.Create(unconfirmedTransaction.OperationId,
                         OperationEventType.DetectedOnBlockChain));

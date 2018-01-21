@@ -74,5 +74,10 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Wallet
                 throw new BusinessException($"Wallet {address} not exist", ErrorCode.EntityNotExist);
             }
         }
+
+        public async Task<IObservableWallet> Get(string address)
+        {
+            return await _storage.GetDataAsync(ObservableWalletEntity.GeneratePartitionKey(), ObservableWalletEntity.GenerateRowKey(address));
+        }
     }
 }

@@ -12,14 +12,12 @@ namespace Lykke.Job.LiteCoin.Functions
     public class UpdateBalanceFunctions
     {
         private readonly IObservableWalletRepository _observableWalletRepository;
-        private readonly IWalletBalanceRepository _balanceRepository;
-        private readonly IBlockChainProvider _blockChainProvider;
+        private readonly IWalletBalanceService _walletBalanceService;
 
-        public UpdateBalanceFunctions(IWalletBalanceRepository balanceRepository, IObservableWalletRepository observableWalletRepository, IBlockChainProvider blockChainProvider)
+        public UpdateBalanceFunctions(IObservableWalletRepository observableWalletRepository, IWalletBalanceService walletBalanceService)
         {
-            _balanceRepository = balanceRepository;
             _observableWalletRepository = observableWalletRepository;
-            _blockChainProvider = blockChainProvider;
+            _walletBalanceService = walletBalanceService;
         }
 
         [TimerTrigger("00:10:00")]
@@ -29,16 +27,7 @@ namespace Lykke.Job.LiteCoin.Functions
 
             foreach (var observableWallet in wallets)
             {
-                var balance = await _blockChainProvider.GetBalanceSatoshi(observableWallet.Address);
-
-                if (balance != 0)
-                {
-                    await _balanceRepository.InsertOrReplace(WalletBalance.Create(observableWallet.Address, balance));
-                }
-                else
-                {
-                    await _balanceRepository.DeleteIfExist(observableWallet.Address);
-                }
+                await _walletBalanceService.UpdateBalance(observableWallet);
             }
         }
     }
