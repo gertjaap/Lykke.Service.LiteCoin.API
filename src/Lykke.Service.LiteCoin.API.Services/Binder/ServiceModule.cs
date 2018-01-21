@@ -8,8 +8,6 @@ using Lykke.Service.LiteCoin.API.Core.ObservableOperation;
 using Lykke.Service.LiteCoin.API.Core.Operation;
 using Lykke.Service.LiteCoin.API.Core.Settings.ServiceSettings;
 using Lykke.Service.LiteCoin.API.Core.TransactionOutputs;
-using Lykke.Service.LiteCoin.API.Core.TransactionOutputs.BroadcastedOutputs;
-using Lykke.Service.LiteCoin.API.Core.TransactionOutputs.SpentOutputs;
 using Lykke.Service.LiteCoin.API.Core.Transactions;
 using Lykke.Service.LiteCoin.API.Core.Wallet;
 using Lykke.Service.LiteCoin.API.Services.Address;
@@ -19,8 +17,6 @@ using Lykke.Service.LiteCoin.API.Services.Fee;
 using Lykke.Service.LiteCoin.API.Services.ObservableOperation;
 using Lykke.Service.LiteCoin.API.Services.Operations;
 using Lykke.Service.LiteCoin.API.Services.TransactionOutputs;
-using Lykke.Service.LiteCoin.API.Services.TransactionOutputs.BroadcastedOutputs;
-using Lykke.Service.LiteCoin.API.Services.TransactionOutputs.SpentOutputs;
 using Lykke.Service.LiteCoin.API.Services.Transactions;
 using Lykke.Service.LiteCoin.API.Services.Wallet;
 using Lykke.SettingsReader;
@@ -99,15 +95,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Binder
         
         private void RegisterTransactionOutputsServices(ContainerBuilder builder)
         {
-            builder.RegisterInstance(new TransactionOutputsExpirationSettings
-            {
-                BroadcastedOutputsExpirationMinutes = _settings.CurrentValue.BroadcastedOutputsExpirationMinutes,
-                SpentOutputsExpirationMinutes = _settings.CurrentValue.SpentOutputsExpirationMinutes
-            });
-
             builder.RegisterType<TransactionOutputsService>().As<ITransactionOutputsService>();
-            builder.RegisterType<SpentOutputService>().As<ISpentOutputService>().SingleInstance();
-            builder.RegisterType<BroadcastedOutputsService>().As<IBroadcastedOutputsService>();
         }
 
         private void RegisterTransactionBuilderServices(ContainerBuilder builder)

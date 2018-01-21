@@ -4,16 +4,12 @@ using AzureStorage.Tables;
 using Common.Log;
 using Lykke.Service.LiteCoin.API.AzureRepositories.Asset;
 using Lykke.Service.LiteCoin.API.AzureRepositories.Operations;
-using Lykke.Service.LiteCoin.API.AzureRepositories.TransactionOutput.BroadcastedOutputs;
-using Lykke.Service.LiteCoin.API.AzureRepositories.TransactionOutput.SpentOutputs;
 using Lykke.Service.LiteCoin.API.AzureRepositories.Transactions;
 using Lykke.Service.LiteCoin.API.AzureRepositories.Wallet;
 using Lykke.Service.LiteCoin.API.Core.Asset;
 using Lykke.Service.LiteCoin.API.Core.ObservableOperation;
 using Lykke.Service.LiteCoin.API.Core.Operation;
 using Lykke.Service.LiteCoin.API.Core.Settings.ServiceSettings;
-using Lykke.Service.LiteCoin.API.Core.TransactionOutputs.BroadcastedOutputs;
-using Lykke.Service.LiteCoin.API.Core.TransactionOutputs.SpentOutputs;
 using Lykke.Service.LiteCoin.API.Core.Transactions;
 using Lykke.Service.LiteCoin.API.Core.Wallet;
 using Lykke.SettingsReader;
@@ -38,16 +34,6 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Binder
 
         private void RegisterRepo(ContainerBuilder builder)
         {
-            builder.RegisterInstance(new BroadcastedOutputRepository(
-                    AzureTableStorage<BroadcastedOutputTableEntity>.Create(_settings.Nested(p => p.Db.DataConnString),
-                        "BroadcastedOutputs", _log)))
-                .As<IBroadcastedOutputRepository>();
-
-            builder.RegisterInstance(new SpentOutputRepository(
-                    AzureTableStorage<SpentOutputTableEntity>.Create(_settings.Nested(p => p.Db.DataConnString),
-                        "SpentOutputs", _log)))
-                .As<ISpentOutputRepository>();
-
             builder.RegisterInstance(new AssetRepository())
                 .As<IAssetRepository>();
 

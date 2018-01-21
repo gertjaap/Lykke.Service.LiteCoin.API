@@ -18,11 +18,5 @@ namespace Lykke.Service.LiteCoin.API.Core.Settings.ServiceSettings
         
         [Optional]
         public int MinConfirmationsToDetectOperation { get; set; } = 1;
-            
-        [Optional]
-        public int BroadcastedOutputsExpirationMinutes { get; set; } = 60;
-
-        [Optional]
-        public int SpentOutputsExpirationMinutes { get; set; } = 60;
     }
 }

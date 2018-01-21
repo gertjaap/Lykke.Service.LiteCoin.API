@@ -64,13 +64,13 @@ namespace Lykke.Service.LiteCoin.API.Services.Transactions
         }
 
         public async Task<IBuildedTransaction> SendWithChange(TransactionBuilder builder, 
-            List<CoinWithSettlementInfo> coins, IDestination destination, Money amount, IDestination changeDestination, bool includeFee)
+            List<Coin> coins, IDestination destination, Money amount, IDestination changeDestination, bool includeFee)
         {
             if (amount.Satoshi <= 0)
                 throw new BusinessException("Amount can't be less or equal to zero", ErrorCode.BadInputParameter);
 
 
-            var orderedCoins = coins.OrderByDescending(p => p.IsSettled).ThenBy(o => o.Amount).ToList(); //use settled in blockchain outputs first
+            var orderedCoins = coins.OrderBy(o => o.Amount).ToList(); //use settled in blockchain outputs first
             var sendAmount = Money.Zero;
             var cnt = GetCoinsCount(amount, orderedCoins, ref sendAmount);
 
@@ -114,7 +114,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Transactions
             return BuildedTransaction.Create(builder.BuildTransaction(false), fee, amount);
         }
 
-        private static int GetCoinsCount(Money amount, List<CoinWithSettlementInfo> orderedCoins, ref Money sendAmount)
+        private static int GetCoinsCount(Money amount, List<Coin> orderedCoins, ref Money sendAmount)
         {
             var cnt = 0;
             while (sendAmount < amount && cnt < orderedCoins.Count)

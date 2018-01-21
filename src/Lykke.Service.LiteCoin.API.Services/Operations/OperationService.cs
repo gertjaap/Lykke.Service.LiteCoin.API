@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using Lykke.Service.LiteCoin.API.Core.Exceptions;
 using Lykke.Service.LiteCoin.API.Core.Operation;
-using Lykke.Service.LiteCoin.API.Core.TransactionOutputs.SpentOutputs;
 using Lykke.Service.LiteCoin.API.Core.Transactions;
 using NBitcoin;
 
@@ -16,7 +15,6 @@ namespace Lykke.Service.LiteCoin.API.Services.Operations
 
         public OperationService(ITransactionBuilderService transactionBuilder,
             IOperationMetaRepository operationMetaRepository, 
-            ISpentOutputService spentOutputService,
             ITransactionBlobStorage transactionBlobStorage)
         {
             _transactionBuilder = transactionBuilder;
