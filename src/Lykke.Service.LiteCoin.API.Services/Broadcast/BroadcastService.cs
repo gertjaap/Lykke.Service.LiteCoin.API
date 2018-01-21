@@ -52,12 +52,11 @@ namespace Lykke.Service.LiteCoin.API.Services.Broadcast
             var operation = await _operationMetaRepository.Get(operationId);
             if (operation == null)
             {
-                throw new BusinessException("Operation not found", ErrorCode.OperationNotFound);
+                throw new BusinessException("Operation not found", ErrorCode.BadInputParameter);
             }
 
             if (await _operationEventRepository.Exist(operationId, OperationEventType.Broadcasted))
             {
-
                 throw new BusinessException("Operation not found", ErrorCode.TransactionAlreadyBroadcasted);
             }
 
@@ -69,7 +68,6 @@ namespace Lykke.Service.LiteCoin.API.Services.Broadcast
             await _spentOutputService.SaveSpentOutputs(tx);
             
             await _operationEventRepository.InsertIfNotExist(OperationEvent.Create(operationId, OperationEventType.Broadcasted));
-
 
             await _observableOperationRepository.InsertOrReplace(ObervableOperation.Create(operation,
                 BroadcastStatus.InProgress, tx.GetHash().ToString()));

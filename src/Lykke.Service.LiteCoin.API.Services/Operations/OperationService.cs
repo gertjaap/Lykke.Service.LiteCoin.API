@@ -32,18 +32,19 @@ namespace Lykke.Service.LiteCoin.API.Services.Operations
         {
             if (await _operationMetaRepository.Exist(operationId))
             {
-                throw new BusinessException($"Operation {operationId} already exist", ErrorCode.BadInputParameter);
+                var txData = await _transactionBlobStorage.GetTransaction(operationId, TransactionBlobType.Initial);
+
+                return Transaction.Parse(txData);
             }
-
-
+            
             var buildedTransaction = await _transactionBuilder.GetTransferTransaction(fromAddress, toAddress, amountToSend, includeFee);
+
+            await _transactionBlobStorage.AddOrReplaceTransaction(operationId, TransactionBlobType.Initial,
+                buildedTransaction.TransactionData.ToHex());
 
             var operation = OperationMeta.Create(operationId, fromAddress.ToString(), toAddress.ToString(), assetId,
                 buildedTransaction.Amount.Satoshi, buildedTransaction.Fee.Satoshi, includeFee);
             await _operationMetaRepository.Insert(operation);
-            
-            await _transactionBlobStorage.AddOrReplaceTransaction(operationId, TransactionBlobType.Initial,
-                buildedTransaction.TransactionData.ToHex());
 
             return buildedTransaction.TransactionData;
         }
