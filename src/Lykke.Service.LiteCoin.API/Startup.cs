@@ -49,6 +49,7 @@ namespace Lykke.Service.LiteCoin.API
                     {
                         options.SerializerSettings.ContractResolver =
                             new Newtonsoft.Json.Serialization.DefaultContractResolver();
+                        options.SerializerSettings.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
                     });
 
                 services.AddSwaggerGen(options =>
