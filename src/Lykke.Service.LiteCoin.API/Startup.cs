@@ -12,6 +12,7 @@ using Lykke.Service.LiteCoin.API.AzureRepositories.Binder;
 using Lykke.Service.LiteCoin.API.Core.Exceptions;
 using Lykke.Service.LiteCoin.API.Core.Services;
 using Lykke.Service.LiteCoin.API.Core.Settings;
+using Lykke.Service.LiteCoin.API.Middleware;
 using Lykke.Service.LiteCoin.API.Modules;
 using Lykke.Service.LiteCoin.API.Services.Binder;
 using Lykke.SettingsReader;
@@ -93,7 +94,7 @@ namespace Lykke.Service.LiteCoin.API
                 {
                     app.UseDeveloperExceptionPage();
                 }
-
+                
                 app.UseLykkeMiddleware("LiteCoin.API", ex =>
                 {
                     if (ex is BusinessException clientError)
@@ -102,7 +103,7 @@ namespace Lykke.Service.LiteCoin.API
                         return ErrorResponse.Create(clientError.Text);
                     }
 
-                    return ErrorResponse.Create("Technical problem");
+                    return ErrorResponse.Create(ex.ToString());
                 });
 
                 app.UseMvc();
