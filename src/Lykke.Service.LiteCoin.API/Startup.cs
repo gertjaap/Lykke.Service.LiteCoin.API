@@ -12,7 +12,6 @@ using Lykke.Service.LiteCoin.API.AzureRepositories.Binder;
 using Lykke.Service.LiteCoin.API.Core.Exceptions;
 using Lykke.Service.LiteCoin.API.Core.Services;
 using Lykke.Service.LiteCoin.API.Core.Settings;
-using Lykke.Service.LiteCoin.API.Middleware;
 using Lykke.Service.LiteCoin.API.Modules;
 using Lykke.Service.LiteCoin.API.Services.Binder;
 using Lykke.SettingsReader;
