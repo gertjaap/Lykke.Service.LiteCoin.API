@@ -78,7 +78,7 @@ namespace Lykke.Service.LiteCoin.API.Controllers
             }
 
 
-            var tx = await _operationService.BuildTransferTransaction(request.OperationId, fromBitcoinAddress, toBitcoinAddress,
+            var tx = await _operationService.GetOrBuildTransferTransaction(request.OperationId, fromBitcoinAddress, toBitcoinAddress,
                 request.AssetId, new Money(amountSatoshi), request.IncludeFee);
 
 
@@ -96,6 +96,11 @@ namespace Lykke.Service.LiteCoin.API.Controllers
         [ProducesResponseType(409)]
         public async Task<IActionResult> BroadcastTransaction([FromBody] BroadcastTransactionRequest request)
         {
+            if (request == null)
+            {
+                throw new BusinessException("Unable deserialize request", ErrorCode.BadInputParameter);
+            }
+
             try
             {
                 await _broadcastService.BroadCastTransaction(request.OperationId, request.SignedTransaction);

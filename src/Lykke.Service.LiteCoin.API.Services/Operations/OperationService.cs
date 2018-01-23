@@ -22,17 +22,18 @@ namespace Lykke.Service.LiteCoin.API.Services.Operations
             _transactionBlobStorage = transactionBlobStorage;
         }
 
-        public async Task<Transaction> BuildTransferTransaction(Guid operationId,
+        public async Task<Transaction> GetOrBuildTransferTransaction(Guid operationId,
             BitcoinAddress fromAddress, 
             BitcoinAddress toAddress,
             string assetId,
-            Money amountToSend, bool includeFee)
+            Money amountToSend, 
+            bool includeFee)
         {
             if (await _operationMetaRepository.Exist(operationId))
             {
-                var txData = await _transactionBlobStorage.GetTransaction(operationId, TransactionBlobType.Initial);
+                var alreadyBuildedTransaction = await _transactionBlobStorage.GetTransaction(operationId, TransactionBlobType.Initial);
 
-                return Transaction.Parse(txData);
+                return Transaction.Parse(alreadyBuildedTransaction);
             }
             
             var buildedTransaction = await _transactionBuilder.GetTransferTransaction(fromAddress, toAddress, amountToSend, includeFee);

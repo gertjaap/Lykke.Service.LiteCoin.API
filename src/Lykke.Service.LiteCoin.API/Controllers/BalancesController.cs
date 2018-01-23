@@ -84,6 +84,10 @@ namespace Lykke.Service.LiteCoin.API.Controllers
         [ProducesResponseType(typeof(ErrorResponse), 400)]
         public async Task<PaginationResponse<WalletBalanceContract>> GetBalances([FromQuery]int take, [FromQuery] string continuation)
         {
+            if (take <= 0)
+            {
+                throw new BusinessException("Take must be greater than zero", ErrorCode.BadInputParameter);
+            }
             var padedResult = await _balanceService.GetBalances(take, continuation);
 
             return PaginationResponse.From(padedResult.Continuation, padedResult.Items.Select(p => new WalletBalanceContract
