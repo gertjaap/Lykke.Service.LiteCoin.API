@@ -17,6 +17,6 @@ namespace Lykke.Service.LiteCoin.API.Core.Settings.ServiceSettings
         public long MaxFeeValue { get; set; } = 10000000;
         
         [Optional]
-        public int MinConfirmationsToDetectOperation { get; set; } = 1;
+        public int MinConfirmationsToDetectOperation { get; set; } = 3;
     }
 }
