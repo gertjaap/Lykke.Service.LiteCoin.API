@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using AzureStorage;
+using Common;
 using Lykke.Service.LiteCoin.API.Core.Operation;
 using Microsoft.WindowsAzure.Storage.Table;
 
@@ -14,6 +15,8 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Operations
 
         public DateTime DateTime { get; set; }
         public Guid OperationId { get; set; }
+
+        public string Context { get; set; }
 
         public static string GeneratePartitionKey(Guid operationId)
         {
@@ -32,7 +35,9 @@ namespace Lykke.Service.LiteCoin.API.AzureRepositories.Operations
                 DateTime = source.DateTime,
                 OperationId = source.OperationId,
                 PartitionKey = GeneratePartitionKey(source.OperationId),
-                RowKey = GenerateRowKey(source.Type)
+                RowKey = GenerateRowKey(source.Type),
+                Context = source.Context
+               
             };
         }
     }

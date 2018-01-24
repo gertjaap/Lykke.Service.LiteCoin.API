@@ -36,16 +36,18 @@ namespace Lykke.Service.LiteCoin.API.Services.Wallet
             return await _balanceRepository.GetBalances(take, continuation);
         }
 
-        public async Task UpdateBalance(string address)
+        public async Task<IWalletBalance> UpdateBalance(string address)
         {
             var wallet = await _observableWalletRepository.Get(address);
             if (wallet != null)
             {
-                await UpdateBalance(wallet);
+                return await UpdateBalance(wallet);
             }
+
+            return null;
         }
 
-        public async Task UpdateBalance(IObservableWallet wallet)
+        public async Task<IWalletBalance> UpdateBalance(IObservableWallet wallet)
         {
             if (wallet != null)
             {
@@ -53,13 +55,18 @@ namespace Lykke.Service.LiteCoin.API.Services.Wallet
 
                 if (balance != 0)
                 {
-                    await _balanceRepository.InsertOrReplace(WalletBalance.Create(wallet.Address, balance));
+                    var walletBalanceEntity = WalletBalance.Create(wallet.Address, balance);
+                    await _balanceRepository.InsertOrReplace(walletBalanceEntity);
+
+                    return walletBalanceEntity;
                 }
                 else
                 {
                     await _balanceRepository.DeleteIfExist(wallet.Address);
                 }
             }
+
+            return null;
         }
     }
 }

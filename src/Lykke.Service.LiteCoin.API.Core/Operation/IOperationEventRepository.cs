@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Common;
 
 namespace Lykke.Service.LiteCoin.API.Core.Operation
 {
@@ -17,6 +18,8 @@ namespace Lykke.Service.LiteCoin.API.Core.Operation
         DateTime DateTime { get; }
 
         Guid OperationId { get; }
+
+        string Context { get;  }
     }
 
     public class OperationEvent : IOperationEvent
@@ -24,14 +27,17 @@ namespace Lykke.Service.LiteCoin.API.Core.Operation
         public OperationEventType Type { get; set; }
         public DateTime DateTime { get; set; }
         public Guid OperationId { get; set; }
+        public string Context { get; set; }
 
-        public static OperationEvent Create(Guid operationId, OperationEventType type, DateTime? dateTime = null)
+        public static OperationEvent Create(Guid operationId, OperationEventType type, object context = null, DateTime? dateTime = null)
         {
             return new OperationEvent
             {
                 DateTime = dateTime ?? DateTime.UtcNow,
                 OperationId = operationId,
-                Type = type
+                Type = type,
+                Context = context?.ToJson()
+                
             };
         }
     }

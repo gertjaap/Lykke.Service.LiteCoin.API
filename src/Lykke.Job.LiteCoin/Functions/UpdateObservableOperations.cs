@@ -62,20 +62,36 @@ namespace Lykke.Job.LiteCoin.Functions
                 var confirmationCount = await _blockChainProvider.GetTxConfirmationCount(unconfirmedTransaction.TxHash);
 
                 var isCompleted = confirmationCount >= _confirmationsSettings.MinConfirmationsToDetectOperation;
-                var status = isCompleted
-                    ? BroadcastStatus.Completed
-                    : BroadcastStatus.InProgress;
-
+;
                 if (isCompleted)
                 {
                     //Force update balances
-                    await _walletBalanceService.UpdateBalance(operationMeta.FromAddress);
-                    await _walletBalanceService.UpdateBalance(operationMeta.ToAddress);
+                    var fromAddressUpdatedBalance = await _walletBalanceService.UpdateBalance(operationMeta.FromAddress);
+                    var toAddressUpdatedBalance = await _walletBalanceService.UpdateBalance(operationMeta.ToAddress);
+                    
+
+                    var operationCompletedLoggingContext = new
+                    {
+                        unconfirmedTransaction.OperationId,
+                        unconfirmedTransaction.TxHash,
+                        fromAddressUpdatedBalance,
+                        toAddressUpdatedBalance
+                    };
+
+                    await _operationEventRepository.InsertIfNotExist(OperationEvent.Create(unconfirmedTransaction.OperationId,
+                        OperationEventType.DetectedOnBlockChain, operationCompletedLoggingContext));
+
+                    await _log.WriteInfoAsync(nameof(UpdateBalanceFunctions), nameof(DetectUnconfirmedTransactions),
+                        operationCompletedLoggingContext.ToJson(),
+                        "Operation completed");
+
 
                     await _unconfirmedTransactionRepository.DeleteIfExist(unconfirmedTransaction.OperationId);
-                    await _operationEventRepository.InsertIfNotExist(OperationEvent.Create(unconfirmedTransaction.OperationId,
-                        OperationEventType.DetectedOnBlockChain));
                 }
+
+                var status = isCompleted
+                    ? BroadcastStatus.Completed
+                    : BroadcastStatus.InProgress;
 
                 await _observableOperationRepository.InsertOrReplace(ObervableOperation.Create(operationMeta, status,
                     unconfirmedTransaction.TxHash));
