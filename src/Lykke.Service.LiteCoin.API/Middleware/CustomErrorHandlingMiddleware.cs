@@ -30,18 +30,21 @@ namespace Lykke.Service.LiteCoin.API.Middleware
             try
             {
                 await _next.Invoke(context);
+
+
             }
             catch (Exception ex)
             {
                 await LogError(context, ex);
                 await CreateErrorResponse(context, ex);
             }
+
+            //await _log.WriteInfoAsync("OkRequests", context.Request.GetUri().AbsoluteUri, ReadBody(context));
         }
 
         private async Task LogError(HttpContext context, Exception ex)
         {
-            var bodyStream = new StreamReader(context.Request.Body);
-            await _log.WriteWarningAsync(_componentName, context.Request.GetUri().AbsoluteUri, bodyStream.ReadToEnd(),
+            await _log.WriteWarningAsync(_componentName, context.Request.GetUri().AbsoluteUri, ReadBody(context),
                 ex);
         }
 
@@ -62,6 +65,12 @@ namespace Lykke.Service.LiteCoin.API.Middleware
         private bool IsValidationError(Exception ex)
         {
             return ex is BusinessException businessException && businessException.Code == ErrorCode.BadInputParameter;
+        }
+
+        private string ReadBody(HttpContext context)
+        {
+            context.Request.Body.Seek(0, SeekOrigin.Begin);
+            return new StreamReader(context.Request.Body).ReadToEnd();
         }
     }
 }
