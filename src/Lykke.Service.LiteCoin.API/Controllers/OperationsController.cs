@@ -92,6 +92,7 @@ namespace Lykke.Service.LiteCoin.API.Controllers
         [HttpPost("api/transactions/broadcast")]
         [SwaggerOperation(nameof(BroadcastTransaction))]
         [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType(400)]
         [ProducesResponseType(409)]
         public async Task<IActionResult> BroadcastTransaction([FromBody] BroadcastTransactionRequest request)
@@ -108,6 +109,10 @@ namespace Lykke.Service.LiteCoin.API.Controllers
             catch (BusinessException e) when (e.Code == ErrorCode.TransactionAlreadyBroadcasted)
             {
                 return new StatusCodeResult(409);
+            }
+            catch (BusinessException e) when (e.Code == ErrorCode.OperationNotFound)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.NoContent);
             }
 
             return Ok();
