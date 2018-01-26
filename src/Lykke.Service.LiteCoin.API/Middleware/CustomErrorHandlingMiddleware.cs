@@ -40,14 +40,9 @@ namespace Lykke.Service.LiteCoin.API.Middleware
 
         private async Task LogError(HttpContext context, Exception ex)
         {
-            using (var ms = new MemoryStream())
-            {
-                context.Request.Body.CopyTo(ms);
-
-                ms.Seek(0, SeekOrigin.Begin);
-
-                await _log.LogPartFromStream(ms, _componentName, context.Request.GetUri().AbsoluteUri, ex);
-            }
+            var bodyStream = new StreamReader(context.Request.Body);
+            await _log.WriteWarningAsync(_componentName, context.Request.GetUri().AbsoluteUri, bodyStream.ReadToEnd(),
+                ex);
         }
 
         private async Task CreateErrorResponse(HttpContext ctx, Exception ex)
