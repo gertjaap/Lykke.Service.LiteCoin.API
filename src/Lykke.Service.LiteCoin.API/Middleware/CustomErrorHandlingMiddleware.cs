@@ -69,8 +69,17 @@ namespace Lykke.Service.LiteCoin.API.Middleware
 
         private string ReadBody(HttpContext context)
         {
+            var body = string.Empty;
             context.Request.Body.Seek(0, SeekOrigin.Begin);
-            return new StreamReader(context.Request.Body).ReadToEnd();
+            body = new StreamReader(context.Request.Body).ReadToEnd();
+            if (context.Request.Body.CanSeek &&
+                +context.Request.Body.Length > 0)
+            {
+                context.Request.Body.Seek(0, SeekOrigin.Begin);
+                body = new StreamReader(context.Request.Body).ReadToEnd();
+            }
+
+            return body;
         }
     }
 }
