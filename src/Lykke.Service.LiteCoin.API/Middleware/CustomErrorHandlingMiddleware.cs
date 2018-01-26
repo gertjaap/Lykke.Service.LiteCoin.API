@@ -39,7 +39,7 @@ namespace Lykke.Service.LiteCoin.API.Middleware
                 await CreateErrorResponse(context, ex);
             }
 
-            //await _log.WriteInfoAsync("OkRequests", context.Request.GetUri().AbsoluteUri, ReadBody(context));
+            await _log.WriteInfoAsync("OkRequests", context.Request.GetUri().AbsoluteUri, ReadBody(context));
         }
 
         private async Task LogError(HttpContext context, Exception ex)
