@@ -49,7 +49,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Broadcast
 
             if (await _operationEventRepository.Exist(operationId, OperationEventType.Broadcasted))
             {
-                throw new BusinessException("Transaction already brodcasted", ErrorCode.TransactionAlreadyBroadcasted);
+                throw new BusinessException("Operation not found", ErrorCode.OperationNotFound);
             }
 
             await _transactionBlobStorage.AddOrReplaceTransaction(operationId,TransactionBlobType.BeforeBroadcast, tx.ToHex());

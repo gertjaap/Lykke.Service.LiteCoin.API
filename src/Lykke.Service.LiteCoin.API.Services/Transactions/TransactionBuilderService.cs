@@ -74,21 +74,9 @@ namespace Lykke.Service.LiteCoin.API.Services.Transactions
             var sendAmount = Money.Zero;
             var cnt = GetCoinsCount(amount, orderedCoins, ref sendAmount);
 
-            builder.AddCoins(orderedCoins.Take(cnt))
-                .Send(destination, amount)
-                .SetChange(changeDestination);
-            
+            builder.AddCoins(orderedCoins.Take(cnt));
+
             var fee = await _feeService.CalcFeeForTransaction(builder);
-
-            if (!includeFee && sendAmount < amount + fee)
-            {
-                var orderedFeeCoins = orderedCoins.Skip(cnt)
-                    .OrderBy(o => o.Amount)
-                    .ToList();
-
-                var feeCoinsCnt = GetCoinsCount(fee, orderedFeeCoins, ref sendAmount);
-                builder.AddCoins(orderedFeeCoins.Take(feeCoinsCnt));
-            }
 
             if (fee >= amount)
             {
@@ -96,25 +84,34 @@ namespace Lykke.Service.LiteCoin.API.Services.Transactions
                     $"The sum of total applicable outputs is less than the required fee: {fee} satoshis.",
                     ErrorCode.BalanceIsLessThanFee);
             }
-            
+
+
+            if (!includeFee && sendAmount < amount + fee)
+            {
+                var orderedFeeCoins = orderedCoins.Skip(cnt)
+                    .OrderBy(o => o.Amount)
+                    .ToList();
+
+                var feeCoinsCnt = GetCoinsCount(amount + fee, orderedFeeCoins, ref sendAmount);
+
+                builder.AddCoins(orderedFeeCoins.Take(feeCoinsCnt));
+            }
+
+            builder.Send(destination, amount);
+
             if (includeFee)
             {
                 builder.SubtractFees();
                 amount = amount - fee;
             }
 
-            if (sendAmount < amount + fee)
-            {
-                throw new BusinessException(
-                    $"The sum of total applicable outputs is less than the required: {amount.Satoshi} satoshis.",
-                    ErrorCode.NotEnoughFundsAvailable);
-            }
-            
+            builder.SetChange(changeDestination);
+
             builder.SendFees(fee);
+            builder.BuildTransaction(false);
+            
 
-            var tx = builder.BuildTransaction(false);
-
-            return BuildedTransaction.Create(tx, fee, amount);
+            return BuildedTransaction.Create(builder.BuildTransaction(false), fee, amount);
         }
 
         private static int GetCoinsCount(Money amount, List<Coin> orderedCoins, ref Money sendAmount)
@@ -124,6 +121,13 @@ namespace Lykke.Service.LiteCoin.API.Services.Transactions
             {
                 sendAmount += orderedCoins[cnt].TxOut.Value;
                 cnt++;
+            }
+
+            if (sendAmount < amount)
+            {
+                throw new BusinessException(
+                    $"The sum of total applicable outputs is less than the required: {amount.Satoshi} satoshis.",
+                    ErrorCode.NotEnoughFundsAvailable);
             }
 
             return cnt;
