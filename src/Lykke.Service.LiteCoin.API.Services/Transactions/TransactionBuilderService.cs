@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Lykke.Service.LiteCoin.API.Core.Exceptions;
@@ -70,59 +71,83 @@ namespace Lykke.Service.LiteCoin.API.Services.Transactions
                 throw new BusinessException("Amount can't be less or equal to zero", ErrorCode.BadInputParameter);
 
 
-            var orderedCoins = coins.OrderBy(o => o.Amount).ToList(); //use settled in blockchain outputs first
-            var sendAmount = Money.Zero;
-            var cnt = GetCoinsCount(amount, orderedCoins, ref sendAmount);
+            var allCoinsOrdered = coins.OrderBy(o => o.Amount).ToList(); //use settled in blockchain outputs first
+            var sendedAmount = Money.Zero;
 
-            builder.AddCoins(orderedCoins.Take(cnt))
+            var amountCoinsCount = GetCoinsCount(amount, allCoinsOrdered);
+            sendedAmount += allCoinsOrdered.Take(amountCoinsCount).Sum(p => p.Amount);
+
+            builder.AddCoins(allCoinsOrdered.Take(amountCoinsCount))
                 .Send(destination, amount)
                 .SetChange(changeDestination);
             
-            var fee = await _feeService.CalcFeeForTransaction(builder);
+            var calculatedFee = await _feeService.CalcFeeForTransaction(builder);
 
-            if (!includeFee && sendAmount < amount + fee)
+            if (!includeFee && sendedAmount < amount + calculatedFee)
             {
-                var orderedFeeCoins = orderedCoins.Skip(cnt)
-                    .OrderBy(o => o.Amount)
-                    .ToList();
+                var providedFeeAmount = sendedAmount - amount;
+                
+                var notUsedCoins = allCoinsOrdered.Skip(amountCoinsCount).ToList();
 
-                var feeCoinsCnt = GetCoinsCount(fee, orderedFeeCoins, ref sendAmount);
-                builder.AddCoins(orderedFeeCoins.Take(feeCoinsCnt));
+                var feeCoinsCnt = 0;
+
+                do
+                {
+                    var missedAmount = calculatedFee - providedFeeAmount;
+
+                    feeCoinsCnt += GetCoinsCount(missedAmount, notUsedCoins);
+                    var feeCoins = notUsedCoins.Take(feeCoinsCnt).ToList();
+
+                    builder.AddCoins(feeCoins);
+
+                    providedFeeAmount += feeCoins.Sum(p => p.Amount);
+                    sendedAmount += feeCoins.Sum(p => p.Amount);
+                    notUsedCoins = allCoinsOrdered.Skip(amountCoinsCount + feeCoinsCnt).ToList();
+
+                    //recalculate new fee based on added inputs
+                    calculatedFee = await _feeService.CalcFeeForTransaction(builder);
+
+                } while (providedFeeAmount < calculatedFee && notUsedCoins.Any());
             }
 
-            if (fee >= amount)
+            if (calculatedFee >= amount)
             {
                 throw new BusinessException(
-                    $"The sum of total applicable outputs is less than the required fee: {fee} satoshis.",
+                    $"The sum of total applicable outputs is less than the required fee: {calculatedFee} satoshis.",
                     ErrorCode.BalanceIsLessThanFee);
             }
             
             if (includeFee)
             {
                 builder.SubtractFees();
-                amount = amount - fee;
+                amount = amount - calculatedFee;
             }
 
-            if (sendAmount < amount + fee)
+            if (sendedAmount < amount + calculatedFee)
             {
                 throw new BusinessException(
                     $"The sum of total applicable outputs is less than the required: {amount.Satoshi} satoshis.",
                     ErrorCode.NotEnoughFundsAvailable);
             }
             
-            builder.SendFees(fee);
+            builder.SendFees(calculatedFee);
 
             var tx = builder.BuildTransaction(false);
 
-            return BuildedTransaction.Create(tx, fee, amount);
+            return BuildedTransaction.Create(tx, calculatedFee, amount);
         }
 
-        private static int GetCoinsCount(Money amount, List<Coin> orderedCoins, ref Money sendAmount)
+        private static int GetCoinsCount(Money amount, IEnumerable<Coin> orderedCoins)
         {
+
+            var orderedCoinsList = orderedCoins.ToList();
             var cnt = 0;
-            while (sendAmount < amount && cnt < orderedCoins.Count)
+
+            var sendAmount = Money.Zero;
+
+            while (sendAmount < amount && cnt < orderedCoinsList.Count)
             {
-                sendAmount += orderedCoins[cnt].TxOut.Value;
+                sendAmount += orderedCoinsList[cnt].TxOut.Value;
                 cnt++;
             }
 
