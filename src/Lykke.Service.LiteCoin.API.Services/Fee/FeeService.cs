@@ -21,12 +21,18 @@ namespace Lykke.Service.LiteCoin.API.Services.Fee
         {
             var size = tx.ToBytes().Length;
 
-            return await CalcFee(size);
+            var feeFromFeeRate = (await GetFeeRate()).GetFee(size);
+
+            return CheckMinMaxThreshold(feeFromFeeRate); 
         }
 
-        public  Task<Money> CalcFeeForTransaction(TransactionBuilder builder)
+        public  async Task<Money> CalcFeeForTransaction(TransactionBuilder builder)
         {
-            return CalcFeeForTransaction(builder.BuildTransaction(false));
+            var feeRate = await GetFeeRate();
+
+            var feeFromFeeRate = builder.EstimateFees(feeRate);
+
+            return CheckMinMaxThreshold(feeFromFeeRate);
         }
 
         public async Task<FeeRate> GetFeeRate()
@@ -36,10 +42,8 @@ namespace Lykke.Service.LiteCoin.API.Services.Fee
             return new FeeRate(new Money(feePerByte * 1024, MoneyUnit.Satoshi));
         }
 
-        private async Task<Money> CalcFee(int size)
+        private Money CheckMinMaxThreshold(Money fromFeeRate)
         {
-            var  fromFeeRate = (await GetFeeRate()).GetFee(size);
-
             var min = new Money(_minFeeValueSatoshi, MoneyUnit.Satoshi);
             var max = new Money(_maxFeeValueSatoshi, MoneyUnit.Satoshi);
 
