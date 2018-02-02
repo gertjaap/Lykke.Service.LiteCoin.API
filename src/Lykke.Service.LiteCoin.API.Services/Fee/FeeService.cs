@@ -30,7 +30,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Fee
         {
             var feeRate = await GetFeeRate();
 
-            var feeFromFeeRate = builder.EstimateFees(feeRate);
+            var feeFromFeeRate = builder.EstimateFees(builder.BuildTransaction(false), feeRate);
 
             return CheckMinMaxThreshold(feeFromFeeRate);
         }
