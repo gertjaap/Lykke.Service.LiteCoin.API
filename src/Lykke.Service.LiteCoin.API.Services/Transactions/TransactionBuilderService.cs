@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Common;
 using Lykke.Service.LiteCoin.API.Core.Exceptions;
 using Lykke.Service.LiteCoin.API.Core.Fee;
 using Lykke.Service.LiteCoin.API.Core.TransactionOutputs;
@@ -69,46 +70,12 @@ namespace Lykke.Service.LiteCoin.API.Services.Transactions
         {
             if (amount.Satoshi <= 0)
                 throw new BusinessException("Amount can't be less or equal to zero", ErrorCode.BadInputParameter);
-
-
-            var allCoinsOrdered = coins.OrderBy(o => o.Amount).ToList(); //use settled in blockchain outputs first
-            var sendedAmount = Money.Zero;
-
-            var amountCoinsCount = GetCoinsCount(amount, allCoinsOrdered);
-            sendedAmount += allCoinsOrdered.Take(amountCoinsCount).Sum(p => p.Amount);
-
-            builder.AddCoins(allCoinsOrdered.Take(amountCoinsCount))
+            
+            builder.AddCoins(coins)
                 .Send(destination, amount)
                 .SetChange(changeDestination);
             
             var calculatedFee = await _feeService.CalcFeeForTransaction(builder);
-
-            if (!includeFee && sendedAmount < amount + calculatedFee)
-            {
-                var providedFeeAmount = sendedAmount - amount;
-                
-                var notUsedCoins = allCoinsOrdered.Skip(amountCoinsCount).ToList();
-
-                var feeCoinsCnt = 0;
-
-                do
-                {
-                    var missedAmount = calculatedFee - providedFeeAmount;
-
-                    feeCoinsCnt += GetCoinsCount(missedAmount, notUsedCoins);
-                    var feeCoins = notUsedCoins.Take(feeCoinsCnt).ToList();
-
-                    builder.AddCoins(feeCoins);
-
-                    providedFeeAmount += feeCoins.Sum(p => p.Amount);
-                    sendedAmount += feeCoins.Sum(p => p.Amount);
-                    notUsedCoins = allCoinsOrdered.Skip(amountCoinsCount + feeCoinsCnt).ToList();
-
-                    //recalculate new fee based on added inputs
-                    calculatedFee = await _feeService.CalcFeeForTransaction(builder);
-
-                } while (providedFeeAmount < calculatedFee && notUsedCoins.Any());
-            }
 
             if (calculatedFee >= amount)
             {
@@ -123,35 +90,11 @@ namespace Lykke.Service.LiteCoin.API.Services.Transactions
                 amount = amount - calculatedFee;
             }
 
-            if (sendedAmount < amount + calculatedFee)
-            {
-                throw new BusinessException(
-                    $"The sum of total applicable outputs is less than the required: {amount.Satoshi} satoshis.",
-                    ErrorCode.NotEnoughFundsAvailable);
-            }
-            
             builder.SendFees(calculatedFee);
 
             var tx = builder.BuildTransaction(false);
 
             return BuildedTransaction.Create(tx, calculatedFee, amount);
-        }
-
-        private static int GetCoinsCount(Money amount, IEnumerable<Coin> orderedCoins)
-        {
-
-            var orderedCoinsList = orderedCoins.ToList();
-            var cnt = 0;
-
-            var sendAmount = Money.Zero;
-
-            while (sendAmount < amount && cnt < orderedCoinsList.Count)
-            {
-                sendAmount += orderedCoinsList[cnt].TxOut.Value;
-                cnt++;
-            }
-
-            return cnt;
         }
     }
 
