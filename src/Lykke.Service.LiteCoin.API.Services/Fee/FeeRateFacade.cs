@@ -5,16 +5,16 @@ namespace Lykke.Service.LiteCoin.API.Services.Fee
 {
     internal class FeeRateFacade:IFeeRateFacade
     {
-        private readonly int _feePerByte;
+        private readonly FeeSettings _feeSettings;
 
-        public FeeRateFacade(int feePerByte)
+        public FeeRateFacade(FeeSettings feeSettings)
         {
-            _feePerByte = feePerByte;
+            _feeSettings = feeSettings;
         }
 
-        public Task<int> GetFeePerByte()
+        public Task<int> GetFeePerKiloByte()
         {
-            return Task.FromResult(_feePerByte);
+            return Task.FromResult(_feeSettings.DefaultFeePerKyloByte);
         }
     }
 }

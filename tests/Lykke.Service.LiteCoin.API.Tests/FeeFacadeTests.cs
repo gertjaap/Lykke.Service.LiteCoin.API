@@ -119,7 +119,7 @@ namespace Lykke.Service.LiteCoin.API.Tests
 
             var result = new Mock<IFeeRateFacade>();
 
-            result.Setup(p => p.GetFeePerByte())
+            result.Setup(p => p.GetFeePerKiloByte())
                 .ReturnsAsync(feePerByte);
 
             return result;

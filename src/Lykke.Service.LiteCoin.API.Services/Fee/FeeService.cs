@@ -7,14 +7,12 @@ namespace Lykke.Service.LiteCoin.API.Services.Fee
     public class FeeService:IFeeService
     {
         private readonly IFeeRateFacade _feeRateFacade;
-        private readonly long _minFeeValueSatoshi;
-        private readonly long _maxFeeValueSatoshi;
+        private readonly FeeSettings _feeSettings;
 
-        public FeeService(IFeeRateFacade feeRateFacade, long minFeeValueSatoshi, long maxFeeValueSatoshi)
+        public FeeService(IFeeRateFacade feeRateFacade, FeeSettings feeSettings)
         {
             _feeRateFacade = feeRateFacade;
-            _minFeeValueSatoshi = minFeeValueSatoshi;
-            _maxFeeValueSatoshi = maxFeeValueSatoshi;
+            _feeSettings = feeSettings;
         }
 
         public async Task<Money> CalcFeeForTransaction(Transaction tx)
@@ -31,17 +29,17 @@ namespace Lykke.Service.LiteCoin.API.Services.Fee
 
         public async Task<FeeRate> GetFeeRate()
         {
-            var feePerByte = await _feeRateFacade.GetFeePerByte();
+            var feePerByte = await _feeRateFacade.GetFeePerKiloByte();
 
-            return new FeeRate(new Money(feePerByte * 1024, MoneyUnit.Satoshi));
+            return new FeeRate(new Money(feePerByte, MoneyUnit.Satoshi));
         }
 
         private async Task<Money> CalcFee(int size)
         {
             var  fromFeeRate = (await GetFeeRate()).GetFee(size);
 
-            var min = new Money(_minFeeValueSatoshi, MoneyUnit.Satoshi);
-            var max = new Money(_maxFeeValueSatoshi, MoneyUnit.Satoshi);
+            var min = new Money(_feeSettings.MinFeeValueSatoshi, MoneyUnit.Satoshi);
+            var max = new Money(_feeSettings.MaxFeeValueSatoshi, MoneyUnit.Satoshi);
 
             return Money.Max(Money.Min(fromFeeRate, max), min);
         }
