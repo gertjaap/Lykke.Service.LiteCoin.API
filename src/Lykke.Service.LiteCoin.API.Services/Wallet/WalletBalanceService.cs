@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Lykke.Service.LiteCoin.API.Core.BlockChainReaders;
 using Lykke.Service.LiteCoin.API.Core.Pagination;
 using Lykke.Service.LiteCoin.API.Core.Wallet;
+using Lykke.Service.LiteCoin.API.Services.Operations;
 using NBitcoin;
 
 namespace Lykke.Service.LiteCoin.API.Services.Wallet
@@ -12,12 +13,17 @@ namespace Lykke.Service.LiteCoin.API.Services.Wallet
         private readonly IWalletBalanceRepository _balanceRepository;
         private readonly IObservableWalletRepository _observableWalletRepository;
         private readonly IBlockChainProvider _blockChainProvider;
+        private readonly OperationsConfirmationsSettings _confirmationsSettings;
 
-        public WalletBalanceService(IWalletBalanceRepository balanceRepository, IObservableWalletRepository observableWalletRepository, IBlockChainProvider blockChainProvider)
+        public WalletBalanceService(IWalletBalanceRepository balanceRepository, 
+            IObservableWalletRepository observableWalletRepository,
+            IBlockChainProvider blockChainProvider, 
+            OperationsConfirmationsSettings confirmationsSettings)
         {
             _balanceRepository = balanceRepository;
             _observableWalletRepository = observableWalletRepository;
             _blockChainProvider = blockChainProvider;
+            _confirmationsSettings = confirmationsSettings;
         }
 
         public async Task Subscribe(string address)
@@ -51,7 +57,7 @@ namespace Lykke.Service.LiteCoin.API.Services.Wallet
         {
             if (wallet != null)
             {
-                var balance = await _blockChainProvider.GetBalanceSatoshi(wallet.Address);
+                var balance = await _blockChainProvider.GetBalanceSatoshiFromUnspentOutputs(wallet.Address, _confirmationsSettings.MinConfirmationsToDetectOperation);
 
                 if (balance != 0)
                 {

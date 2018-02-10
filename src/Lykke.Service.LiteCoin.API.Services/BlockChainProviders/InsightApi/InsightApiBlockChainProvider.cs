@@ -111,14 +111,11 @@ namespace Lykke.Service.LiteCoin.API.Services.BlockChainProviders.InsightApi
             return tx?.Outputs?.FirstOrDefault(p => p.N == n)?.ScriptPubKey?.Addresses?.FirstOrDefault();
         }
 
-        public async Task<long> GetBalanceSatoshi(string address)
+        public async Task<long> GetBalanceSatoshiFromUnspentOutputs(string address, int minConfirmationCount)
         {
-            var url = _insightApiSettings.Url
-                .AppendPathSegment($"insight-lite-api/addr/{address}");
+            var unspentOutputs = await GetUnspentOutputs(address, minConfirmationCount);
 
-            var resp = await GetJson<AddressBalanceResponceContract>(url);
-
-            return resp.BalanceSatoshi;
+            return unspentOutputs.Sum(p => p.Amount.Satoshi);
         }
 
         private Coin MapUnspentCoun(AddressUnspentOutputsResponce source)

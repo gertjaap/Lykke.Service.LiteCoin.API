@@ -14,7 +14,7 @@ namespace Lykke.Service.LiteCoin.API.Core.Pagination
         public IEnumerable<T> Items { get; set; }
         public string Continuation { get; set; }
 
-        public static IPaginationResult<T> Create<T>(IEnumerable<T> items, string continuation)
+        public static IPaginationResult<T> Create(IEnumerable<T> items, string continuation)
         {
             return new PaginationResult<T>
             {
