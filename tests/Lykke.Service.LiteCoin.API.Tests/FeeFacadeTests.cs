@@ -77,7 +77,7 @@ namespace Lykke.Service.LiteCoin.API.Tests
             var feeRateService = CreateFeeRateFacade(feePerByte);
 
             var feeMaxValue = 1000;
-            var feeMinValue = 125;
+            var feeMinValue = 999;
             var feeFacade = new FeeService(feeRateService.Object, feeMinValue, feeMaxValue);
 
             var txBuilder = GetTestTx(Network.RegTest);

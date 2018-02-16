@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Common;
 using Lykke.Service.LiteCoin.API.Core.Exceptions;
 using Lykke.Service.LiteCoin.API.Core.Fee;
 using Lykke.Service.LiteCoin.API.Core.TransactionOutputs;
@@ -68,65 +70,31 @@ namespace Lykke.Service.LiteCoin.API.Services.Transactions
         {
             if (amount.Satoshi <= 0)
                 throw new BusinessException("Amount can't be less or equal to zero", ErrorCode.BadInputParameter);
-
-
-            var orderedCoins = coins.OrderBy(o => o.Amount).ToList(); //use settled in blockchain outputs first
-            var sendAmount = Money.Zero;
-            var cnt = GetCoinsCount(amount, orderedCoins, ref sendAmount);
-
-            builder.AddCoins(orderedCoins.Take(cnt))
+            
+            builder.AddCoins(coins)
                 .Send(destination, amount)
                 .SetChange(changeDestination);
             
-            var fee = await _feeService.CalcFeeForTransaction(builder);
+            var calculatedFee = await _feeService.CalcFeeForTransaction(builder);
 
-            if (!includeFee && sendAmount < amount + fee)
-            {
-                var orderedFeeCoins = orderedCoins.Skip(cnt)
-                    .OrderBy(o => o.Amount)
-                    .ToList();
-
-                var feeCoinsCnt = GetCoinsCount(fee, orderedFeeCoins, ref sendAmount);
-                builder.AddCoins(orderedFeeCoins.Take(feeCoinsCnt));
-            }
-
-            if (fee >= amount)
+            if (calculatedFee >= amount)
             {
                 throw new BusinessException(
-                    $"The sum of total applicable outputs is less than the required fee: {fee} satoshis.",
+                    $"The sum of total applicable outputs is less than the required fee: {calculatedFee} satoshis.",
                     ErrorCode.BalanceIsLessThanFee);
             }
             
             if (includeFee)
             {
                 builder.SubtractFees();
-                amount = amount - fee;
+                amount = amount - calculatedFee;
             }
 
-            if (sendAmount < amount + fee)
-            {
-                throw new BusinessException(
-                    $"The sum of total applicable outputs is less than the required: {amount.Satoshi} satoshis.",
-                    ErrorCode.NotEnoughFundsAvailable);
-            }
-            
-            builder.SendFees(fee);
+            builder.SendFees(calculatedFee);
 
             var tx = builder.BuildTransaction(false);
 
-            return BuildedTransaction.Create(tx, fee, amount);
-        }
-
-        private static int GetCoinsCount(Money amount, List<Coin> orderedCoins, ref Money sendAmount)
-        {
-            var cnt = 0;
-            while (sendAmount < amount && cnt < orderedCoins.Count)
-            {
-                sendAmount += orderedCoins[cnt].TxOut.Value;
-                cnt++;
-            }
-
-            return cnt;
+            return BuildedTransaction.Create(tx, calculatedFee, amount);
         }
     }
 

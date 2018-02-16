@@ -4,7 +4,7 @@
     {
         static PrepareNetworks()
         {
-            NBitcoin.Litecoin.Networks.Register();
+            NBitcoin.Litecoin.Networks.EnsureRegistered();
         }
 
         public static void EnsureLiteCoinPrepared()
