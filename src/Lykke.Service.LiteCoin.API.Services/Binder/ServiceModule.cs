@@ -60,9 +60,12 @@ namespace Lykke.Service.LiteCoin.API.Services.Binder
             {
                 DefaultFeePerKyloByte = _settings.CurrentValue.DefaultFeePerKyloByte,
                 DynamicFeeProviderUrl = _settings.CurrentValue.DynamicFeeProviderUrl,
-                MaxFeeValueSatoshi = _settings.CurrentValue.MaxFeeValueSatoshi,
-                MinFeeValueSatoshi = _settings.CurrentValue.MinFeeValueSatoshi
+                MaxFeePerKyloByte = _settings.CurrentValue.MaxFeePerKyloByte,
+                MinFeePerKyloByte = _settings.CurrentValue.MinFeePerKyloByte
             }).AsSelf();
+
+            builder.RegisterType<DynamicFeeProvider>()
+                .As<IDynamicFeeProvider>();
 
             builder.RegisterType<FeeRateFacade>()
                 .As<IFeeRateFacade>();

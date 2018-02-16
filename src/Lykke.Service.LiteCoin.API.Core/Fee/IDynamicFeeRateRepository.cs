@@ -7,26 +7,25 @@ namespace Lykke.Service.LiteCoin.API.Core.Fee
 {
     public interface IDynamicFeeRate
     {
-        int SatoshiPerKylobite { get; }
+        int FeePerKb { get; }
     }
 
-    public class DynamicFeeRate : IDynamicFeeRate
+    public class DynamicFeeRate:IDynamicFeeRate
     {
-        public int SatoshiPerKylobite { get; set; }
+        public int FeePerKb { get; set; }
 
-        public static DynamicFeeRate Create(int satoshiPerKb)
+        public static DynamicFeeRate Create(int feePerKb)
         {
             return new DynamicFeeRate
             {
-                SatoshiPerKylobite = satoshiPerKb
+                FeePerKb = feePerKb
             };
         }
     }
 
     public interface IDynamicFeeRateRepository
-    {
-        Task InsertOrReplacet(IDynamicFeeRate feeRate);
-
+    {   
+        Task InsertOrReplace(IDynamicFeeRate dynamicFeeRate);
         Task<IDynamicFeeRate> Get();
     }
 }

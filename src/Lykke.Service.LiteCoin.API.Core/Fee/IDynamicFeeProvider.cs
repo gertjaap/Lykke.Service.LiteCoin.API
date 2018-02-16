@@ -7,6 +7,6 @@ namespace Lykke.Service.LiteCoin.API.Core.Fee
 {
     public interface IDynamicFeeProvider
     {
-        Task<int> GetFeePerKylobyte { get; set; }
+        Task<int> GetFeePerKylobyte();
     }
 }
